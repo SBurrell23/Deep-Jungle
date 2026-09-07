@@ -1,5 +1,7 @@
 # Deep Jungle
 
+**Play it: https://sburrell23.github.io/Deep-Jungle/**
+
 A turn-based jungle roguelite that runs entirely in the browser. Pick three adventurers,
 carve a path through a procedurally generated jungle, and fight your way to the Heart of
 the Jungle at the far end.
@@ -11,10 +13,11 @@ No build step, no dependencies, no framework. Open `index.html` and play.
 Choose three of 23 adventurers. Three are available from the start; the other 20 unlock
 through achievements, so each run tends to open up a different roster for the next one.
 
-The map runs left to right across three regions and roughly 40 columns. Each column offers
-a branch of two to four nodes and you take exactly one, so a run visits about 36 nodes out
-of a much larger map. Every path funnels through the same three region bosses and ends at
-the Heart.
+The map runs left to right across three regions and 40 columns. Each column offers a branch
+of two to four nodes and you take exactly one, so a run visits about 35 of the 99 nodes on
+the map. Roughly 78% of steps present a real choice of direction, and a single map contains
+on the order of 10^11 distinct routes. Every path funnels through the same three region
+bosses and ends at the Heart.
 
 Battles are JRPG-style: initiative order by speed, four skills per hero unlocking at levels
 1, 1, 4 and 8, and status effects that matter. Heroes level up, find equipment, and drink a
@@ -86,14 +89,19 @@ The balance simulator plays complete expeditions with an AI player and reports w
 estimated real playtime, and a difficulty curve broken down by map column. `sweep.js` runs
 many random party compositions to catch outliers.
 
-Current tuning, measured over 200 simulated runs across 40 random party compositions:
+Current tuning, measured over 250 simulated runs across 50 random party compositions:
 
 | Metric | Value |
 |---|---|
-| Win rate | 57.5% |
-| Average playtime | 39m |
-| Rounds per battle | 7.4 |
-| Nodes per run | 36.4 |
+| Win rate | 54.8% |
+| Average playtime | 45m31s |
+| Rounds per battle | 6.4 |
+| Battles per run | 21.6 |
+| Nodes per run | 35.2 |
+
+The three starting adventurers have no healer between them and win about a third of the
+time, which is deliberate: losing is how you earn the achievements that open the rest of
+the roster.
 
 The simulator's AI is a decent but not expert player, and its timing model assumes someone
 who already knows the game. A first-time player reading skill descriptions and browsing
