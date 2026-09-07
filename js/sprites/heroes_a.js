@@ -400,4 +400,202 @@
       '................................',
     ],
   };
+
+  // 9. Orchid Witch — pale witch in pink/magenta petal dress, wide flower hat, wand
+  S.orchid_witch = {
+    w: 32, h: 32,
+    pal: {
+      k: '#2a0e28', // outline
+      p: '#8a1e5a', // magenta dark
+      q: '#d24a90', // magenta mid
+      r: '#f88ac2', // pink light
+      w: '#ffdcee', // pale petal
+      s: '#f2d8c8', // skin
+      g: '#3f7a3a', // stem / wand
+      y: '#ffe14a', // pollen / wand gem
+    },
+    px: [
+      '................................',
+      '................................',
+      '................................',
+      '.............krrrk..............',
+      '...........krrwwwrrk............',
+      '.........krrrwwwwwrrrk..........',
+      '.......krrrrwwwyywwwrrrrk.......',
+      '.....krrrrrwwwwyywwwwrrrrrk.....',
+      '.....kqqrrrrrwwwwwwrrrrrqqk.....',
+      '......kqqqqqqrrrrrrqqqqqqk......',
+      '........kppppppppppppppppk......',
+      '.............kssssssk...kyk.....',
+      '.............kssksksk..kyyyk....',
+      '.............kssssqsk..kyyyk....',
+      '..............kssssk....kyk.....',
+      '.............kgqqqqgk...kgk.....',
+      '...........kpqqqqqqqpk..kgk.....',
+      '..........kpqqrqqqqqpk..kgk.....',
+      '..........kpqqrrqqqqpssskgk.....',
+      '..........kpqqrrrqqqpk..kgk.....',
+      '.........kpqqrrrrqqqqpk.kkk.....',
+      '.........kpqqrrrrqqqqpk.........',
+      '........kpqqrrrrrqqqqqpk........',
+      '........kpqqrrwrrrqqqqpk........',
+      '.......kpqqqrrwwrrrqqqqpk.......',
+      '.......kpqqqrrwwrrrqqqqpk.......',
+      '......kpqqqqrrwwwrrrqqqqpk......',
+      '......kpqqqqrrwwwrrrqqqqpk......',
+      '.....kpqqqqqrrwwwwrrrqqqqpk.....',
+      '....kpqqqqqqrrwwwwrrrqqqqqpk....',
+      '....kkkkkkkkkkkkkkkkkkkkkkkk....',
+      '................................',
+    ],
+  };
+
+  // 10. Golem Guardian — squat mossy stone golem, glowing rune eyes, huge fists
+  S.golem_guardian = {
+    w: 32, h: 32,
+    pal: {
+      k: '#0e1410', // outline
+      a: '#464e4c', // stone dark
+      b: '#6e7874', // stone mid
+      c: '#96a09a', // stone light
+      d: '#c4ccc6', // stone highlight
+      m: '#2b6226', // moss dark
+      n: '#5fae44', // moss light
+      e: '#4ad8ff', // rune glow
+    },
+    px: [
+      '................................',
+      '................................',
+      '................................',
+      '................................',
+      '................................',
+      '............kmnnmnmk............',
+      '...........kmnnmnnmmk...........',
+      '...........kabbbbbbak...........',
+      '..........kabeebeebak...........',
+      '..........kabbbbbbcak...........',
+      '..........kabccccccak...........',
+      '..........kakkkkkkkak...........',
+      '...........kabbbbbak............',
+      '......kmnnmbbbbbbbmnnnmk........',
+      '.......kabcbbccddcbbcak.........',
+      '.......kabbcbcddcbcbbak.kkkkkk..',
+      '.......kabccbbccbbccbakkbccbbk..',
+      '.......kamnbbbccbbbnmakkbccbbk..',
+      '..kkkkkkamnnbbccbbbnmakkbccbbk..',
+      '.kbccbkkabnbbbbbbbbbbakkbccbbk..',
+      '.kbccbkkabbbbccccbbbbakkbccbbk..',
+      '.kbccbkkabbbbceecbbbbakkbccbbk..',
+      '.kbccbkkabbbbccccbbbbakkkkkkkk..',
+      '.kkkkkkkabbbbbbbbbbbbak.........',
+      '........kabbak..kabbak..........',
+      '........kabbak..kabbak..........',
+      '........kabbak..kabbak..........',
+      '........kabbak..kabbak..........',
+      '.......kabbbbakkabbbbak.........',
+      '.......kabbbbakkabbbbak.........',
+      '.......kkkkkkkkkkkkkkkk.........',
+      '................................',
+    ],
+  };
+
+  // 11. Ratkin Corsair — rat pirate with tricorne hat, eyepatch, cutlass, curling tail
+  S.ratkin_corsair = {
+    w: 32, h: 32,
+    pal: {
+      k: '#1a1218', // outline
+      b: '#5a4a42', // fur dark
+      c: '#8a7568', // fur mid
+      d: '#b8a494', // fur light / trim
+      h: '#272134', // hat dark
+      i: '#474058', // hat mid
+      r: '#b02a2a', // coat red
+      l: '#c8d0dc', // cutlass steel
+      e: '#ffd12a', // eye / gold
+    },
+    px: [
+      '................................',
+      '................................',
+      '................................',
+      '.............khhhk..............',
+      '...........khhiiihhk............',
+      '.........khhiiiiiiihhk..........',
+      '......khhhiiiiiiiiiiihhhk.......',
+      '.....khhhhhhiiiiiiihhhhhhk......',
+      '......kkkkkkkkkkkkkkkkkkk.......',
+      '.........kckkbcccccck......klk..',
+      '...........kbcckkcecdk....kllk..',
+      '...........kbccccccdddk...kllk..',
+      '...........kbcccccdddrk..kllk...',
+      '............kbccccck.....kllk...',
+      '.............kbcck......kllk....',
+      '..........krrrrrrrrrk...kllk....',
+      '.........krrdrrrrrrrk..kllk.....',
+      '.........krrerrrrrrcckkeeek.....',
+      '.........krrddrrrrrcckkbbk......',
+      '.........krrerrrrrrrrkkkkk......',
+      '........krrrddrrrrrrrk..........',
+      '........krrrddrrrrrrrk..........',
+      '.....kdkkrrrddrrrrrrrrrk........',
+      '...kdk..krrrddrrrrrrrrrk........',
+      '..kdk.....kbck..kbcck...........',
+      '..kdk.....kbck..kbcck...........',
+      '...kdk....kbck..kbcck...........',
+      '.....kdk..kbck..kbcck...........',
+      '.........kbbbk..kbbbbk..........',
+      '........kbbbbk..kbbbbbk.........',
+      '........kkkkkk..kkkkkkk.........',
+      '................................',
+    ],
+  };
+
+  // 12. Firefly Ranger — hooded archer, bow drawn, glowing fireflies orbiting
+  S.firefly_ranger = {
+    w: 32, h: 32,
+    pal: {
+      k: '#101a14', // outline
+      b: '#1e3a2a', // cloak dark
+      c: '#33604a', // cloak mid
+      d: '#4f8a66', // cloak light
+      s: '#d8a878', // skin
+      w: '#6b4a2a', // bow wood
+      l: '#c8b890', // string / arrow
+      e: '#eaff6a', // firefly / eye glow
+      y: '#8fd94a', // glow halo
+    },
+    px: [
+      '................................',
+      '................................',
+      '................................',
+      '.....................y..........',
+      '...........kbbbbk...yey.........',
+      '.....y....kbcccbbk...y..........',
+      '....yey..kbcccccbbk....kk.......',
+      '.....y...kbccccccbk...kwk.......',
+      '.........kbccckssbk...lkwk......',
+      '.........kbccckesbk...l.kwk.....',
+      '.........kbccccssbk..l..kwk.....',
+      '..........kbccccsbk..l...kwk....',
+      '..........kbcccccbk..l...kwk....',
+      '..........kbccdcccbkl....kwk....',
+      '.........kbccddcccbkl....kwk....',
+      '.........kbccddcccbkl....kwk....',
+      '.........kbccddccsskllllkkwkllk.',
+      '.........kbccddcccbkssssskwk....',
+      '.........kbccddcccbkkkkkkkwk....',
+      '.........kbcccccccbk.l...kwk....',
+      '......y..kbcccccccbk.l...kwk....',
+      '.....yey.kbcccccccbk..l..kwk....',
+      '......y..kbcccccccbk..l.kwk.....',
+      '.........kbcck.kccbk...lkwk.....',
+      '.........kbcck.kccbk...kwk......',
+      '.........kbcck.kccbk...kwk......',
+      '.........kbcck.kccbk..kwk.......',
+      '.........kbcck.kccbk...kk.......',
+      '.........kbcck.kccbk............',
+      '........kbccck.kcccbk...........',
+      '........kkkkkk.kkkkkk...........',
+      '................................',
+    ],
+  };
 })();

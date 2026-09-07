@@ -197,7 +197,7 @@
       '.kbbcccdddddddddcccbk.ktk.......',
       '.kbbccdddddddddddcccbkktk.......',
       '.kbbcccddddddddddcccbkktk.......',
-      '.kbkbkbbkbkbbkbkbbkbkktk.......',
+      '.kbkbkbbkbkbbkbkbbkbkkktk.......',
       '.kbbkkbbkkbbkkbbkkbbkkktk.......',
     ],
   };
@@ -449,6 +449,106 @@
       '.........kbck.kbck..............',
       '........kbcck.kbcck.............',
       '........kkkkk.kkkkk.............',
+    ],
+  };
+
+  // 22. Treant Sage — small walking tree elder with moss beard holding a glowing book
+  S.treant_sage = {
+    w: 32, h: 32,
+    pal: {
+      k: '#160f06', // outline
+      b: '#452c14', // bark dark
+      c: '#6b4724', // bark mid
+      d: '#9a6c3a', // bark light
+      m: '#37672a', // moss dark
+      n: '#72b648', // moss light
+      w: '#f2e6c4', // book pages
+      r: '#8a2a2a', // book cover
+      e: '#ffd85a', // glow / eyes
+    },
+    px: [
+      '................................',
+      '...........kkkkkk...............',
+      '........kkmmnnnnmmkk............',
+      '......kmmnnnnnnnnnmmk...........',
+      '.....kmnnnnnnnnnnnnmk...........',
+      '....kmnnnnnnnnnnnnnnmk..........',
+      '....kmnnnnmmnnnnnnnnmk..........',
+      '....kmmnnnnnnnnnnnnmmk..........',
+      '.....kmmnnnnnnnnnnnmk...........',
+      '......kkmmnnmmnnmmkk............',
+      '........kbccccccccbk............',
+      '........kbcddccddcbk............',
+      '........kbckekckekbk............',
+      '........kbccccccccbk............',
+      '........kbccddccdcbk............',
+      '........kbcckkkkccbk............',
+      '........kbccmmmmccbk............',
+      '.......kbcmmnnnnmmcbkwwrrwwk....',
+      '......kbcmmnnnnnnmmckkrwwwwrk...',
+      '......kbcmmnnnnnnmmckkrwewwrk...',
+      '......kbccmmnnnnmmcckkrwwewrk...',
+      '......kbcccmmmmmcccbkkrwwwwrk...',
+      '......kbcccccccccccbkkkrrrrkk...',
+      '......kbccdcccccdccbk...........',
+      '......kbcccccccccccbk...........',
+      '......kbbcccccccccbbk...........',
+      '.......kbcck...kbcck............',
+      '.......kbcck...kbcck............',
+      '.......kbcck...kbcck............',
+      '......kbccck..kbccck............',
+      '.....kbccdck..kbccdck...........',
+      '.....kkkkkkk..kkkkkkk...........',
+    ],
+  };
+
+  // 23. Jaguar Paladin — jaguar humanoid in golden armor with sun shield and mace
+  S.jaguar_paladin = {
+    w: 32, h: 32,
+    pal: {
+      k: '#1e1206', // outline
+      y: '#9a6a14', // gold dark
+      z: '#dda428', // gold mid
+      x: '#ffd97a', // gold light
+      o: '#cf8a30', // jaguar fur
+      b: '#4a2a0e', // fur spots / dark
+      w: '#f6ead0', // muzzle white
+      e: '#7ef25a', // eyes
+      s: '#aab4c0', // mace steel
+    },
+    px: [
+      '................................',
+      '................................',
+      '................................',
+      '................................',
+      '.........kzk..kzk...............',
+      '........kzxzkkzxzk.....kzk......',
+      '........kzzxxzzxxzzk.kzsszk.....',
+      '........kyzzzzzzzzykkzsssszk....',
+      '........kyzzzzzzzzykkssxxssk....',
+      '........kooeooeooookkssxxssk....',
+      '........kobooboowwokkzsssszk....',
+      '........kooooowwwwok.kzsszk.....',
+      '........koooowwkkwok...kyk......',
+      '.........koooowwwok....kyk......',
+      '..........kobooobk.....kyk......',
+      '.kkyyyykkkyzzzzzzzzyk..kyk......',
+      '.kyzzzzykkyzzzzzzzzyk..kyk......',
+      '.kyzxxzykkyzzxxzzzzyk..kyk......',
+      '.kzxxxxzkkyzzxxxzzzyk..kyk......',
+      '.kzxxxxzkkyzzxxxzzzooookyk......',
+      '.kyzxxzykkyzzzzzzzzooookyk......',
+      '.kyzzzzykkyzzzzzzzzyk..kyk......',
+      '.kkyzzykkkyzzzzzzzzyk..kyk......',
+      '..kkyykk.kyzzzzzzzzyk..kyk......',
+      '.........kyzzzzzzzzyk..kyk......',
+      '.........kyzzkkkkzzyk..kyk......',
+      '.........kyzk.kyzk.....kyk......',
+      '.........kyzk.kyzk.....kyk......',
+      '.........kyzk.kyzk.....kyk......',
+      '.........kobk.kobk.....kyk......',
+      '........koobk.koobk....kyk......',
+      '........kkkkk.kkkkk....kkk......',
     ],
   };
 })();

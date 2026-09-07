@@ -187,7 +187,7 @@
     const drops = { potions: [], items: [] };
     const boss = node.type === 'boss' || node.type === 'heart';
     const elite = node.type === 'elite';
-    const pChance = boss ? 1 : elite ? 0.85 : 0.5;
+    const pChance = boss ? 1 : elite ? 0.9 : 0.62;
     if (rng.chance(pChance)) drops.potions.push(DJ.rollPotion(rng));
     if (rng.chance(boss ? 0.9 : elite ? 0.45 : 0.14)) drops.potions.push(DJ.rollPotion(rng));
     const iChance = boss ? 1 : elite ? 0.7 : 0.16;
@@ -224,7 +224,9 @@
     const level = this.node().level;
     const items = [];
     for (let i = 0; i < 3; i++) items.push(DJ.rollItem(rng, level, 1));
-    const potions = rng.shuffle(['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'elixir', 'phoenix']).slice(0, 4);
+    // Always stock a heal and a revive: a party with no healer must be able to buy sustain.
+    const rest = rng.shuffle(['blue', 'green', 'purple', 'orange', 'elixir', 'phoenix']).slice(0, 2);
+    const potions = rng.shuffle(['red', 'yellow'].concat(rest));
     return { items, potions };
   };
 

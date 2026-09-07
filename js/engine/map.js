@@ -18,11 +18,11 @@
   // Node types and their base weights per region index.
   const NODE_WEIGHTS = [
     // region 0
-    { battle: 46, elite: 5, rest: 10, treasure: 9, shrine: 7, event: 10, merchant: 5, puzzle: 6, training: 4, trap: 4, mystery: 5 },
+    { battle: 74, elite: 7, rest: 9, treasure: 8, shrine: 6, event: 8, merchant: 4, puzzle: 5, training: 4, trap: 3, mystery: 5 },
     // region 1
-    { battle: 44, elite: 9, rest: 9, treasure: 9, shrine: 7, event: 9, merchant: 5, puzzle: 6, training: 4, trap: 5, mystery: 5 },
+    { battle: 70, elite: 13, rest: 9, treasure: 8, shrine: 6, event: 7, merchant: 4, puzzle: 5, training: 4, trap: 4, mystery: 5 },
     // region 2
-    { battle: 42, elite: 12, rest: 9, treasure: 9, shrine: 6, event: 8, merchant: 5, puzzle: 5, training: 4, trap: 5, mystery: 5 },
+    { battle: 66, elite: 18, rest: 9, treasure: 8, shrine: 5, event: 7, merchant: 4, puzzle: 4, training: 3, trap: 4, mystery: 5 },
   ];
 
   DJ.NODE_INFO = {
@@ -66,7 +66,9 @@
           let t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
           // avoid duplicates in the same column when possible (more meaningful choices)
           let tries = 0;
-          while (usedTypes[t] && tries++ < 6) t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
+          // Special nodes should not repeat inside one column (that would waste a choice),
+          // but plain battles may, since combat is the default and should stay common.
+          while (t !== 'battle' && usedTypes[t] && tries++ < 6) t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
           // no elite in the first column of region 0
           if (t === 'elite' && r === 0 && c === 0) t = 'battle';
           usedTypes[t] = true;
@@ -108,9 +110,10 @@
       const covered = new Set();
       a.forEach((src, i) => {
         const center = b.length === 1 ? 0 : Math.round((i / Math.max(1, a.length - 1)) * (b.length - 1));
-        const span = b.length === 1 ? 1 : rng.weighted([{ v: 1, w: 3 }, { v: 2, w: 5 }, { v: 3, w: 1.5 }]);
-        const lo = DJ.clamp(center - Math.floor((span - 1) / 2), 0, b.length - 1);
-        const hi = DJ.clamp(lo + span - 1, 0, b.length - 1);
+        const span = b.length === 1 ? 1 : rng.weighted([{ v: 2, w: 6 }, { v: 3, w: 4 }, { v: 1, w: 1.4 }]);
+        const width = Math.min(span, b.length);
+        const lo = DJ.clamp(center - Math.floor((width - 1) / 2), 0, b.length - width);
+        const hi = lo + width - 1;
         for (let j = lo; j <= hi; j++) { src.next.push(b[j].id); b[j].prev.push(src.id); covered.add(j); }
       });
       // ensure every target is reachable
