@@ -331,21 +331,7 @@
 
     // Growth used to be one comma-run of numbers. As a row of chips, each tinted like its
     // stat bar above, you can see at a glance which stats this adventurer actually gains.
-    const gh = UI.el('div', 'grow-head', 'Gained per level');
-    box.appendChild(gh);
-    const grow = UI.el('div', 'grow-row');
-    const grown = ['hp', 'mp', 'atk', 'mag', 'def', 'spd'].filter((k) => (h.grow[k] || 0) >= 0.5);
-    if (!grown.length) grow.appendChild(UI.el('span', 'muted', 'No growth.'));
-    for (const k of grown) {
-      const chip = UI.el('span', 'grow-chip');
-      chip.style.borderColor = STAT_COLOR[k];
-      chip.appendChild(UI.el('b', null, '+' + h.grow[k]));
-      const lbl = UI.el('span', null, k.toUpperCase());
-      lbl.style.color = STAT_COLOR[k];
-      chip.appendChild(lbl);
-      grow.appendChild(chip);
-    }
-    box.appendChild(grow);
+    box.appendChild(UI.growthRow(h, STAT_COLOR));
 
     const sh = UI.el('h4', null, 'Skills');
     sh.style.cssText = 'margin:14px 0 8px;font-size:14px;color:#8fe08a';

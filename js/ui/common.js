@@ -271,6 +271,27 @@
     return wrap;
   };
 
+  // Per-level growth as a row of chips, each tinted like its bar in the stats above.
+  // Returns a heading plus the row, appended together, so both hero panels read alike.
+  UI.growthRow = function (hero, colors) {
+    const wrap = document.createDocumentFragment();
+    wrap.appendChild(UI.el('div', 'grow-head', 'Gained per level'));
+    const row = UI.el('div', 'grow-row');
+    const grown = ['hp', 'mp', 'atk', 'mag', 'def', 'spd'].filter((k) => (hero.grow[k] || 0) >= 0.5);
+    if (!grown.length) row.appendChild(UI.el('span', 'muted', 'No growth.'));
+    for (const k of grown) {
+      const chip = UI.el('span', 'grow-chip');
+      chip.style.borderColor = colors[k];
+      chip.appendChild(UI.el('b', null, '+' + hero.grow[k]));
+      const lbl = UI.el('span', null, k.toUpperCase());
+      lbl.style.color = colors[k];
+      chip.appendChild(lbl);
+      row.appendChild(chip);
+    }
+    wrap.appendChild(row);
+    return wrap;
+  };
+
   UI.goldTag = function (amount) {
     const w = UI.el('span', 'gold-tag');
     if (DJ.SPRITES.icon_gold) w.appendChild(UI.spriteEl('icon_gold', 1.1, 'gold'));

@@ -91,12 +91,7 @@
     }
     box.appendChild(stats);
 
-    const gt = UI.el('p', 'muted');
-    gt.style.fontSize = '11.5px';
-    gt.textContent = 'Per level: ' + ['hp', 'atk', 'mag', 'def', 'spd']
-      .filter((k) => h.grow[k] >= 0.5)
-      .map((k) => `+${h.grow[k]} ${k.toUpperCase()}`).join(', ');
-    box.appendChild(gt);
+    box.appendChild(UI.growthRow(h, STAT_COLOR));
 
     box.appendChild(UI.el('h4', null, 'Skills')).style.cssText = 'margin:14px 0 8px;font-size:14px';
     h.skills.forEach((sid, i) => {
