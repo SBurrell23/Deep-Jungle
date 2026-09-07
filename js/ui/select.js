@@ -22,20 +22,19 @@
     const grid = UI.$('#heroGrid');
     grid.innerHTML = '';
     grid.onmouseleave = () => { hovered = null; renderDetail(); };
-    for (const h of DJ.HEROES) {
-      const unlocked = DJ.isUnlocked(h.id);
-      const card = UI.el('div', 'hero-card' + (unlocked ? '' : ' locked') + (picked.includes(h.id) ? ' selected' : ''));
+    // Only what you have earned. The locked roster lives on the Adventurers screen, where
+    // it can show the achievement each one is waiting on; here it was just dead cards.
+    for (const h of DJ.HEROES.filter((x) => DJ.isUnlocked(x.id))) {
+      const card = UI.el('div', 'hero-card' + (picked.includes(h.id) ? ' selected' : ''));
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', unlocked ? h.name + ', ' + h.role : h.name + ', locked');
-      const sprite = unlocked ? UI.spriteEl(h.id, 2.4, h.name) : UI.silhouetteEl(h.id, 2.4);
-      card.appendChild(sprite);
-      card.appendChild(UI.el('div', 'hero-name', unlocked ? h.name : '???'));
-      card.appendChild(UI.el('div', 'hero-role', unlocked ? h.role : 'Locked'));
-      if (!unlocked) { const b = UI.el('div', 'lock-badge', '🔒'); card.appendChild(b); }
+      card.setAttribute('aria-label', h.name + ', ' + h.role);
+      card.appendChild(UI.spriteEl(h.id, 2.75, h.name));
+      card.appendChild(UI.el('div', 'hero-name', h.name));
+      card.appendChild(UI.el('div', 'hero-role', h.role));
       const idx = picked.indexOf(h.id);
       if (idx >= 0) card.appendChild(UI.el('div', 'pick-num', String(idx + 1)));
-      const act = () => selectCard(h, unlocked);
+      const act = () => selectCard(h, true);
       card.addEventListener('click', act);
       card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
       // Hovering is enough to preview: no click needed just to read a kit.
