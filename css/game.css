@@ -292,7 +292,7 @@ button { font-family: inherit; }
 /* The bar keeps one fixed height whatever is showing, so switching to the target
    prompt never makes the battlefield jump. */
 .battle-ui {
-  display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 12px;
+  display: grid; grid-template-columns: 256px minmax(0, 1fr); gap: 12px;
   /* Constant while you play, but it gives a little ground on short windows so the
      battlefield above keeps some room. */
   height: clamp(156px, 30vh, 196px);
@@ -315,7 +315,9 @@ button { font-family: inherit; }
 .bp-hero.dead { opacity: .42; filter: grayscale(.85); }
 .bp-info { flex: 1; min-width: 0; }
 .bp-name { display: flex; justify-content: space-between; gap: 6px; font-size: 12.5px; font-weight: 700; }
-.bp-hp { color: var(--ink-mute); font-weight: 600; font-size: 11px; }
+.bp-name > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.bp-hp { flex: 0 0 auto; white-space: nowrap; }
+.bp-hp { color: var(--ink-mute); font-weight: 600; font-size: 11px; flex: 0 0 auto; white-space: nowrap; }
 .bp-bars { display: grid; gap: 3px; margin-top: 4px; }
 .bp-status { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
 .bp-dot {
@@ -399,7 +401,7 @@ button { font-family: inherit; }
 .act-defend:hover:not(:disabled) { background: linear-gradient(#284b52, #1c383d); border-color: #5aa8b5; }
 
 @media (max-width: 720px) {
-  .battle-ui { grid-template-columns: 170px minmax(0, 1fr); }
+  .battle-ui { grid-template-columns: 196px minmax(0, 1fr); }
   .act-skills { grid-template-columns: 1fr; }
   .act-attack .a-name { font-size: 15px; }
   .act-btn .a-name { font-size: 13.5px; }
