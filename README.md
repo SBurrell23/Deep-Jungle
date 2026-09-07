@@ -28,7 +28,7 @@ fight, while still leaving a real choice at every step: on a combat column you p
 fight, on a mixed one you pick whether to fight at all.
 
 Battles are JRPG-style: initiative order by speed, four skills per hero unlocking at levels
-1, 1, 4 and 8, and status effects that matter. Heroes level up, find equipment, and drink a
+1, 1, 5 and 10, and status effects that matter. Heroes level up, find equipment, and drink a
 lot of potions. Actions are bound to Q, W, E and 1-4, and hovering any stat or status icon
 explains it immediately.
 
@@ -119,10 +119,10 @@ Current tuning, measured over 250 simulated runs across 50 random party composit
 | Metric | Value |
 |---|---|
 | Win rate | 50.7% |
-| Average playtime | 52m57s |
-| Winning-run playtime | 59m35s |
-| Battles per run | 24.9 |
-| Nodes per run | 34.1 |
+| Average playtime | 56m30s |
+| Winning-run playtime | 61m25s |
+| Battles per run | 25.5 |
+| Nodes per run | 34.9 |
 
 Each region is guaranteed one or two trading posts, so gold always has somewhere to go.
 

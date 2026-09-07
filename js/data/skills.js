@@ -84,7 +84,7 @@
   // -- Dryad Healer --
   def('mend',         { name: 'Mend', kind: 'heal', target: 'ally', power: 2.2, mp: 5, fx: 'heal', sfx: 'heal', desc: 'Heal one ally.' });
   def('thorn_bolt',   { name: 'Thorn Bolt', kind: 'mag', target: 'enemy', power: 1.4, mp: 4, fx: 'thorns', sfx: 'magic', desc: 'Launch a barbed thorn.' });
-  def('blooming',     { name: 'Blooming Grove', kind: 'heal', target: 'allies', power: 1.4, mp: 12, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
+  def('blooming',     { name: 'Blooming Grove', kind: 'heal', target: 'allies', power: 1.4, mp: 16, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
   def('rebirth',      { name: 'Rebirth', kind: 'revive', target: 'deadAlly', power: 0.5, mp: 18, fx: 'holy_heal', sfx: 'revive', desc: 'Revive a fallen ally at 50% HP.' });
   // -- Lizardfolk Berserker --
   def('rend',         { name: 'Rend', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, status: { id: 'bleed', turns: 3, chance: 0.7 }, fx: 'claw', sfx: 'slash', desc: 'Savage cut that bleeds.' });
@@ -155,7 +155,7 @@
   def('gourd_smash',  { name: 'Gourd Smash', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, fx: 'hit_big', sfx: 'hit', desc: 'Bonk with the gourd.' });
   def('healing_brew', { name: 'Healing Brew', kind: 'heal', target: 'ally', power: 2.0, mp: 5, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'heal', sfx: 'potion', desc: 'Heal an ally and grant Regen.' });
   def('fire_brew',    { name: 'Fire Brew', kind: 'mag', target: 'enemies', power: 1.4, mp: 10, status: { id: 'burn', turns: 2, chance: 0.6 }, fx: 'flame', sfx: 'fire', desc: 'Spit flaming brew at all foes.' });
-  def('master_brew',  { name: 'Master Brew', kind: 'heal', target: 'allies', power: 1.6, mp: 14, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'buff', sfx: 'potion', desc: 'Heal party and grant Rage.' });
+  def('master_brew',  { name: 'Master Brew', kind: 'heal', target: 'allies', power: 1.6, mp: 17, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'buff', sfx: 'potion', desc: 'Heal party and grant Rage.' });
   // -- Gorilla Stormcaller --
   def('thunder_fist', { name: 'Thunder Fist', kind: 'phys', target: 'enemy', power: 1.7, mp: 5, status: { id: 'stun', turns: 1, chance: 0.3 }, fx: 'thunder', sfx: 'thunder', desc: 'Electrified punch.' });
   def('chain_lightning', { name: 'Chain Lightning', kind: 'mag', target: 'enemies', power: 1.3, mp: 10, fx: 'lightning', sfx: 'thunder', desc: 'Lightning arcs to all enemies.' });
@@ -181,7 +181,7 @@
   def('beak_jab',     { name: 'Beak Jab', kind: 'phys', target: 'enemy', power: 1.5, mp: 4, fx: 'pierce', sfx: 'pierce', desc: 'A quick stab of that enormous beak.' });
   def('rally_song',   { name: 'Rally Song', kind: 'buff', target: 'allies', mp: 8, status: { id: 'haste', turns: 3, chance: 1 }, self: { id: 'rage', turns: 3, chance: 1 }, fx: 'song', sfx: 'buff', desc: 'The party gains Haste; you gain Rage.' });
   def('discord_cry',  { name: 'Discordant Cry', kind: 'debuff', target: 'enemies', mp: 10, status: { id: 'weak', turns: 3, chance: 0.8 }, fx: 'song', sfx: 'debuff', desc: 'An awful noise. All enemies are Weakened.' });
-  def('dawn_anthem',  { name: 'Anthem of Dawn', kind: 'heal', target: 'allies', power: 1.5, mp: 15, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
+  def('dawn_anthem',  { name: 'Anthem of Dawn', kind: 'heal', target: 'allies', power: 1.5, mp: 17, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
 
   // -- Scarab Alchemist --
   def('acid_flask',   { name: 'Acid Flask', kind: 'mag', target: 'enemy', power: 1.7, mp: 5, status: { id: 'weak', turns: 3, chance: 0.6 }, fx: 'poison', sfx: 'poison', desc: 'Corrosive glass. Eats armour as well as flesh.' });

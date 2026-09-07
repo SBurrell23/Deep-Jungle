@@ -127,7 +127,7 @@
   ];
   DJ.HERO_BY_ID = {};
   DJ.HEROES.forEach((h) => (DJ.HERO_BY_ID[h.id] = h));
-  DJ.SKILL_UNLOCK_LEVELS = [1, 1, 4, 8];
+  DJ.SKILL_UNLOCK_LEVELS = [1, 1, 5, 10];
   // Available without any achievement, so a first run still has a real choice.
   DJ.STARTER_HEROES = DJ.HEROES.filter((h) => !h.unlock).map((h) => h.id);
 })(typeof window !== 'undefined' ? window : globalThis);
