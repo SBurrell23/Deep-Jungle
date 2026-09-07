@@ -238,6 +238,9 @@ function simBattle(run, enemies, node, rng) {
     }
   }
   const wiped = b.result === 'defeat';
+  // When a profile is loaded (the unlock-pacing harness), feed results into it so
+  // achievement progress can be measured across runs.
+  if (global.DJ && DJ.profile && DJ.recordBattle) DJ.recordBattle(b, run);
   if (!wiped) {
     const rew = b.rewards();
     run.applyBattleRewards(rew);
