@@ -194,7 +194,8 @@ if (DJ.MUSIC.playlist.length < 2) err('the music playlist needs at least two tra
   for (const [, f, want] of stamped) {
     const fp = path.join(ROOT, f);
     if (!fs.existsSync(fp)) { err(`stamped asset missing: ${f}`); continue; }
-    const got = crypto.createHash('sha1').update(fs.readFileSync(fp)).digest('hex').slice(0, 8);
+    const norm = fs.readFileSync(fp, 'utf8').split('\r\n').join('\n');
+    const got = crypto.createHash('sha1').update(norm, 'utf8').digest('hex').slice(0, 8);
     if (got !== want) err(`stale cache stamp on ${f} (html says ${want}, file is ${got}); run node tools/stamp.js`);
   }
 }
