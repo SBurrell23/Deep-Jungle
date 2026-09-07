@@ -663,7 +663,7 @@
     rail.appendChild(bindKey('w', utilBtn('act-item', 'potion_red', 'Items',
       potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
       'Open your potions and use one on the party.')));
-    rail.appendChild(bindKey('e', utilBtn('act-defend', 'status_guard', 'Guard', 'raise DEF, regain MP', false,
+    rail.appendChild(bindKey('e', utilBtn('act-defend', 'status_guard', 'Guard', 'Raise DEF, Regain MP', false,
       () => submit({ type: 'defend' }),
       'Guard: raises this hero\u2019s DEF by 50% for 2 turns and restores a little MP.')));
     menu.appendChild(rail);
