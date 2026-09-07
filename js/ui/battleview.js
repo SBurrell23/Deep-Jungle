@@ -399,7 +399,8 @@
         UI.$('#battleRound').textContent = 'Round ' + e.round;
         return 60;
       case 'turnStart':
-        if (e.unit.side === 'enemy') { UI.$('#turnBanner').textContent = e.unit.name + '’s turn'; return 220; }
+        // Whose turn it is reads from the highlighted portrait in the turn strip.
+        if (e.unit.side === 'enemy') return 220;
         return 10;
       case 'action': {
         const u = e.unit;
@@ -605,7 +606,6 @@
     UI.$('#battleLog').innerHTML = '';
     UI.$('#actionMenu').innerHTML = '';
     UI.$('#turnOrder').innerHTML = '';
-    UI.$('#turnBanner').textContent = '';
     UI.$('#battleRound').textContent = 'Round 1';
     const info = DJ.NODE_INFO[theNode.type];
     UI.$('#battleTitle').textContent =
@@ -648,7 +648,6 @@
     pendingAction = null;
     selectedTarget = null;
     hoverTarget = null;
-    UI.$('#turnBanner').textContent = '';
     showTargetPrompt(false);
     refreshPartyStrip();
     refreshTurnOrder();
@@ -853,7 +852,6 @@
     pendingAction = null;
     showTargetPrompt(false);
     UI.$('#actionMenu').innerHTML = '';
-    UI.$('#turnBanner').textContent = '';
     const events = battle.act(u, action);
     battle.checkEnd();
     playEvents(events, () => {
@@ -873,7 +871,6 @@
     const won = battle.result === 'victory';
     UI.$('#actionMenu').innerHTML = '';
     UI.$('#turnOrder').innerHTML = '';
-    UI.$('#turnBanner').textContent = '';
     showTargetPrompt(false);
     waitingFor = null;
     if (node && (node.type === 'boss' || node.type === 'heart')) DJ.Audio.exitBossMusic();

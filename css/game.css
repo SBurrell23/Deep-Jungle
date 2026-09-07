@@ -324,10 +324,7 @@ button { font-family: inherit; }
 }
 
 .battle-right { display: flex; flex-direction: column; min-width: 0; height: 100%; min-height: 0; overflow: hidden; }
-.turn-banner {
-  font-size: 12.5px; color: var(--gold); font-weight: 700;
-  margin-bottom: 7px; min-height: 16px; letter-spacing: .4px; flex: 0 0 auto;
-}
+.turn-banner { display: none; }
 
 /* --- action buttons: attack is its own thing, skills are cards --- */
 .action-menu {
@@ -357,7 +354,7 @@ button { font-family: inherit; }
 /* Attack: always available, so it reads as the anchor of the menu. */
 .act-attack {
   background: linear-gradient(#4a2a1e, #331c14); border: 2px solid #b5623a;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
+  display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px;
   text-align: left; padding: 8px 10px; white-space: nowrap;
 }
 .act-attack:hover:not(:disabled) { background: linear-gradient(#653a28, #47261a); border-color: #e0834f; }
