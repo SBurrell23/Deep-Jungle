@@ -176,6 +176,9 @@
   // Node "level" drives enemy strength and reward scale.
   DJ.nodeLevel = function (col, type) {
     let lvl = 1 + Math.floor(col * 0.43);
+    // The Undergrowth used to sit more than a level under the party the whole way, so the
+    // opening was a formality. This closes the gap without moving the later curve at all.
+    if (col >= 2 && col <= 11) lvl += 1;
     if (type === 'elite') lvl += 2;
     if (type === 'boss') lvl += 1;
     if (type === 'heart') lvl = 20;
@@ -191,6 +194,9 @@
 
   // Build the enemy group for a node.
   DJ.buildEncounter = function (rng, node) {
+    return DJ.scaleEncounter(buildEncounterUnits(rng, node), node.region == null ? DJ.regionOfCol(node.col) : node.region);
+  };
+  function buildEncounterUnits(rng, node) {
     const level = node.level;
     const region = node.region;
     if (node.type === 'heart') {

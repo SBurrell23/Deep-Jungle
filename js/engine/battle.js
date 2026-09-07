@@ -29,6 +29,21 @@
     hpMult:  { normal: 1.85, elite: 1.7, boss: 1.15, final: 1.0 },
     dmgMult: { normal: 0.83, elite: 0.84, boss: 0.74, final: 0.72 },
     levelScale: 0.10,   // stat growth per level above the monster's tier base
+    // Damage from everything in a region, by region index. Hero HP climbs much faster
+    // than a tier-1 monster's attack does, so the opening region needs a thumb on the
+    // scale to stay a fight rather than a formality.
+    regionDmg: [1.14, 1.0, 1.0],
+  };
+
+  // Applies the region's damage factor to a freshly built encounter.
+  DJ.scaleEncounter = function (units, region) {
+    const k = (DJ.TUNE.regionDmg || [])[region];
+    if (!k || k === 1) return units;
+    for (const u of units) {
+      u.base.atk = Math.round(u.base.atk * k);
+      u.base.mag = Math.round(u.base.mag * k);
+    }
+    return units;
   };
 
   // ---- Enemy unit factory ----

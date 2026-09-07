@@ -285,7 +285,11 @@
     const drops = { potions: [], items: [] };
     const boss = node.type === 'boss' || node.type === 'heart';
     const elite = node.type === 'elite';
-    const pChance = boss ? 1 : elite ? 0.9 : 0.62;
+    // The Undergrowth now hits hard enough to cost real sustain, so it hands a little
+    // more back. Without this the opening drains potions the party never recovers, and
+    // the whole run gets harder rather than just its first stretch.
+    const early = (node.region == null ? DJ.regionOfCol(node.col) : node.region) === 0;
+    const pChance = boss ? 1 : elite ? 0.9 : (early ? 0.8 : 0.62);
     if (rng.chance(pChance)) drops.potions.push(DJ.rollPotion(rng, this));
     if (rng.chance(boss ? 0.9 : elite ? 0.45 : 0.14)) drops.potions.push(DJ.rollPotion(rng, this));
     const iChance = boss ? 1 : elite ? 0.7 : 0.16;

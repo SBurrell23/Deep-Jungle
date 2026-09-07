@@ -67,6 +67,9 @@ function simRun(seed, partyIds, opt) {
     if (res.wiped) { run.finished = true; run.won = false; break; }
     run.completeNode();
     if (run.finished) break;
+    // opt.maxCol stops a run early, for measuring one stretch of the map in isolation
+    // without paying for a whole expedition each time.
+    if (opt.maxCol && node.col >= opt.maxCol) break;
   }
   const maxLevel = Math.max(...run.party.map((h) => h.level));
   return {
