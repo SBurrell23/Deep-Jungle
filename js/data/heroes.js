@@ -1,4 +1,4 @@
-/* Deep Jungle — 23 adventurers. 3 are unlocked by default; 20 unlock via achievements. */
+/* Deep Jungle — 23 adventurers. 5 are unlocked by default; 18 unlock via achievements. */
 (function (root) {
   const DJ = (root.DJ = root.DJ || {});
   // base: level-1 stats. grow: automatic per-level gains. skills unlock at levels 1,1,4,8.
@@ -16,11 +16,11 @@
       desc: 'A river-tribe spear champion. Hard-hitting single-target pierce and a rallying cry.',
       base: { hp: 90, mp: 20, atk: 14, mag: 4, def: 7, spd: 8 }, grow: { hp: 8.5, mp: 1.8, atk: 1.8, mag: 0.3, def: 0.8, spd: 0.5 },
       skills: ['lunge', 'sweep', 'war_cry', 'impale'] },
-    { id: 'frog_monk', name: 'Frog Monk', role: 'Monk', unlock: 'first_blood',
+    { id: 'frog_monk', name: 'Frog Monk', role: 'Monk', unlock: null,
       desc: 'A serene amphibian martial artist. Self-sustaining flurries of strikes.',
       base: { hp: 88, mp: 18, atk: 12, mag: 7, def: 7, spd: 11 }, grow: { hp: 8, mp: 1.5, atk: 1.5, mag: 0.6, def: 0.8, spd: 0.9 },
       skills: ['tongue_lash', 'meditate', 'lily_kick', 'thousand_fists'] },
-    { id: 'dryad_healer', name: 'Dryad Healer', role: 'Healer', unlock: 'thorn_crown',
+    { id: 'dryad_healer', name: 'Dryad Healer', role: 'Healer', unlock: null,
       desc: 'Born of an ancient kapok tree. Keeps the party standing through anything.',
       base: { hp: 70, mp: 44, atk: 5, mag: 14, def: 6, spd: 7 }, grow: { hp: 6, mp: 4.2, atk: 0.4, mag: 1.7, def: 0.7, spd: 0.5 },
       skills: ['mend', 'thorn_bolt', 'blooming', 'rebirth'] },
@@ -100,4 +100,6 @@
   DJ.HERO_BY_ID = {};
   DJ.HEROES.forEach((h) => (DJ.HERO_BY_ID[h.id] = h));
   DJ.SKILL_UNLOCK_LEVELS = [1, 1, 4, 8];
+  // Available without any achievement, so a first run still has a real choice.
+  DJ.STARTER_HEROES = DJ.HEROES.filter((h) => !h.unlock).map((h) => h.id);
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -10,8 +10,11 @@ No build step, no dependencies, no framework. Open `index.html` and play.
 
 ## Playing
 
-Choose three of 23 adventurers. Three are available from the start; the other 20 unlock
+Choose three of 23 adventurers. Five are available from the start, covering fighter, mage,
+lancer, monk and healer, so a first run already has a real choice. The other 18 unlock
 through achievements, so each run tends to open up a different roster for the next one.
+The Adventurers screen on the title menu shows every hero's stats and skills, with locked
+ones kept as silhouettes.
 
 The map runs left to right across three regions and 40 columns. Each column offers a branch
 of two to four nodes and you take exactly one, so a run visits about 34 of the 99 nodes on
@@ -54,7 +57,7 @@ A full run takes roughly 40 minutes to an hour depending on your party. Progress
 - **100 monsters**, every one with its own stat line, ability set, tags, and compendium
   entry. Tier 1 species haunt the undergrowth; tier 5 only appear deep in the canopy.
 - **23 adventurers** across fighter, mage, healer, tank, rogue, and hybrid roles.
-- **100 achievements**, 20 of which unlock a new adventurer.
+- **100 achievements**, 18 of which unlock a new adventurer.
 - **159 skills** shared between heroes and monsters, with 12 status effects.
 - **39 items** and 8 potions.
 - **12 story events**, 16 riddles, and 4 puzzle types.
@@ -110,15 +113,13 @@ Current tuning, measured over 250 simulated runs across 50 random party composit
 
 | Metric | Value |
 |---|---|
-| Win rate | 49.3% |
-| Average playtime | 48m20s |
-| Winning-run playtime | 51m27s |
-| Battles per run | 24.5 |
-| Nodes per run | 33.9 |
+| Win rate | 53.3% |
+| Average playtime | 52m09s |
+| Winning-run playtime | 55m04s |
+| Battles per run | 25.1 |
+| Nodes per run | 34.5 |
 
-The three starting adventurers have no healer between them and win about a third of the
-time, which is deliberate: losing is how you earn the achievements that open the rest of
-the roster.
+Each region is guaranteed one or two trading posts, so gold always has somewhere to go.
 
 The simulator's AI is a decent but not expert player, and its timing model assumes someone
 who already knows the game. A first-time player reading skill descriptions and browsing

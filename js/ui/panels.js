@@ -172,19 +172,6 @@
       });
       btnCol.appendChild(abandon);
 
-      const wipe = UI.el('button', 'btn danger small');
-      wipe.textContent = 'Erase all save data';
-      wipe.addEventListener('click', () => {
-        confirmDialog('Erase everything?', 'This permanently deletes every achievement, unlocked adventurer, and compendium entry. It cannot be undone.', () => {
-          DJ.wipeSave();
-          DJ.run = null;
-          UI.closeOverlay();
-          UI.Title.refresh();
-          UI.show('title');
-          UI.toast('Save erased', 'Starting fresh.', 'cancel');
-        });
-      });
-      btnCol.appendChild(wipe);
       right.appendChild(btnCol);
 
       cols.appendChild(right);

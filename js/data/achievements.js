@@ -1,4 +1,4 @@
-/* Deep Jungle — 100 achievements. 20 of them unlock adventurers.
+/* Deep Jungle — 100 achievements. 18 of them unlock adventurers (5 start unlocked).
  * check(s, p): s = profile.stats, p = profile. Returns true when earned.
  */
 (function (root) {
@@ -10,9 +10,9 @@
   const boss = (id, n) => (s) => ((s.bossKills || {})[id] || 0) >= (n || 1);
   const won = (h) => (s) => ((s.wonWith || {})[h] || 0) >= 1;
 
-  // ===== Adventurer-unlocking achievements (20) =====
-  a('first_blood', 'First Blood', 'Win your first battle.', ge('battlesWon', 1), 'frog_monk');
-  a('thorn_crown', 'Thorn Crown', 'Defeat the Bramble King.', boss('bramble_king'), 'dryad_healer');
+  // ===== Adventurer-unlocking achievements (18) =====
+  a('first_blood', 'First Blood', 'Win your first battle.', ge('battlesWon', 1));
+  a('thorn_crown', 'Thorn Crown', 'Defeat the Bramble King.', boss('bramble_king'));
   a('overkill', 'Overkill', 'Deal 120 or more damage in a single hit.', ge('maxHit', 120), 'lizard_berserker');
   a('lore_seeker', 'Lore Seeker', 'Discover 15 monsters in the compendium.', ge('discovered', 15), 'moth_oracle');
   a('tamer', 'Tamer', 'Defeat 60 monsters.', ge('kills', 60), 'pygmy_beastmaster');

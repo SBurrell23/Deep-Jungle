@@ -45,6 +45,26 @@
   // Column plan per region: [normal columns..., boss column]
   const REGION_COLS = [11, 12, 11]; // + 1 boss column each => 1 start + 12 + 13 + 12 + 1 camp + 1 heart = 40 columns
 
+  // Guarantee trading posts. Left to the type weights alone a whole region could pass
+  // without one, which strands the player with gold and nothing to spend it on.
+  function ensureMerchants(cols, region, rng) {
+    const mine = cols.filter((col) => col.length > 1 && col[0].region === region);
+    if (!mine.length) return;
+    const has = () => mine.reduce((n, col) => n + col.filter((x) => x.type === 'merchant').length, 0);
+    const want = rng.int(1, 2);
+    // Only free columns can host one; forced columns are all-combat by design.
+    const free = mine.filter((col) => col.some((x) => x.type !== 'battle' && x.type !== 'elite'));
+    let guard = 0;
+    while (has() < want && free.length && guard++ < 40) {
+      const col = rng.pick(free);
+      if (col.some((x) => x.type === 'merchant')) continue;
+      // Replace a non-combat, non-camp node so the pre-boss camp guarantee survives.
+      const swappable = col.filter((x) => x.type !== 'battle' && x.type !== 'elite' && x.type !== 'rest');
+      if (!swappable.length) continue;
+      rng.pick(swappable).type = 'merchant';
+    }
+  }
+
   DJ.generateMap = function (seed) {
     const rng = new DJ.RNG(seed);
     const cols = [];
@@ -61,7 +81,7 @@
     for (let r = 0; r < 3; r++) {
       const n = REGION_COLS[r];
       for (let c = 0; c < n; c++) {
-        const width = rng.weighted([{ v: 2, w: 3 }, { v: 3, w: 5 }, { v: 4, w: 2.2 }]);
+        const width = rng.weighted([{ v: 2, w: 2 }, { v: 3, w: 5 }, { v: 4, w: 4 }]);
         const nodes = [];
         // Strict alternation. A free column is never adjacent to another free column,
         // so no route can string two non-combat nodes together.
@@ -101,6 +121,7 @@
         push(nodes);
         lastWasCombat = forced;
       }
+      ensureMerchants(cols, r, rng);
       // Region boss column (single node, everything converges)
       push([{ type: 'boss', region: r, boss: DJ.REGIONS[r].boss }]);
       lastWasCombat = true;

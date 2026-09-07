@@ -85,6 +85,7 @@
         UI.Title.refresh();
       }
     });
+    UI.$('#btnRoster').addEventListener('click', () => { DJ.sfx('page'); UI.Roster.open(); });
     UI.$('#btnCompendium').addEventListener('click', () => { DJ.sfx('page'); UI.Compendium.open(); });
     UI.$('#btnAchievements').addEventListener('click', () => { DJ.sfx('page'); UI.Achievements.open(); });
     UI.$('#btnSettings').addEventListener('click', () => UI.Panels.settings());
@@ -101,7 +102,7 @@
     root.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (UI.overlayOpen) { UI.closeOverlay(); return; }
-        if (UI.current === 'compendium' || UI.current === 'achievements') {
+        if (UI.current === 'compendium' || UI.current === 'achievements' || UI.current === 'roster') {
           UI.show(DJ.run && !DJ.run.finished ? 'map' : 'title');
           return;
         }

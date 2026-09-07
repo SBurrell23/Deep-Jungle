@@ -226,11 +226,6 @@
       b.appendChild(UI.el('div', 'c-label', 'Onward'));
       b.addEventListener('click', () => { DJ.sfx('confirm'); N.finish(); });
       acts.appendChild(b);
-      const g = UI.el('button', 'choice-btn');
-      g.appendChild(UI.el('div', 'c-label', 'Manage party'));
-      g.appendChild(UI.el('div', 'c-desc', 'Equip gear, check skills.'));
-      g.addEventListener('click', () => { DJ.sfx('click'); UI.Panels.party(); });
-      acts.appendChild(g);
     }
     UI.show('result');
     DJ.checkAndAnnounce();

@@ -38,8 +38,8 @@ const expect = (label, actual, wanted) => {
 expect('monsters', DJ.MONSTERS.length, 100);
 expect('heroes', DJ.HEROES.length, 23);
 expect('achievements', DJ.ACHIEVEMENTS.length, 100);
-expect('achievements that unlock a hero', DJ.ACHIEVEMENTS.filter((a) => a.unlocks).length, 20);
-expect('starter heroes', DJ.HEROES.filter((h) => !h.unlock).length, 3);
+expect('achievements that unlock a hero', DJ.ACHIEVEMENTS.filter((a) => a.unlocks).length, 18);
+expect('starter heroes', DJ.HEROES.filter((h) => !h.unlock).length, 5);
 
 // ---- uniqueness ----
 const seenId = new Set();

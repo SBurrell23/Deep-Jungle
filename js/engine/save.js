@@ -6,7 +6,7 @@
   DJ.defaultProfile = function () {
     return {
       version: 1,
-      unlocked: ['elf_warrior', 'goblin_mage', 'kuata_lancer'],
+      unlocked: DJ.STARTER_HEROES.slice(),
       achievements: [],
       compendium: {},            // monsterId -> {seen, killed}
       settings: { music: 0.5, sfx: 0.7, musicOn: true, sfxOn: true, speed: 1, autoSave: true, screenShake: true, damageNumbers: true, loopOne: false },
@@ -38,7 +38,7 @@
       Object.assign(p, d);
       p.settings = Object.assign(DJ.defaultProfile().settings, d.settings || {});
       p.stats = Object.assign(DJ.defaultProfile().stats, d.stats || {});
-      p.unlocked = Array.from(new Set((d.unlocked || []).concat(['elf_warrior', 'goblin_mage', 'kuata_lancer'])));
+      p.unlocked = Array.from(new Set((d.unlocked || []).concat(DJ.STARTER_HEROES)));
       DJ.profile = p;
       return true;
     } catch (e) { console.warn('load failed', e); DJ.profile = DJ.defaultProfile(); return false; }

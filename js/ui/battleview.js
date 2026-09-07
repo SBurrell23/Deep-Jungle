@@ -667,10 +667,7 @@
     b.type = 'button';
     const weapon = u.equip && u.equip.weapon ? u.equip.weapon.icon : 'item_sword';
     if (DJ.SPRITES[weapon]) b.appendChild(UI.spriteEl(weapon, 2, 'attack'));
-    const txt = UI.el('div');
-    txt.appendChild(UI.el('div', 'a-name', 'Attack'));
-    txt.appendChild(UI.el('div', 'a-desc', '0 MP'));
-    b.appendChild(txt);
+    b.appendChild(UI.el('div', 'a-name', 'Attack'));
     b.title = 'A basic weapon strike. Always available and costs no MP.';
     b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'attack' }, 'enemy'); });
     return b;

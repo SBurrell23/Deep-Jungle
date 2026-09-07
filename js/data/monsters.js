@@ -122,7 +122,7 @@
 
   // XP / gold rewards by tier and kind
   DJ.monsterRewards = function (mon) {
-    const baseXp = [0, 26, 55, 94, 138, 190][mon.tier];
+    const baseXp = [0, 24, 50, 86, 126, 174][mon.tier];
     const baseGold = [0, 9, 17, 27, 38, 52][mon.tier];
     const mult = mon.kind === 'elite' ? 2.5 : mon.kind === 'boss' ? 5 : mon.kind === 'final' ? 10 : 1;
     return { xp: Math.round(baseXp * mult), gold: Math.round(baseGold * mult) };
