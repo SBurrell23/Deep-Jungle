@@ -262,7 +262,11 @@
     const grid = UI.$('#rosterGrid');
     grid.innerHTML = '';
     grid.onmouseleave = () => { rosterHover = null; renderPanel(); };
-    for (const h of DJ.HEROES) {
+    // Everyone you have earned comes first, in roster order, then the silhouettes. Sorting
+    // a copy leaves DJ.HEROES alone, since party setup and saves rely on its order.
+    const ordered = DJ.HEROES.slice().sort(
+      (a, b) => (DJ.isUnlocked(b.id) ? 1 : 0) - (DJ.isUnlocked(a.id) ? 1 : 0));
+    for (const h of ordered) {
       const unlocked = DJ.isUnlocked(h.id);
       const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked'));
       card.tabIndex = 0;
