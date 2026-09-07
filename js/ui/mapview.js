@@ -369,8 +369,8 @@
       return b;
     };
     const carrying = Object.values(run.inventory).reduce((a, n) => a + n, 0) + run.stash.length;
-    actions.appendChild(mk('icon_party', 'Party', 0, () => UI.Panels.party(() => M.refresh())));
     actions.appendChild(mk('icon_bag', 'Bag', carrying, () => UI.Panels.bag()));
+    actions.appendChild(mk('icon_party', 'Party', 0, () => UI.Panels.party(() => M.refresh())));
     bar.appendChild(actions);
     centerOnCurrent();
   };
