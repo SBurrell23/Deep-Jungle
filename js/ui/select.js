@@ -28,7 +28,7 @@
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
       card.setAttribute('aria-label', unlocked ? h.name + ', ' + h.role : h.name + ', locked');
-      const sprite = unlocked ? UI.spriteEl(h.id, 2, h.name) : UI.silhouetteEl(h.id, 2);
+      const sprite = unlocked ? UI.spriteEl(h.id, 2.4, h.name) : UI.silhouetteEl(h.id, 2.4);
       card.appendChild(sprite);
       card.appendChild(UI.el('div', 'hero-name', unlocked ? h.name : '???'));
       card.appendChild(UI.el('div', 'hero-role', unlocked ? h.role : 'Locked'));

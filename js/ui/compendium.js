@@ -266,7 +266,7 @@
       const unlocked = DJ.isUnlocked(h.id);
       const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked'));
       card.tabIndex = 0;
-      card.appendChild(unlocked ? UI.spriteEl(h.id, 3.1, h.name) : UI.silhouetteEl(h.id, 3.1));
+      card.appendChild(unlocked ? UI.spriteEl(h.id, 2.6, h.name) : UI.silhouetteEl(h.id, 2.6));
       card.appendChild(UI.el('div', 'rc-name', unlocked ? h.name : '???'));
       card.appendChild(UI.el('div', 'rc-role', unlocked ? h.role : 'Locked'));
       if (unlocked && !h.unlock) card.appendChild(UI.el('div', 'rc-tag', 'Starter'));
