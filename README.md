@@ -10,11 +10,11 @@ No build step, no dependencies, no framework. Open `index.html` and play.
 
 ## Playing
 
-Choose three of 23 adventurers. Five are available from the start, covering fighter, mage,
-lancer, monk and healer, so a first run already has a real choice. The other 18 unlock
-through achievements, so each run tends to open up a different roster for the next one.
-The Adventurers screen on the title menu shows every hero's stats and skills, with locked
-ones kept as silhouettes.
+Choose three of 30 adventurers. Five are available from the start, covering fighter, mage,
+lancer, monk and healer, so a first run already has a real choice. The other 25 unlock
+through achievements, spread so that a first run opens about four and the roster keeps
+opening for a dozen expeditions. The Adventurers screen on the title menu shows every
+hero's stats and skills, with locked ones kept as silhouettes.
 
 The map runs left to right across three regions and 40 columns. Each column offers a branch
 of two to four nodes and you take exactly one, so a run visits about 34 of the 99 nodes on
@@ -29,7 +29,12 @@ fight, on a mixed one you pick whether to fight at all.
 
 Battles are JRPG-style: initiative order by speed, four skills per hero unlocking at levels
 1, 1, 4 and 8, and status effects that matter. Heroes level up, find equipment, and drink a
-lot of potions.
+lot of potions. Actions are bound to Q, W, E and 1-4, and hovering any stat or status icon
+explains it immediately.
+
+Levelling restores rather than fully heals: the increase to max HP and MP is added straight
+to the current values, and then a further 25% of max HP and 30% of max MP is topped up on
+top. A hero who levels at low health comes out better off, but not full.
 
 A full run takes roughly 40 minutes to an hour depending on your party. Progress saves to
 `localStorage` automatically, and you can leave and resume mid-expedition.
@@ -56,10 +61,10 @@ A full run takes roughly 40 minutes to an hour depending on your party. Progress
 
 - **100 monsters**, every one with its own stat line, ability set, tags, and compendium
   entry. Tier 1 species haunt the undergrowth; tier 5 only appear deep in the canopy.
-- **23 adventurers** across fighter, mage, healer, tank, rogue, and hybrid roles.
-- **100 achievements**, 18 of which unlock a new adventurer.
-- **159 skills** shared between heroes and monsters, with 12 status effects.
-- **39 items** and 8 potions.
+- **30 adventurers** across fighter, mage, healer, tank, rogue, and hybrid roles.
+- **100 achievements**, 25 of which unlock a new adventurer.
+- **187 skills** shared between heroes and monsters, with 12 status effects.
+- **39 items** and 9 potions, including a rare one that grants an instant level.
 - **12 story events**, 16 riddles, and 4 puzzle types.
 
 ## Technical notes
@@ -73,7 +78,7 @@ diffable, and means the only binary assets are the music track and the effect sh
 API in `js/core/audio.js` — oscillators, filtered noise, and envelopes. There are no sound
 effect files.
 
-Music is the exception. Four exploration tracks play as a queue with a five-second
+Music is the exception. Five exploration tracks play as a queue with a five-second
 crossfade between them, and boss fights swap to their own track and hand control back when
 the fight ends. Settings shows what is playing, with a skip button and a per-track repeat.
 
@@ -113,11 +118,11 @@ Current tuning, measured over 250 simulated runs across 50 random party composit
 
 | Metric | Value |
 |---|---|
-| Win rate | 53.3% |
-| Average playtime | 52m09s |
-| Winning-run playtime | 55m04s |
-| Battles per run | 25.1 |
-| Nodes per run | 34.5 |
+| Win rate | 50.7% |
+| Average playtime | 52m57s |
+| Winning-run playtime | 59m35s |
+| Battles per run | 24.9 |
+| Nodes per run | 34.1 |
 
 Each region is guaranteed one or two trading posts, so gold always has somewhere to go.
 
