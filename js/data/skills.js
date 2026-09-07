@@ -187,31 +187,31 @@
   def('acid_flask',   { name: 'Acid Flask', kind: 'mag', target: 'enemy', power: 1.7, mp: 5, status: { id: 'weak', turns: 3, chance: 0.6 }, fx: 'poison', sfx: 'poison', desc: 'Corrosive glass. Eats armour as well as flesh.' });
   def('smoke_screen', { name: 'Smoke Screen', kind: 'buff', target: 'allies', mp: 7, status: { id: 'shield', turns: 3, chance: 1, val: 0.3 }, fx: 'debuff', sfx: 'debuff', desc: 'Cover the party in choking smoke: Shield for 3 turns.' });
   def('volatile_mix', { name: 'Volatile Mix', kind: 'mag', target: 'enemies', power: 1.5, mp: 12, status: { id: 'burn', turns: 2, chance: 0.6 }, fx: 'fireball', sfx: 'explosion', desc: 'Whatever was in the flask, it is angry now.' });
-  def('philos_fire',  { name: "Philosopher's Fire", kind: 'mag', target: 'enemies', power: 2.3, mp: 21, status: { id: 'burn', turns: 3, chance: 0.7 }, fx: 'inferno', sfx: 'explosion', desc: 'The reaction he has spent his life perfecting.' });
+  def('philos_fire',  { name: "Philosopher's Fire", kind: 'mag', target: 'enemies', power: 2.05, mp: 22, status: { id: 'burn', turns: 3, chance: 0.7 }, fx: 'inferno', sfx: 'explosion', desc: 'The reaction he has spent his life perfecting.' });
 
   // -- Sloth Sentinel --
   def('slow_swipe',   { name: 'Slow Swipe', kind: 'phys', target: 'enemy', power: 2.1, mp: 5, fx: 'claw', sfx: 'slash', desc: 'It takes a while. It lands like a falling tree.' });
-  def('immovable',    { name: 'Immovable', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 4, chance: 1 }, self: { id: 'shield', turns: 3, chance: 1, val: 0.45 }, fx: 'shield', sfx: 'buff', desc: 'Guard for 4 turns and a heavy Shield.' });
-  def('canopy_hold',  { name: 'Canopy Hold', kind: 'buff', target: 'allies', mp: 11, status: { id: 'guard', turns: 3, chance: 1 }, self: { id: 'regen', turns: 3, chance: 1 }, fx: 'nature', sfx: 'buff', desc: 'The party braces behind you and Guards.' });
-  def('avalanche',    { name: 'Avalanche', kind: 'phys', target: 'enemies', power: 1.7, mp: 16, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'earth', sfx: 'explosion', desc: 'You finally let go. Everything below you regrets it.' });
+  def('immovable',    { name: 'Immovable', kind: 'buff', target: 'self', mp: 5, status: { id: 'guard', turns: 3, chance: 1 }, self: { id: 'shield', turns: 3, chance: 1, val: 0.32 }, fx: 'shield', sfx: 'buff', desc: 'Guard for 3 turns and a solid Shield.' });
+  def('canopy_hold',  { name: 'Canopy Hold', kind: 'buff', target: 'allies', mp: 13, status: { id: 'guard', turns: 3, chance: 1 }, self: { id: 'regen', turns: 3, chance: 1 }, fx: 'nature', sfx: 'buff', desc: 'The party braces behind you and Guards.' });
+  def('avalanche',    { name: 'Avalanche', kind: 'phys', target: 'enemies', power: 1.55, mp: 17, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'earth', sfx: 'explosion', desc: 'You finally let go. Everything below you regrets it.' });
 
   // -- Peacock Duelist --
   def('riposte',      { name: 'Riposte', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, crit: 0.3, fx: 'slash', sfx: 'slash', desc: 'A precise counter-thrust. High crit chance.' });
   def('feint',        { name: 'Feint', kind: 'debuff', target: 'enemy', mp: 5, status: { id: 'weak', turns: 3, chance: 0.9 }, self: { id: 'haste', turns: 2, chance: 1 }, fx: 'sparkle', sfx: 'debuff', desc: 'Weaken a foe and gain Haste.' });
   def('plume_flourish', { name: 'Plume Flourish', kind: 'phys', target: 'enemy', power: 1.15, hits: 3, mp: 11, crit: 0.15, fx: 'slash_big', sfx: 'slash', desc: 'Three showy, deadly strikes.' });
-  def('perfect_thrust', { name: 'Perfect Thrust', kind: 'phys', target: 'enemy', power: 3.0, mp: 16, crit: 0.45, fx: 'pierce', sfx: 'crit', desc: 'One thrust. Usually enough.' });
+  def('perfect_thrust', { name: 'Perfect Thrust', kind: 'phys', target: 'enemy', power: 2.6, mp: 17, crit: 0.38, fx: 'pierce', sfx: 'crit', desc: 'One thrust. Usually enough.' });
 
   // -- Crocodile Warlord --
   def('jaw_crush',    { name: 'Jaw Crush', kind: 'phys', target: 'enemy', power: 1.8, mp: 5, status: { id: 'bleed', turns: 3, chance: 0.7 }, fx: 'hit_big', sfx: 'bite', desc: 'Clamps down and does not let go.' });
   def('war_banner',   { name: 'War Banner', kind: 'buff', target: 'allies', mp: 9, status: { id: 'rage', turns: 3, chance: 1 }, self: { id: 'guard', turns: 2, chance: 1 }, fx: 'roar', sfx: 'roar', desc: 'The party gains Rage; you also Guard.' });
   def('tail_cleave',  { name: 'Tail Cleave', kind: 'phys', target: 'enemies', power: 1.45, mp: 12, fx: 'slash_big', sfx: 'slash', desc: 'One sweep of a very large tail.' });
-  def('death_roll',   { name: 'Death Roll', kind: 'phys', target: 'enemy', power: 3.2, mp: 18, status: { id: 'bleed', turns: 3, chance: 0.9 }, fx: 'blood', sfx: 'crit', desc: 'The old crocodile answer to everything.' });
+  def('death_roll',   { name: 'Death Roll', kind: 'phys', target: 'enemy', power: 2.8, mp: 19, status: { id: 'bleed', turns: 3, chance: 0.9 }, fx: 'blood', sfx: 'crit', desc: 'The old crocodile answer to everything.' });
 
   // -- Axolotl Mystic --
   def('water_lash',   { name: 'Water Lash', kind: 'mag', target: 'enemy', power: 1.6, mp: 4, fx: 'water', sfx: 'water', desc: 'A whip of living river water.' });
-  def('regrowth',     { name: 'Regrowth', kind: 'heal', target: 'ally', power: 2.0, mp: 6, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'heal', sfx: 'heal', desc: 'Heal an ally and grant Regen.' });
-  def('tidal_surge',  { name: 'Tidal Surge', kind: 'mag', target: 'enemies', power: 1.6, mp: 13, status: { id: 'slow', turns: 2, chance: 0.7 }, fx: 'water', sfx: 'water', desc: 'The river rises on your word. All enemies are Slowed.' });
-  def('eternal_return', { name: 'Eternal Return', kind: 'revive', target: 'deadAlly', power: 0.75, mp: 20, self: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'revive', desc: 'Revive a fallen ally at 75% HP. Nothing truly dies here.' });
+  def('regrowth',     { name: 'Regrowth', kind: 'heal', target: 'ally', power: 1.8, mp: 8, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'heal', sfx: 'heal', desc: 'Heal an ally and grant Regen.' });
+  def('tidal_surge',  { name: 'Tidal Surge', kind: 'mag', target: 'enemies', power: 1.35, mp: 13, status: { id: 'slow', turns: 2, chance: 0.7 }, fx: 'water', sfx: 'water', desc: 'The river rises on your word. All enemies are Slowed.' });
+  def('eternal_return', { name: 'Eternal Return', kind: 'revive', target: 'deadAlly', power: 0.6, mp: 22, self: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'revive', desc: 'Revive a fallen ally at 60% HP. Nothing truly dies here.' });
 
   // -- Termite Swarmlord --
   def('gnawing_swarm', { name: 'Gnawing Swarm', kind: 'phys', target: 'enemy', power: 0.95, hits: 4, mp: 10, fx: 'hit', sfx: 'bite', desc: 'Four waves of jaws.' });
