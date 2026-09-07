@@ -87,7 +87,12 @@
     this.startedAt = Date.now();
     this.elapsed = 0;
     this.discovered = {};             // monsters seen this run
-    this.stats = { battles: 0, elites: 0, bosses: 0, rests: 0, treasures: 0, merchants: 0, shrines: 0, events: 0, puzzles: 0, traps: 0, trainings: 0 };
+    this.stats = { battles: 0, elites: 0, bosses: 0, rests: 0, treasures: 0, merchants: 0, shrines: 0, events: 0, puzzles: 0, traps: 0, trainings: 0, bestHit: 0, longestBattle: 0 };
+    // The profile's running totals as this expedition began. Everything the history
+    // screen reports for a single run is the difference between then and the end, so
+    // no counter anywhere else has to learn about per-run bookkeeping.
+    this.startStats = (typeof DJ.profile === 'object' && DJ.profile) ? Object.assign({}, DJ.profile.stats) : {};
+    this.startedWall = Date.now();
   }
   DJ.Run = Run;
   const R = Run.prototype;
@@ -345,6 +350,7 @@
       nodesVisited: this.nodesVisited, flawless: this.flawless, finished: this.finished, won: this.won,
       pending: !!this.pending, pendingRng: this.pendingRng == null ? null : this.pendingRng,
       elapsed: this.elapsed + (Date.now() - this.startedAt), stats: this.stats, discovered: this.discovered,
+      startStats: this.startStats, startedWall: this.startedWall,
       doneNodes: Object.keys(this.map.nodeById).filter((k) => this.map.nodeById[k].done),
     };
   };
@@ -367,7 +373,9 @@
     r.nodesVisited = d.nodesVisited; r.flawless = d.flawless; r.finished = d.finished; r.won = d.won;
     r.pending = !!d.pending; r.pendingRng = d.pendingRng == null ? null : d.pendingRng;
     r.elapsed = d.elapsed || 0; r.startedAt = Date.now();
-    r.stats = d.stats || r.stats; r.discovered = d.discovered || {};
+    r.stats = Object.assign(r.stats, d.stats || {}); r.discovered = d.discovered || {};
+    r.startStats = d.startStats || r.startStats;
+    r.startedWall = d.startedWall || r.startedWall;
     for (const id of d.doneNodes || []) if (r.map.nodeById[id]) r.map.nodeById[id].done = true;
     return r;
   };

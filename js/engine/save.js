@@ -23,6 +23,7 @@
         fastestWinNodes: 999, starterWins: 0, casterWins: 0, playTime: 0,
       },
       run: null,
+      history: [],               // finished expeditions, newest first
     };
   };
 
@@ -39,6 +40,7 @@
       p.settings = Object.assign(DJ.defaultProfile().settings, d.settings || {});
       p.stats = Object.assign(DJ.defaultProfile().stats, d.stats || {});
       p.unlocked = Array.from(new Set((d.unlocked || []).concat(DJ.STARTER_HEROES)));
+      p.history = Array.isArray(d.history) ? d.history : [];
       DJ.profile = p;
       return true;
     } catch (e) { console.warn('load failed', e); DJ.profile = DJ.defaultProfile(); return false; }
@@ -138,9 +140,63 @@
       if (alive.length === 1 && battle.party.length > 1) DJ.bump('soloWins');
       if (alive.some((h) => h.hp / h.maxHp < 0.1)) DJ.bump('lowHpWins');
     }
+    if (run) {
+      // The profile keeps lifetime bests; the run keeps its own, for the history entry.
+      run.stats.bestHit = Math.max(run.stats.bestHit || 0, st.maxHit || 0);
+      run.stats.longestBattle = Math.max(run.stats.longestBattle || 0, battle.round);
+    }
     if (st.heroKOs > 0 && run) run.flawless = false;
     for (const h of (run ? run.party : [])) DJ.setMax('heroMaxLevel', h.level);
     if (run) DJ.setMax('goldMax', run.gold);
+  };
+
+  // At most this many expeditions are kept. Beyond that the oldest fall off the end,
+  // which keeps the save well inside what localStorage will hold.
+  const HISTORY_MAX = 60;
+
+  // A finished expedition, reduced to the numbers the history screen shows. Every tally
+  // is the growth in a profile counter across the run, so it needs no new instrumentation.
+  DJ.buildHistoryEntry = function (run) {
+    const now = DJ.profile.stats, was = run.startStats || {};
+    const grew = (k) => Math.max(0, (now[k] || 0) - (was[k] || 0));
+    const node = run.node();
+    const col = node ? node.col : 0;
+    const region = DJ.REGIONS[DJ.regionOfCol(col)] || DJ.REGIONS[0];
+    return {
+      at: Date.now(),
+      won: !!run.won,
+      seed: run.seed,
+      ms: (run.elapsed || 0) + (Date.now() - run.startedAt),
+      // A run only counts as flawless if nobody is lying down at the end of it either.
+      flawless: !!run.flawless && run.party.every((h) => h.alive),
+      nodes: run.nodesVisited,
+      col: col,
+      totalCols: run.map ? run.map.totalCols : 0,
+      region: region.name,
+      goldLeft: run.gold,
+      party: run.party.map((h) => ({ id: h.id, name: h.name, level: h.level, alive: h.alive })),
+      // Nodes resolved, by type. These are counted on the run itself as it goes.
+      nodeTypes: {
+        battles: run.stats.battles || 0, elites: run.stats.elites || 0, bosses: run.stats.bosses || 0,
+        rests: run.stats.rests || 0, treasures: run.stats.treasures || 0, merchants: run.stats.merchants || 0,
+        shrines: run.stats.shrines || 0, events: run.stats.events || 0, puzzles: run.stats.puzzles || 0,
+        traps: run.stats.traps || 0, trainings: run.stats.trainings || 0,
+      },
+      bestHit: run.stats.bestHit || 0,
+      longestBattle: run.stats.longestBattle || 0,
+      tally: {
+        battlesWon: grew('battlesWon'), kills: grew('kills'), elitesKilled: grew('elitesKilled'),
+        damageDealt: grew('damageDealt'), damageTaken: grew('damageTaken'), healingDone: grew('healingDone'),
+        crits: grew('crits'), statusesInflicted: grew('statusesInflicted'), skillsUsed: grew('skillsUsed'),
+        defends: grew('defends'), revives: grew('revives'), heroKOs: grew('heroKOs'),
+        potionsUsed: grew('potionsUsed'), perfectBattles: grew('perfectBattles'), oneRoundWins: grew('oneRoundWins'),
+        goldEarned: grew('goldEarned'), goldSpent: grew('goldSpent'),
+        itemsFound: grew('itemsFound'), itemsEquipped: grew('itemsEquipped'), epicsFound: grew('epicsFound'),
+        discovered: grew('discovered'), puzzlesSolved: grew('puzzlesSolved'),
+        riddlesSolved: grew('riddlesSolved'), totemsSolved: grew('totemsSolved'), vinesSolved: grew('vinesSolved'),
+        summonKills: grew('summonKills'),
+      },
+    };
   };
 
   DJ.recordRunEnd = function (run) {
@@ -154,6 +210,12 @@
       const casters = run.party.filter((h) => { const b = DJ.HERO_BY_ID[h.id].base; return b.mag >= b.atk; });
       if (casters.length === 3) DJ.bump('casterWins');
     } else DJ.bump('runsLost');
+    // Written after the profile totals are updated, so the entry sees the finished run.
+    try {
+      DJ.profile.history = DJ.profile.history || [];
+      DJ.profile.history.unshift(DJ.buildHistoryEntry(run));
+      if (DJ.profile.history.length > HISTORY_MAX) DJ.profile.history.length = HISTORY_MAX;
+    } catch (e) { console.warn('history entry failed', e); }
     DJ.profile.run = null;
     DJ.save();
   };

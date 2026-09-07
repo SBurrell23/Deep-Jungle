@@ -88,6 +88,7 @@
     UI.$('#btnRoster').addEventListener('click', () => { DJ.sfx('page'); UI.Roster.open(); });
     UI.$('#btnCompendium').addEventListener('click', () => { DJ.sfx('page'); UI.Compendium.open(); });
     UI.$('#btnAchievements').addEventListener('click', () => { DJ.sfx('page'); UI.Achievements.open(); });
+    UI.$('#btnHistory').addEventListener('click', () => { DJ.sfx('page'); UI.History.open(); });
     UI.$('#btnSettings').addEventListener('click', () => UI.Panels.settings());
     // The gear floats above every screen, so settings are always one click away.
     const gear = UI.$('#btnGlobalSettings');
