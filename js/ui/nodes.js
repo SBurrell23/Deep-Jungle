@@ -358,8 +358,10 @@
       for (const it of loot.items || []) {
         const btn = UI.el('button', 'btn small');
         btn.textContent = 'Equip';
-        btn.addEventListener('click', () => { DJ.sfx('click'); UI.Panels.equipChooser(it); });
-        body.appendChild(UI.itemLine(it, equipOffer ? btn : null));
+        const row = UI.itemLine(it, equipOffer ? btn : null);
+        // Once the item is dealt with, either way, it leaves this list.
+        btn.addEventListener('click', () => { DJ.sfx('click'); UI.Panels.equipChooser(it, () => row.remove()); });
+        body.appendChild(row);
       }
       const counts = {};
       for (const p of loot.potions || []) counts[p] = (counts[p] || 0) + 1;
@@ -630,8 +632,9 @@
         for (const it of gotItems) {
           const btn = UI.el('button', 'btn small');
           btn.textContent = 'Equip';
-          btn.addEventListener('click', () => { DJ.sfx('click'); UI.Panels.equipChooser(it); });
-          body.appendChild(UI.itemLine(it, btn));
+          const row = UI.itemLine(it, btn);
+          btn.addEventListener('click', () => { DJ.sfx('click'); UI.Panels.equipChooser(it, () => row.remove()); });
+          body.appendChild(row);
         }
         const counts = {};
         for (const p of gotPotions) counts[p] = (counts[p] || 0) + 1;

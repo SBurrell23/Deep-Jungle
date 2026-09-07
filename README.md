@@ -14,10 +14,15 @@ Choose three of 23 adventurers. Three are available from the start; the other 20
 through achievements, so each run tends to open up a different roster for the next one.
 
 The map runs left to right across three regions and 40 columns. Each column offers a branch
-of two to four nodes and you take exactly one, so a run visits about 35 of the 99 nodes on
+of two to four nodes and you take exactly one, so a run visits about 34 of the 99 nodes on
 the map. Roughly 78% of steps present a real choice of direction, and a single map contains
 on the order of 10^11 distinct routes. Every path funnels through the same three region
 bosses and ends at the Heart.
+
+Columns alternate between forced-combat and mixed. Since you take exactly one node per
+column, that alternation guarantees you can never travel two nodes in a row without a
+fight, while still leaving a real choice at every step: on a combat column you pick which
+fight, on a mixed one you pick whether to fight at all.
 
 Battles are JRPG-style: initiative order by speed, four skills per hero unlocking at levels
 1, 1, 4 and 8, and status effects that matter. Heroes level up, find equipment, and drink a
@@ -93,11 +98,11 @@ Current tuning, measured over 250 simulated runs across 50 random party composit
 
 | Metric | Value |
 |---|---|
-| Win rate | 54.8% |
-| Average playtime | 45m31s |
-| Rounds per battle | 6.4 |
-| Battles per run | 21.6 |
-| Nodes per run | 35.2 |
+| Win rate | 49.3% |
+| Average playtime | 48m20s |
+| Winning-run playtime | 51m27s |
+| Battles per run | 24.5 |
+| Nodes per run | 33.9 |
 
 The three starting adventurers have no healer between them and win about a third of the
 time, which is deliberate: losing is how you earn the achievements that open the rest of
