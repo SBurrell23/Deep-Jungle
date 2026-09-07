@@ -74,16 +74,39 @@ button { font-family: inherit; }
 #bootMsg { color: var(--ink-mute); font-size: 13px; margin: 0; }
 
 /* ---------- Logo ---------- */
+/* Metamorphous: a carved, overgrown display face, self-hosted so the game still works
+   with no network. Everything else on screen stays on the system stack. */
+@font-face {
+  font-family: 'Metamorphous';
+  src: url('../assets/fonts/metamorphous-latin.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
 .logo {
-  font-family: var(--fontpx); font-weight: 900; letter-spacing: 5px;
-  font-size: 34px; margin: 0; line-height: 1.05;
+  font-family: 'Metamorphous', var(--fontpx); font-weight: 400; letter-spacing: 3px;
+  font-size: 34px; margin: 0; line-height: 1.08;
   color: var(--green-2); text-shadow: 0 3px 0 #08150d, 0 0 26px rgba(95,191,90,.35);
 }
 .logo span { display: block; color: var(--gold); text-shadow: 0 3px 0 #1c1405, 0 0 26px rgba(232,198,90,.3); }
-.logo.big { font-size: clamp(38px, 8.5vw, 76px); letter-spacing: clamp(5px, 1.6vw, 14px); }
+/* Height matters as much as width here: the title sits above a six-button menu, so on a
+   short window it has to give way rather than push the menu off the screen. */
+.logo.big { font-size: clamp(34px, min(9vw, 12vh), 84px); letter-spacing: clamp(3px, 1.1vw, 10px); }
+/* The face has real contrast in it, so the title earns a deeper carve than the boot logo. */
+.logo.big { text-shadow: 0 4px 0 #08150d, 0 6px 14px rgba(0,0,0,.6), 0 0 34px rgba(95,191,90,.32); }
+.logo.big span { text-shadow: 0 4px 0 #1c1405, 0 6px 14px rgba(0,0,0,.6), 0 0 34px rgba(232,198,90,.3); }
 
 /* ---------- Title ---------- */
-#title { align-items: center; justify-content: center; }
+/* The menu is six buttons tall, so on a short window the title screen has to be able to
+   scroll. Centring with margin:auto rather than justify-content keeps the top of the logo
+   reachable instead of clipping it, which is what plain centring does when content
+   overflows a flex container. */
+#title { align-items: center; justify-content: flex-start; overflow-y: auto; }
+#title .title-inner { margin: auto; }
+@media (max-height: 640px) {
+  .tagline { margin: 10px 0 16px; }
+  .title-menu { gap: 7px; }
+  .title-menu .btn { padding: 8px 16px; font-size: 14px; }
+  .title-stats { margin-top: 14px; }
+}
 .bg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .title-inner { position: relative; z-index: 2; text-align: center; padding: 20px; max-width: 640px; width: 100%; }
 .tagline { color: var(--ink-dim); font-size: clamp(13px, 2.4vw, 16px); margin: 14px 0 26px; font-style: italic; }
@@ -579,27 +602,60 @@ button { font-family: inherit; }
 
 /* ---------- Adventurer roster ---------- */
 .roster-grid {
-  overflow-y: auto; padding: 14px 14px 28px;
-  display: grid; gap: 10px; align-content: start;
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  overflow-y: auto; padding: 16px 16px 30px;
+  display: grid; gap: 12px; align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
 }
 #roster .select-body { flex: 1; display: grid; grid-template-columns: 1fr 320px; min-height: 0; }
 @media (max-width: 780px) { #roster .select-body { grid-template-columns: 1fr; } }
 .roster-card {
   background: linear-gradient(#16301f, #102318); border: 1px solid var(--line);
-  border-radius: var(--r); padding: 12px 8px 9px; text-align: center; cursor: pointer;
+  border-radius: var(--r); padding: 15px 10px 12px; text-align: center; cursor: pointer;
   transition: transform .1s, border-color .15s;
 }
 .roster-card:hover { transform: translateY(-2px); border-color: var(--green); }
 .roster-card.locked { opacity: .62; }
 .roster-card canvas { display: block; margin: 0 auto 7px; }
-.rc-name { font-size: 13px; font-weight: 700; line-height: 1.2; }
-.rc-role { font-size: 11.5px; color: var(--ink-mute); margin-top: 2px; }
+.rc-name { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.rc-role { font-size: 14px; color: var(--ink-mute); margin-top: 3px; }
 .rc-tag {
-  display: inline-block; margin-top: 6px; font-size: 10px; font-weight: 800;
-  letter-spacing: .7px; text-transform: uppercase; padding: 2px 8px; border-radius: 999px;
+  display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 800;
+  letter-spacing: .7px; text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
   background: rgba(95,191,90,.14); border: 1px solid var(--line-2); color: var(--green-2);
 }
+
+/* Per-level growth, one chip per stat, tinted to match the bars above it. */
+.grow-head {
+  font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--ink-mute); margin: 10px 0 6px;
+}
+.grow-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.grow-chip {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  background: #0f2115; border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 6px; padding: 3px 9px; font-size: 12px;
+}
+.grow-chip b { font-size: 13px; font-weight: 900; color: var(--ink); }
+.grow-chip span { font-size: 10.5px; font-weight: 800; letter-spacing: .6px; }
+
+/* How an adventurer was earned, kept under their kit. */
+.unlock-earned {
+  margin: 16px 0 4px; padding: 10px 12px; border-radius: 8px;
+  background: rgba(232,198,90,.07); border: 1px solid #4d4320;
+  font-size: 13px; color: var(--gold-2);
+}
+.unlock-earned .ue-label {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--ink-mute); margin-right: 5px;
+}
+.unlock-earned .ue-desc { font-size: 12px; color: var(--ink-dim); margin-top: 4px; }
+
+/* Shared "so far" bar for an achievement still in progress. */
+.ach-prog { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.ap-track { flex: 1; height: 6px; border-radius: 3px; background: #0d1c12; border: 1px solid var(--line); overflow: hidden; }
+.ap-fill { height: 100%; background: linear-gradient(90deg, #3f8f46, var(--green-2)); border-radius: 3px; }
+.ap-num { font-size: 11px; font-weight: 800; color: var(--ink-dim); letter-spacing: .3px; white-space: nowrap; }
+.unlock-note .ach-prog { margin-top: 8px; }
 .rc-tag.locked { background: rgba(232,198,90,.10); border-color: #5c5023; color: var(--gold); }
 
 /* ---------- Achievements ---------- */

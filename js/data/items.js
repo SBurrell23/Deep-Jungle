@@ -61,23 +61,40 @@
   };
 
   // ---- Potions ----
+  // grade drives both how often a potion drops and how its price moves through a run:
+  //   basic   cheap sustain, bought constantly, so its price tracks the gold curve closely
+  //   mid     situational, inflates more slowly
+  //   premium a run-defining tonic, priced as a luxury and capped by `cap` drops per run
   DJ.POTIONS = {
-    red:     { id: 'red', name: 'Red Potion', icon: 'potion_red', price: 18, desc: 'Heal 45% HP of one hero.', effect: { heal: 0.45 } },
-    blue:    { id: 'blue', name: 'Blue Potion', icon: 'potion_blue', price: 16, desc: 'Restore 50% MP of one hero.', effect: { mp: 0.5 } },
-    green:   { id: 'green', name: 'Green Potion', icon: 'potion_green', price: 14, desc: 'Cure all ailments and heal 15% HP.', effect: { cure: true, heal: 0.15 } },
-    yellow:  { id: 'yellow', name: 'Yellow Potion', icon: 'potion_yellow', price: 34, desc: 'Revive a fallen hero with 50% HP.', effect: { revive: 0.5 } },
-    purple:  { id: 'purple', name: 'Purple Potion', icon: 'potion_purple', price: 22, desc: 'Grant Rage and Haste for 3 turns.', effect: { status: ['rage', 'haste'], turns: 3 } },
-    orange:  { id: 'orange', name: 'Orange Potion', icon: 'potion_orange', price: 40, desc: 'Fully heal one hero.', effect: { heal: 1.0 } },
-    elixir:  { id: 'elixir', name: 'Elixir', icon: 'potion_elixir', price: 70, desc: 'Fully restore HP and MP of the whole party.', effect: { party: true, heal: 1.0, mp: 1.0, cure: true } },
-    phoenix: { id: 'phoenix', name: 'Phoenix Down', icon: 'potion_phoenix', price: 90, desc: 'Revive all fallen heroes at full HP.', effect: { party: true, revive: 1.0 } },
+    red:     { id: 'red', name: 'Red Potion', icon: 'potion_red', grade: 'basic', price: 16, desc: 'Heal 45% HP of one hero.', effect: { heal: 0.45 } },
+    blue:    { id: 'blue', name: 'Blue Potion', icon: 'potion_blue', grade: 'basic', price: 14, desc: 'Restore 50% MP of one hero.', effect: { mp: 0.5 } },
+    green:   { id: 'green', name: 'Green Potion', icon: 'potion_green', grade: 'basic', price: 13, desc: 'Cure all ailments and heal 15% HP.', effect: { cure: true, heal: 0.15 } },
+    yellow:  { id: 'yellow', name: 'Yellow Potion', icon: 'potion_yellow', grade: 'mid', price: 44, desc: 'Revive a fallen hero with 50% HP.', effect: { revive: 0.5 } },
+    purple:  { id: 'purple', name: 'Purple Potion', icon: 'potion_purple', grade: 'mid', price: 30, desc: 'Grant Rage and Haste for 3 turns.', effect: { status: ['rage', 'haste'], turns: 3 } },
+    orange:  { id: 'orange', name: 'Orange Potion', icon: 'potion_orange', grade: 'premium', price: 130, cap: 2, desc: 'Fully heal one hero.', effect: { heal: 1.0 } },
+    elixir:  { id: 'elixir', name: 'Elixir', icon: 'potion_elixir', grade: 'premium', price: 320, cap: 1, desc: 'Fully restore HP and MP of the whole party.', effect: { party: true, heal: 1.0, mp: 1.0, cure: true } },
+    phoenix: { id: 'phoenix', name: 'Phoenix Down', icon: 'potion_phoenix', grade: 'premium', price: 260, cap: 1, desc: 'Revive all fallen heroes at full HP.', effect: { party: true, revive: 1.0 } },
     // The rare one. Never sold, never dropped by ordinary monsters.
-    pink:    { id: 'pink', name: 'Heartbloom Nectar', icon: 'potion_pink', price: 0, rare: true, desc: 'Raises one adventurer a full level, instantly.', effect: { levelUp: 1 } },
+    pink:    { id: 'pink', name: 'Heartbloom Nectar', icon: 'potion_pink', grade: 'rare', price: 0, rare: true, desc: 'Raises one adventurer a full level, instantly.', effect: { levelUp: 1 } },
   };
   // 'pink' is deliberately absent: it is only granted by the boss/elite rules in run.js.
+  // The premium three sit at the bottom on purpose. Between them they turn up well under
+  // once per run, and `cap` stops a lucky streak handing out a second Elixir.
   DJ.POTION_DROP_WEIGHTS = [
-    { v: 'red', w: 34 }, { v: 'blue', w: 22 }, { v: 'green', w: 16 }, { v: 'yellow', w: 10 },
-    { v: 'purple', w: 8 }, { v: 'orange', w: 6 }, { v: 'elixir', w: 3 }, { v: 'phoenix', w: 1 },
+    { v: 'red', w: 40 }, { v: 'blue', w: 26 }, { v: 'green', w: 20 },
+    { v: 'yellow', w: 8 }, { v: 'purple', w: 6 },
+    { v: 'orange', w: 1.4 }, { v: 'phoenix', w: 0.6 }, { v: 'elixir', w: 0.5 },
   ];
+
+  // How fast a grade's price climbs per level of the node you are shopping at. Gold income
+  // roughly triples across a run, so the shelf has to move with it or late gold is worthless.
+  const PRICE_GROWTH = { basic: 0.11, mid: 0.08, premium: 0.05 };
+  DJ.potionPrice = function (pid, level) {
+    const p = DJ.POTIONS[pid];
+    if (!p || !p.price) return 0;
+    const lv = DJ.clamp(level || 1, 1, 20);
+    return Math.round(p.price * (1 + (lv - 1) * (PRICE_GROWTH[p.grade] || 0)));
+  };
 
   // Roll an equipment item for a given level. rarityBoost bumps toward rare/epic (elites, bosses, treasure).
   DJ.rollItem = function (rng, level, rarityBoost) {
@@ -87,7 +104,20 @@
     const weights = pool.map((x) => ({ v: x, w: (x.rarity === 'common' ? 10 : x.rarity === 'rare' ? 5 + boost * 3 : 1.5 + boost * 3) * (x.tier === tier ? 1.6 : 1) }));
     return rng.weighted(weights);
   };
-  DJ.rollPotion = function (rng) { return rng.weighted(DJ.POTION_DROP_WEIGHTS); };
+  // Pass the run and the per-run caps apply: a capped potion drops out of the pool once
+  // the run has already produced its allowance, so an Elixir really is a once-a-run find.
+  DJ.rollPotion = function (rng, run) {
+    if (!run) return rng.weighted(DJ.POTION_DROP_WEIGHTS);
+    const got = run.potionDrops || (run.potionDrops = {});
+    let pool = DJ.POTION_DROP_WEIGHTS.filter((e) => {
+      const cap = DJ.POTIONS[e.v].cap;
+      return !cap || (got[e.v] || 0) < cap;
+    });
+    if (!pool.length) pool = DJ.POTION_DROP_WEIGHTS.filter((e) => !DJ.POTIONS[e.v].cap);
+    const pid = rng.weighted(pool);
+    got[pid] = (got[pid] || 0) + 1;
+    return pid;
+  };
   DJ.itemPrice = function (item) {
     const base = { common: 30, rare: 60, epic: 110 }[item.rarity];
     return base + item.tier * 18;

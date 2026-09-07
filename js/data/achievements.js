@@ -4,11 +4,17 @@
 (function (root) {
   const DJ = (root.DJ = root.DJ || {});
   const A = (DJ.ACHIEVEMENTS = []);
-  function a(id, name, desc, check, unlocks) { A.push({ id, name, desc, check, unlocks: unlocks || null }); }
-  const ge = (k, n) => (s) => (s[k] || 0) >= n;
-  const tag = (t, n) => (s) => ((s.killsByTag || {})[t] || 0) >= n;
-  const boss = (id, n) => (s) => ((s.bossKills || {})[id] || 0) >= (n || 1);
-  const won = (h) => (s) => ((s.wonWith || {})[h] || 0) >= 1;
+  function a(id, name, desc, check, unlocks) {
+    A.push({ id, name, desc, check, progress: check.prog || null, unlocks: unlocks || null });
+  }
+  // Each helper carries a `prog` alongside its test, so the UI can say "14 / 25" instead of
+  // just "not yet". Hand-written checks below opt in by wrapping themselves in withProg.
+  const withProg = (fn, prog) => { fn.prog = prog; return fn; };
+  const count = (read, n) => withProg((s) => read(s) >= n, (s) => ({ cur: read(s), goal: n }));
+  const ge = (k, n) => count((s) => s[k] || 0, n);
+  const tag = (t, n) => count((s) => (s.killsByTag || {})[t] || 0, n);
+  const boss = (id, n) => count((s) => (s.bossKills || {})[id] || 0, n || 1);
+  const won = (h) => count((s) => Math.min(1, (s.wonWith || {})[h] || 0), 1);
 
   // ===== Adventurer-unlocking achievements (18 here; 7 more are marked further down) =====
   a('first_blood', 'First Blood', 'Win your first battle.', ge('battlesWon', 1));
@@ -114,14 +120,27 @@
   // ===== Heroes =====
   a('level_5', 'Growing Up', 'Raise a hero to level 5.', ge('heroMaxLevel', 5));
   a('level_15', 'Peak Form', 'Raise a hero to level 15.', ge('heroMaxLevel', 15));
-  a('roster_10', 'Recruiter', 'Unlock 10 adventurers.', (s, p) => (p.unlocked || []).length >= 10);
-  a('roster_23', 'Full Roster', 'Unlock all 23 adventurers.', (s, p) => (p.unlocked || []).length >= 23);
-  a('variety', 'Variety Pack', 'Win the game with 6 different adventurers.', (s) => Object.keys(s.wonWith || {}).length >= 6);
+  a('roster_10', 'Recruiter', 'Unlock 10 adventurers.', withProg((s, p) => (p.unlocked || []).length >= 10, (s, p) => ({ cur: (p.unlocked || []).length, goal: 10 })));
+  a('roster_23', 'Full Roster', 'Unlock all 23 adventurers.', withProg((s, p) => (p.unlocked || []).length >= 23, (s, p) => ({ cur: (p.unlocked || []).length, goal: 23 })));
+  a('variety', 'Variety Pack', 'Win the game with 6 different adventurers.', withProg((s) => Object.keys(s.wonWith || {}).length >= 6, (s) => ({ cur: Object.keys(s.wonWith || {}).length, goal: 6 })));
   a('starters', 'The Original Three', 'Win the game with Elf Warrior, Goblin Mage and Kua Ta Lancer together.', ge('starterWins', 1));
   a('all_casters', 'Spellbound', 'Win the game with a party of three magic users.', ge('casterWins', 1));
   a('goblin_win', 'Goblin Made Good', 'Win the game with the Goblin Mage in the party.', won('goblin_mage'));
-  a('completionist', 'Completionist', 'Earn 90 achievements.', (s, p) => (p.achievements || []).length >= 90);
+  a('completionist', 'Completionist', 'Earn 90 achievements.', withProg((s, p) => (p.achievements || []).length >= 90, (s, p) => ({ cur: (p.achievements || []).length, goal: 90 })));
 
   DJ.ACH_BY_ID = {};
   A.forEach((x) => (DJ.ACH_BY_ID[x.id] = x));
+
+  // How close the current profile is to an achievement. Null when the goal is a single
+  // event ("defeat the Bramble King"), where a bar would say nothing a lock icon does not.
+  DJ.achProgress = function (ach, profile) {
+    if (!ach || !ach.progress) return null;
+    const pr = profile || DJ.profile;
+    if (!pr) return null;
+    let out;
+    try { out = ach.progress(pr.stats || {}, pr); } catch (e) { return null; }
+    if (!out || !(out.goal > 1)) return null;
+    const cur = Math.max(0, Math.min(out.cur || 0, out.goal));
+    return { cur, goal: out.goal, pct: cur / out.goal, done: cur >= out.goal };
+  };
 })(typeof window !== 'undefined' ? window : globalThis);

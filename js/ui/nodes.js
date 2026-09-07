@@ -278,8 +278,8 @@
           } },
         { label: 'Forage', desc: 'Search the clearing for potions and a little gold.', sfx: 'open',
           fn: () => {
-            const loot = { gold: 12 + node.level * 4, potions: [DJ.rollPotion(run.rng)] };
-            if (run.rng.chance(0.4)) loot.potions.push(DJ.rollPotion(run.rng));
+            const loot = { gold: 12 + node.level * 4, potions: [DJ.rollPotion(run.rng, run)] };
+            if (run.rng.chance(0.4)) loot.potions.push(DJ.rollPotion(run.rng, run));
             run.applyLoot(loot);
             DJ.bump('goldEarned', loot.gold);
             run.restHeal(0.25);
@@ -486,7 +486,7 @@
       { label: 'Disarm it carefully', desc: 'Takes time. Might work. Might not.', sfx: 'click', fn: () => {
         const ok = rng.chance(0.55);
         if (ok) {
-          const loot = { gold: 24 + node.level * 7, potions: rng.chance(0.5) ? [DJ.rollPotion(rng)] : [] };
+          const loot = { gold: 24 + node.level * 7, potions: rng.chance(0.5) ? [DJ.rollPotion(rng, run)] : [] };
           run.applyLoot(loot); DJ.bump('goldEarned', loot.gold);
           showLoot('Disarmed', loot, false, 'You unpick the mechanism and salvage the parts. The trapper would be furious.');
         } else {
@@ -552,9 +552,10 @@
 
       body.appendChild(UI.el('h4', null, 'Potions')).style.cssText = 'margin:14px 0 8px;font-size:14px';
       stock.potions.forEach((pid) => {
-        const p = DJ.POTIONS[pid];
-        body.appendChild(UI.potionLine(pid, null, mkBuy(p.name, p.price, run.gold >= p.price, () => {
-          run.gold -= p.price; DJ.bump('goldSpent', p.price);
+        // Priced against this node's level, so the shelf keeps pace with the party's purse.
+        const price = DJ.potionPrice(pid, node.level);
+        body.appendChild(UI.potionLine(pid, null, mkBuy(DJ.POTIONS[pid].name, price, run.gold >= price, () => {
+          run.gold -= price; DJ.bump('goldSpent', price);
           run.addPotion(pid, 1);
           merchant(node);
         })));
@@ -629,7 +630,7 @@
       if (op.damage) { for (const h of run.party) if (h.alive) h.hp = Math.max(1, h.hp - Math.round(h.maxHp * op.damage)); lines.push(`The party takes ${Math.round(op.damage * 100)}% damage.`); }
       if (op.status) { for (const h of run.party) if (h.alive) h.statuses.push({ id: op.status, turns: 2 }); lines.push(`The party is afflicted with ${(DJ.STATUS[op.status] || {}).name || op.status}.`); }
       if (op.gold) { const g = op.gold; run.gold = Math.max(0, run.gold + g); gold += g; if (g > 0) DJ.bump('goldEarned', g); }
-      if (op.potion) { const pid = op.potion === 'random' ? DJ.rollPotion(rng) : op.potion; run.addPotion(pid, 1); gotPotions.push(pid); }
+      if (op.potion) { const pid = op.potion === 'random' ? DJ.rollPotion(rng, run) : op.potion; run.addPotion(pid, 1); gotPotions.push(pid); }
       if (op.item != null) { const it = DJ.rollItem(rng, node.level, op.item); run.addItem(it); gotItems.push(it); DJ.bump('itemsFound'); if (it.rarity === 'epic') DJ.bump('epicsFound'); }
       if (op.xp) { for (const h of run.party) DJ.grantXp(h, op.xp); lines.push(`Everyone gains ${op.xp} XP.`); }
       if (op.stat) {

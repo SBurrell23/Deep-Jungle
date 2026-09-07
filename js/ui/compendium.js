@@ -224,6 +224,10 @@
         const body = UI.el('div', 'ach-body');
         body.appendChild(UI.el('div', 'ach-name', a.name));
         body.appendChild(UI.el('div', 'ach-desc', a.desc));
+        if (!done) {
+          const bar = UI.achProgressBar(a);
+          if (bar) body.appendChild(bar);
+        }
         if (a.unlocks) {
           const h = DJ.HERO_BY_ID[a.unlocks];
           body.appendChild(UI.el('div', 'ach-unlock', (done ? 'Unlocked: ' : 'Unlocks: ') + (h ? h.name : a.unlocks)));
@@ -262,7 +266,7 @@
       const unlocked = DJ.isUnlocked(h.id);
       const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked'));
       card.tabIndex = 0;
-      card.appendChild(unlocked ? UI.spriteEl(h.id, 2.5, h.name) : UI.silhouetteEl(h.id, 2.5));
+      card.appendChild(unlocked ? UI.spriteEl(h.id, 3.1, h.name) : UI.silhouetteEl(h.id, 3.1));
       card.appendChild(UI.el('div', 'rc-name', unlocked ? h.name : '???'));
       card.appendChild(UI.el('div', 'rc-role', unlocked ? h.role : 'Locked'));
       if (unlocked && !h.unlock) card.appendChild(UI.el('div', 'rc-tag', 'Starter'));
@@ -305,7 +309,11 @@
       const a = DJ.unlockRequirement(h.id);
       const note = UI.el('div', 'unlock-note');
       note.innerHTML = `<b>Locked.</b> Unlocks with the achievement <b>${a ? a.name : '???'}</b>.`;
-      if (a) note.appendChild(UI.el('div', null, a.desc));
+      if (a) {
+        note.appendChild(UI.el('div', null, a.desc));
+        const bar = UI.achProgressBar(a);
+        if (bar) note.appendChild(bar);
+      }
       box.appendChild(note);
       return;
     }
@@ -317,12 +325,23 @@
     }
     box.appendChild(stats);
 
-    const gt = UI.el('p', 'muted');
-    gt.style.cssText = 'font-size:11.5px;margin:0 0 4px';
-    gt.textContent = 'Per level: ' + ['hp', 'atk', 'mag', 'def', 'spd']
-      .filter((k) => h.grow[k] >= 0.5)
-      .map((k) => `+${h.grow[k]} ${k.toUpperCase()}`).join(', ');
-    box.appendChild(gt);
+    // Growth used to be one comma-run of numbers. As a row of chips, each tinted like its
+    // stat bar above, you can see at a glance which stats this adventurer actually gains.
+    const gh = UI.el('div', 'grow-head', 'Gained per level');
+    box.appendChild(gh);
+    const grow = UI.el('div', 'grow-row');
+    const grown = ['hp', 'mp', 'atk', 'mag', 'def', 'spd'].filter((k) => (h.grow[k] || 0) >= 0.5);
+    if (!grown.length) grow.appendChild(UI.el('span', 'muted', 'No growth.'));
+    for (const k of grown) {
+      const chip = UI.el('span', 'grow-chip');
+      chip.style.borderColor = STAT_COLOR[k];
+      chip.appendChild(UI.el('b', null, '+' + h.grow[k]));
+      const lbl = UI.el('span', null, k.toUpperCase());
+      lbl.style.color = STAT_COLOR[k];
+      chip.appendChild(lbl);
+      grow.appendChild(chip);
+    }
+    box.appendChild(grow);
 
     const sh = UI.el('h4', null, 'Skills');
     sh.style.cssText = 'margin:14px 0 8px;font-size:14px;color:#8fe08a';
@@ -344,6 +363,19 @@
       if (lv > 1) item.appendChild(UI.el('div', 'sk-lvl', 'Unlocks at level ' + lv));
       box.appendChild(item);
     });
+
+    // Under the kit, a reminder of how this adventurer was earned. Starters say so plainly
+    // rather than leaving a gap where every other card has a line.
+    const src = UI.el('div', 'unlock-earned');
+    const req = DJ.unlockRequirement(h.id);
+    if (req) {
+      src.innerHTML = `<span class="ue-label">Unlocked by</span> <b>${req.name}</b>`;
+      src.appendChild(UI.el('div', 'ue-desc', req.desc));
+    } else {
+      src.innerHTML = '<span class="ue-label">Unlocked by</span> <b>Starter</b>';
+      src.appendChild(UI.el('div', 'ue-desc', 'Available from your very first expedition.'));
+    }
+    box.appendChild(src);
   }
 
 })(typeof window !== 'undefined' ? window : globalThis);

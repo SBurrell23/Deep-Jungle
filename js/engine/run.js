@@ -73,6 +73,8 @@
     this.party = o.partyIds.map((id) => DJ.makeHeroUnit(id, 1));
     this.gold = 40;
     this.inventory = { red: 2, blue: 1, green: 1, yellow: 0, purple: 0, orange: 0, elixir: 0, phoenix: 0 };
+    // How many of each capped potion this run has already dropped, so the caps hold.
+    this.potionDrops = {};
     this.stash = [];                  // unequipped items
     this.currentId = this.map.startId;
     this.visited = { [this.map.startId]: true };
@@ -262,8 +264,8 @@
     out.gold = Math.round((18 + level * 9) * rng.range(0.8, 1.3));
     if (DJ.hasPassive(this.party[0] || {}, 'gold')) out.gold = Math.round(out.gold * 1.25);
     out.items.push(DJ.rollItem(rng, level, boost || 1));
-    if (rng.chance(0.55)) out.potions.push(DJ.rollPotion(rng));
-    if (rng.chance(0.2)) out.potions.push(DJ.rollPotion(rng));
+    if (rng.chance(0.55)) out.potions.push(DJ.rollPotion(rng, this));
+    if (rng.chance(0.2)) out.potions.push(DJ.rollPotion(rng, this));
     return out;
   };
   R.applyLoot = function (loot) {
@@ -279,8 +281,8 @@
     const boss = node.type === 'boss' || node.type === 'heart';
     const elite = node.type === 'elite';
     const pChance = boss ? 1 : elite ? 0.9 : 0.62;
-    if (rng.chance(pChance)) drops.potions.push(DJ.rollPotion(rng));
-    if (rng.chance(boss ? 0.9 : elite ? 0.45 : 0.14)) drops.potions.push(DJ.rollPotion(rng));
+    if (rng.chance(pChance)) drops.potions.push(DJ.rollPotion(rng, this));
+    if (rng.chance(boss ? 0.9 : elite ? 0.45 : 0.14)) drops.potions.push(DJ.rollPotion(rng, this));
     const iChance = boss ? 1 : elite ? 0.7 : 0.16;
     if (rng.chance(iChance)) drops.items.push(DJ.rollItem(rng, node.level, boss ? 3 : elite ? 2 : 0));
     // Heartbloom Nectar is the run's rare prize: a guaranteed reward for a region boss,
@@ -320,9 +322,14 @@
     const items = [];
     for (let i = 0; i < 3; i++) items.push(DJ.rollItem(rng, level, 1));
     // Always stock a heal and a revive: a party with no healer must be able to buy sustain.
-    const rest = rng.shuffle(['blue', 'green', 'purple', 'orange', 'elixir', 'phoenix']).slice(0, 2);
-    const potions = rng.shuffle(['red', 'yellow'].concat(rest));
-    return { items, potions };
+    // Everything above that is the mid shelf. A premium tonic appears only now and then,
+    // and mostly deep in the run, where a party might actually have the gold for one.
+    const mid = rng.shuffle(['blue', 'green', 'purple']).slice(0, 2);
+    const potions = ['red', 'yellow'].concat(mid);
+    if (rng.chance(level >= 10 ? 0.3 : 0.1)) {
+      potions.push(rng.weighted([{ v: 'orange', w: 5 }, { v: 'phoenix', w: 2 }, { v: 'elixir', w: 1 }]));
+    }
+    return { items, potions: rng.shuffle(potions) };
   };
 
   R.serialize = function () {
@@ -332,6 +339,7 @@
     });
     return {
       seed: this.seed, rngState: this.rng.s, gold: this.gold, inventory: this.inventory,
+      potionDrops: this.potionDrops || {},
       stash: this.stash.map((i) => i.id), party: this.party.map(ser),
       currentId: this.currentId, visited: this.visited, path: this.path, available: this.available,
       nodesVisited: this.nodesVisited, flawless: this.flawless, finished: this.finished, won: this.won,
@@ -344,6 +352,7 @@
     const r = new Run({ seed: d.seed, partyIds: d.party.map((p) => p.id) });
     r.rng.s = d.rngState;
     r.gold = d.gold; r.inventory = d.inventory;
+    r.potionDrops = d.potionDrops || {};   // per-run caps survive a reload
     r.stash = (d.stash || []).map((id) => DJ.ITEM_BY_ID[id]).filter(Boolean);
     d.party.forEach((p, i) => {
       const u = r.party[i];

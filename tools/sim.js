@@ -132,9 +132,10 @@ function resolveNode(run, node, rng) {
   }
   if (t === 'merchant') {
     const stock = run.merchantStock();
-    // buy potions when affordable
+    // Buy potions when affordable, at the shelf price for this node's level so the
+    // simulated purse feels the same inflation a player does.
     for (const p of ['red', 'red', 'green', 'yellow']) {
-      const price = DJ.POTIONS[p].price;
+      const price = DJ.potionPrice(p, node.level);
       if (run.gold >= price + 40) { run.gold -= price; run.addPotion(p, 1); }
     }
     for (const item of stock.items) {
@@ -154,7 +155,7 @@ function resolveNode(run, node, rng) {
       if (op.mp) for (const h of run.party) if (h.alive) h.mp = Math.min(h.maxMp, h.mp + Math.round(h.maxMp * op.mp));
       if (op.damage) for (const h of run.party) if (h.alive) h.hp = Math.max(1, h.hp - Math.round(h.maxHp * op.damage));
       if (op.gold) run.gold = Math.max(0, run.gold + op.gold);
-      if (op.potion) run.addPotion(op.potion === 'random' ? DJ.rollPotion(rng) : op.potion, 1);
+      if (op.potion) run.addPotion(op.potion === 'random' ? DJ.rollPotion(rng, run) : op.potion, 1);
       if (op.item != null) { run.addItem(DJ.rollItem(rng, node.level, op.item)); autoEquip(run); }
       if (op.xp) for (const h of run.party) DJ.grantXp(h, op.xp);
       if (op.stat) { const h = op.stat.who === 'all' ? null : rng.pick(run.party);

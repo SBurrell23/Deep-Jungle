@@ -256,6 +256,21 @@
     return row;
   };
 
+  // A thin "14 / 25" bar for an achievement still in progress. Returns null when the
+  // achievement is a one-off event, so callers can just append the result and move on.
+  UI.achProgressBar = function (ach, profile) {
+    const pr = DJ.achProgress(ach, profile);
+    if (!pr) return null;
+    const wrap = UI.el('div', 'ach-prog');
+    const track = UI.el('div', 'ap-track');
+    const fill = UI.el('div', 'ap-fill');
+    fill.style.width = Math.round(pr.pct * 100) + '%';
+    track.appendChild(fill);
+    wrap.appendChild(track);
+    wrap.appendChild(UI.el('span', 'ap-num', DJ.fmt(pr.cur) + ' / ' + DJ.fmt(pr.goal)));
+    return wrap;
+  };
+
   UI.goldTag = function (amount) {
     const w = UI.el('span', 'gold-tag');
     if (DJ.SPRITES.icon_gold) w.appendChild(UI.spriteEl('icon_gold', 1.1, 'gold'));

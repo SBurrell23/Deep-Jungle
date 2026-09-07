@@ -1,0 +1,8 @@
+Metamorphous is licensed under the SIL Open Font License, Version 1.1.
+Copyright (c) The Metamorphous Project Authors.
+
+The full licence text is available at:
+https://openfontlicense.org/
+
+Only the latin subset is bundled here (metamorphous-latin.woff2), taken from
+Google Fonts. It is used for the DEEP JUNGLE title on the main menu.
