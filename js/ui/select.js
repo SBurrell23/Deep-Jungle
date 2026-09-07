@@ -1,0 +1,131 @@
+/* Deep Jungle — adventurer selection (pick 3 of 23). */
+(function (root) {
+  const DJ = (root.DJ = root.DJ || {});
+  const UI = (DJ.UI = DJ.UI || {});
+  const S = (UI.Select = {});
+
+  let picked = [];
+  let focused = null;
+
+  const STAT_MAX = { hp: 130, mp: 60, atk: 20, mag: 20, def: 16, spd: 16 };
+  const STAT_COLOR = { hp: '#4fbf5a', mp: '#4f9fe0', atk: '#e05252', mag: '#a97fe0', def: '#7fc8ff', spd: '#e8c65a' };
+
+  S.open = function () {
+    picked = [];
+    focused = null;
+    render();
+    UI.show('select');
+  };
+
+  function render() {
+    const grid = UI.$('#heroGrid');
+    grid.innerHTML = '';
+    for (const h of DJ.HEROES) {
+      const unlocked = DJ.isUnlocked(h.id);
+      const card = UI.el('div', 'hero-card' + (unlocked ? '' : ' locked') + (picked.includes(h.id) ? ' selected' : ''));
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', unlocked ? h.name + ', ' + h.role : h.name + ', locked');
+      const sprite = unlocked ? UI.spriteEl(h.id, 2, h.name) : UI.silhouetteEl(h.id, 2);
+      card.appendChild(sprite);
+      card.appendChild(UI.el('div', 'hero-name', unlocked ? h.name : '???'));
+      card.appendChild(UI.el('div', 'hero-role', unlocked ? h.role : 'Locked'));
+      if (!unlocked) { const b = UI.el('div', 'lock-badge', '🔒'); card.appendChild(b); }
+      const idx = picked.indexOf(h.id);
+      if (idx >= 0) card.appendChild(UI.el('div', 'pick-num', String(idx + 1)));
+      const act = () => selectCard(h, unlocked);
+      card.addEventListener('click', act);
+      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+      grid.appendChild(card);
+    }
+    renderDetail();
+    renderParty();
+  }
+
+  function selectCard(h, unlocked) {
+    focused = h.id;
+    if (!unlocked) { DJ.sfx('error'); renderDetail(); render(); return; }
+    const i = picked.indexOf(h.id);
+    if (i >= 0) { picked.splice(i, 1); DJ.sfx('cancel'); }
+    else if (picked.length < 3) { picked.push(h.id); DJ.sfx('confirm'); }
+    else { DJ.sfx('error'); }
+    render();
+  }
+
+  function renderDetail() {
+    const box = UI.$('#heroDetail');
+    box.innerHTML = '';
+    if (!focused) {
+      box.appendChild(UI.el('p', 'muted center', 'Select an adventurer to see their skills.'));
+      return;
+    }
+    const h = DJ.HERO_BY_ID[focused];
+    const unlocked = DJ.isUnlocked(h.id);
+    const head = UI.el('div');
+    head.style.cssText = 'display:flex;gap:12px;align-items:center;margin-bottom:8px';
+    head.appendChild(unlocked ? UI.spriteEl(h.id, 2.5, h.name) : UI.silhouetteEl(h.id, 2.5));
+    const ht = UI.el('div');
+    ht.appendChild(UI.el('h3', null, unlocked ? h.name : '???'));
+    ht.appendChild(UI.el('div', 'role-line', unlocked ? h.role : 'Locked'));
+    head.appendChild(ht);
+    box.appendChild(head);
+
+    if (!unlocked) {
+      const a = DJ.unlockRequirement(h.id);
+      const note = UI.el('div', 'unlock-note');
+      note.innerHTML = `<b>Locked.</b> Unlocks with the achievement <b>${a ? a.name : '???'}</b>.`;
+      if (a) note.appendChild(UI.el('div', null, a.desc));
+      box.appendChild(note);
+      return;
+    }
+
+    box.appendChild(UI.el('p', 'desc', h.desc));
+    const stats = UI.el('div', 'stat-rows');
+    for (const k of ['hp', 'mp', 'atk', 'mag', 'def', 'spd']) {
+      stats.appendChild(UI.statBar(k.toUpperCase(), h.base[k], STAT_MAX[k], STAT_COLOR[k]));
+    }
+    box.appendChild(stats);
+
+    const gt = UI.el('p', 'muted');
+    gt.style.fontSize = '11.5px';
+    gt.textContent = 'Per level: ' + ['hp', 'atk', 'mag', 'def', 'spd']
+      .filter((k) => h.grow[k] >= 0.5)
+      .map((k) => `+${h.grow[k]} ${k.toUpperCase()}`).join(', ');
+    box.appendChild(gt);
+
+    box.appendChild(UI.el('h4', null, 'Skills')).style.cssText = 'margin:14px 0 8px;font-size:14px';
+    h.skills.forEach((sid, i) => {
+      const sk = DJ.SKILLS[sid];
+      if (!sk) return;
+      const item = UI.el('div', 'skill-item');
+      const hd = UI.el('div', 'sk-head');
+      hd.appendChild(UI.el('span', 'sk-name', sk.name));
+      hd.appendChild(UI.el('span', 'sk-cost', sk.mp ? sk.mp + ' MP' : 'Free'));
+      item.appendChild(hd);
+      item.appendChild(UI.el('div', 'sk-desc', sk.desc));
+      const lv = DJ.SKILL_UNLOCK_LEVELS[i];
+      if (lv > 1) item.appendChild(UI.el('div', 'sk-lvl', 'Unlocks at level ' + lv));
+      box.appendChild(item);
+    });
+  }
+
+  function renderParty() {
+    const strip = UI.$('#partyStrip');
+    strip.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const slot = UI.el('div', 'party-slot' + (picked[i] ? ' filled' : ''));
+      if (picked[i]) slot.appendChild(UI.spriteEl(picked[i], 1.3, ''));
+      strip.appendChild(slot);
+    }
+    UI.$('#selCount').textContent = picked.length + ' / 3';
+    UI.$('#btnBegin').disabled = picked.length !== 3;
+  }
+
+  S.init = function () {
+    UI.$('#btnBegin').addEventListener('click', () => {
+      if (picked.length !== 3) return;
+      DJ.sfx('confirm');
+      DJ.startRun(picked.slice());
+    });
+  };
+})(typeof window !== 'undefined' ? window : globalThis);

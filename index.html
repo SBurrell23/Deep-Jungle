@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deep Jungle</title>
+<meta name="description" content="Deep Jungle — a turn-based jungle roguelite. Pick three adventurers, carve a path through a procedurally generated jungle, and face the Heart of the Jungle.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230d1f14'/><path d='M4 12c0-4 2-7 4-8 2 1 4 4 4 8z' fill='%234fae4a'/><circle cx='8' cy='9' r='2' fill='%23ff4d6d'/></svg>">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div id="app">
+  <!-- ======== BOOT ======== -->
+  <div id="boot" class="screen active">
+    <div class="boot-inner">
+      <h1 class="logo">DEEP<span>JUNGLE</span></h1>
+      <div class="boot-bar"><div id="bootFill"></div></div>
+      <p id="bootMsg">Waking the jungle…</p>
+    </div>
+  </div>
+
+  <!-- ======== TITLE ======== -->
+  <div id="title" class="screen">
+    <canvas id="titleCanvas" class="bg-canvas"></canvas>
+    <div class="title-inner">
+      <h1 class="logo big">DEEP<span>JUNGLE</span></h1>
+      <p class="tagline">Three adventurers. One jungle. It is awake, and it has noticed you.</p>
+      <div class="title-menu">
+        <button id="btnContinue" class="btn primary hidden">Continue Expedition</button>
+        <button id="btnNewRun" class="btn primary">New Expedition</button>
+        <button id="btnCompendium" class="btn">Monster Compendium</button>
+        <button id="btnAchievements" class="btn">Achievements</button>
+        <button id="btnSettings" class="btn">Settings</button>
+      </div>
+      <p class="title-stats" id="titleStats"></p>
+    </div>
+  </div>
+
+  <!-- ======== HERO SELECT ======== -->
+  <div id="select" class="screen">
+    <header class="bar">
+      <button class="btn small back" data-back="title">‹ Back</button>
+      <h2>Choose Three Adventurers</h2>
+      <div class="bar-right"><span id="selCount" class="pill">0 / 3</span></div>
+    </header>
+    <div class="select-body">
+      <div id="heroGrid" class="hero-grid"></div>
+      <aside id="heroDetail" class="hero-detail">
+        <p class="muted center">Select an adventurer to see their skills.</p>
+      </aside>
+    </div>
+    <footer class="bar bottom">
+      <div id="partyStrip" class="party-strip"></div>
+      <button id="btnBegin" class="btn primary" disabled>Begin Expedition</button>
+    </footer>
+  </div>
+
+  <!-- ======== MAP ======== -->
+  <div id="map" class="screen">
+    <header class="bar">
+      <div class="bar-left">
+        <span id="mapRegion" class="region-tag">The Undergrowth</span>
+        <span id="mapGold" class="pill gold">0</span>
+        <span id="mapProgress" class="pill">0%</span>
+      </div>
+      <div class="bar-right">
+        <button id="btnParty" class="btn small">Party</button>
+        <button id="btnBag" class="btn small">Bag</button>
+        <button id="btnMapCompendium" class="btn small icon-only" title="Compendium">📖</button>
+        <button id="btnMapSettings" class="btn small icon-only" title="Settings">⚙</button>
+      </div>
+    </header>
+    <div class="map-wrap">
+      <canvas id="mapCanvas"></canvas>
+      <div id="mapHint" class="map-hint">Choose your path</div>
+    </div>
+    <footer id="partyBar" class="party-bar"></footer>
+  </div>
+
+  <!-- ======== BATTLE ======== -->
+  <div id="battle" class="screen">
+    <div class="battle-wrap">
+      <canvas id="battleCanvas"></canvas>
+      <div id="battleTop" class="battle-top">
+        <span id="battleTitle" class="battle-title">Battle</span>
+        <span id="battleRound" class="pill">Round 1</span>
+        <button id="btnBattleSettings" class="btn small icon-only" title="Settings">⚙</button>
+      </div>
+      <div id="battleLog" class="battle-log"></div>
+    </div>
+    <div id="battleUi" class="battle-ui">
+      <div id="battleParty" class="battle-party"></div>
+      <div id="turnBanner" class="turn-banner"></div>
+      <div id="actionMenu" class="action-menu"></div>
+      <div id="targetHint" class="target-hint hidden">Choose a target</div>
+    </div>
+  </div>
+
+  <!-- ======== NODE / EVENT SCREEN ======== -->
+  <div id="node" class="screen">
+    <div class="node-panel">
+      <div class="node-head">
+        <canvas id="nodeIcon" width="72" height="72"></canvas>
+        <div>
+          <h2 id="nodeTitle">Node</h2>
+          <p id="nodeSub" class="muted"></p>
+        </div>
+      </div>
+      <div id="nodeBody" class="node-body"></div>
+      <div id="nodeActions" class="node-actions"></div>
+    </div>
+  </div>
+
+  <!-- ======== RESULT (victory/defeat/run end) ======== -->
+  <div id="result" class="screen">
+    <div class="result-panel">
+      <h2 id="resultTitle">Victory</h2>
+      <div id="resultBody"></div>
+      <div id="resultActions" class="node-actions"></div>
+    </div>
+  </div>
+
+  <!-- ======== COMPENDIUM ======== -->
+  <div id="compendium" class="screen">
+    <header class="bar">
+      <button class="btn small back" data-back="auto">‹ Back</button>
+      <h2>Monster Compendium</h2>
+      <div class="bar-right">
+        <input id="compSearch" class="search" type="search" placeholder="Search…" aria-label="Search monsters">
+        <span id="compCount" class="pill">0 / 100</span>
+      </div>
+    </header>
+    <div class="comp-filters" id="compFilters"></div>
+    <div id="compGrid" class="comp-grid"></div>
+  </div>
+
+  <!-- ======== ACHIEVEMENTS ======== -->
+  <div id="achievements" class="screen">
+    <header class="bar">
+      <button class="btn small back" data-back="auto">‹ Back</button>
+      <h2>Achievements</h2>
+      <div class="bar-right"><span id="achCount" class="pill">0 / 100</span></div>
+    </header>
+    <div id="achList" class="ach-list"></div>
+  </div>
+
+  <!-- ======== OVERLAYS ======== -->
+  <div id="overlay" class="overlay hidden">
+    <div class="overlay-panel" id="overlayPanel"></div>
+  </div>
+  <div id="toasts" class="toasts"></div>
+  <div id="fxFlash" class="fx-flash"></div>
+</div>
+
+<script src="js/core/util.js"></script>
+<script src="js/core/audio.js"></script>
+<script src="js/core/render.js"></script>
+<script src="js/data/skills.js"></script>
+<script src="js/data/heroes.js"></script>
+<script src="js/data/monsters.js"></script>
+<script src="js/data/items.js"></script>
+<script src="js/data/events.js"></script>
+<script src="js/data/achievements.js"></script>
+<script src="js/sprites/monsters_a.js"></script>
+<script src="js/sprites/monsters_b.js"></script>
+<script src="js/sprites/monsters_c.js"></script>
+<script src="js/sprites/monsters_d.js"></script>
+<script src="js/sprites/monsters_e.js"></script>
+<script src="js/sprites/heroes_a.js"></script>
+<script src="js/sprites/heroes_b.js"></script>
+<script src="js/sprites/ui.js"></script>
+<script src="js/sprites/ui_items.js"></script>
+<script src="js/sprites/ui_status.js"></script>
+<script src="js/engine/battle.js"></script>
+<script src="js/engine/map.js"></script>
+<script src="js/engine/run.js"></script>
+<script src="js/engine/save.js"></script>
+<script src="js/ui/common.js"></script>
+<script src="js/ui/title.js"></script>
+<script src="js/ui/select.js"></script>
+<script src="js/ui/mapview.js"></script>
+<script src="js/ui/battleview.js"></script>
+<script src="js/ui/nodes.js"></script>
+<script src="js/ui/puzzles.js"></script>
+<script src="js/ui/panels.js"></script>
+<script src="js/ui/compendium.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
