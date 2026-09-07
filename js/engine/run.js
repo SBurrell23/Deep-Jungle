@@ -150,6 +150,64 @@
     return given;
   };
 
+  // ---- Potions outside battle ----
+  // Buff potions only last for battle turns, so they are not offered on the map.
+  DJ.potionUsableOutOfBattle = function (pid) {
+    const e = DJ.POTIONS[pid].effect;
+    return !!(e.heal || e.mp || e.cure || e.revive != null);
+  };
+  // Would this potion actually do anything right now? Keeps the player from burning a
+  // revive with nobody down, or a heal on a party already at full.
+  R.potionHasEffect = function (pid) {
+    const e = DJ.POTIONS[pid].effect;
+    if (!DJ.potionUsableOutOfBattle(pid)) return false;
+    const pool = e.party ? this.party : this.party;
+    if (e.revive != null) return pool.some((h) => !h.alive);
+    return pool.some((h) => h.alive && (
+      (e.heal && h.hp < h.maxHp) ||
+      (e.mp && h.mp < h.maxMp) ||
+      (e.cure && h.statuses.some((st) => (DJ.STATUS[st.id] || {}).bad))
+    ));
+  };
+  // Apply it and report what happened, so the UI can show a line per hero.
+  R.usePotionOutOfBattle = function (pid, target) {
+    const pot = DJ.POTIONS[pid];
+    if (!pot || (this.inventory[pid] || 0) <= 0) return null;
+    const e = pot.effect;
+    const targets = e.party ? this.party.slice() : [target].filter(Boolean);
+    if (!targets.length) return null;
+    const lines = [];
+    for (const h of targets) {
+      if (e.revive != null) {
+        if (h.alive) continue;
+        h.alive = true;
+        h.hp = Math.max(1, Math.round(h.maxHp * e.revive));
+        h.statuses = [];
+        lines.push({ unit: h, text: `back on their feet at ${h.hp}/${h.maxHp} HP` });
+        continue;
+      }
+      if (!h.alive) continue;
+      const bits = [];
+      if (e.cure) {
+        const before = h.statuses.length;
+        h.statuses = h.statuses.filter((st) => !(DJ.STATUS[st.id] && DJ.STATUS[st.id].bad));
+        if (before !== h.statuses.length) bits.push('cured');
+      }
+      if (e.heal) {
+        const gain = Math.min(h.maxHp - h.hp, Math.round(h.maxHp * e.heal));
+        if (gain > 0) { h.hp += gain; bits.push(`+${gain} HP`); }
+      }
+      if (e.mp) {
+        const gain = Math.min(h.maxMp - h.mp, Math.round(h.maxMp * e.mp));
+        if (gain > 0) { h.mp += gain; bits.push(`+${gain} MP`); }
+      }
+      if (bits.length) lines.push({ unit: h, text: bits.join(', ') });
+    }
+    if (!lines.length) return null;
+    this.inventory[pid]--;
+    return { potion: pot, lines };
+  };
+
   // ---- Rest / campfire ----
   R.restHeal = function (pct) {
     const out = [];

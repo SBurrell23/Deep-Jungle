@@ -374,8 +374,8 @@
         info.style.flex = '1';
         info.appendChild(UI.el('div', 'slot-item', h.name));
         info.appendChild(UI.el('div', 'loot-desc', cur ? `Replaces ${cur.name}` : `${item.slot} slot is empty`));
-        const delta = statDelta(h, item, cur);
-        if (delta) info.appendChild(UI.el('div', 'loot-stats', delta));
+        const delta = statDeltaEl(h, item, cur);
+        if (delta) info.appendChild(delta);
         row.appendChild(info);
         row.addEventListener('click', () => {
           DJ.sfx('confirm');
@@ -391,7 +391,7 @@
       }
       panel.appendChild(list);
       const skip = UI.el('button', 'btn wide');
-      skip.textContent = 'Keep it in the bag';
+      skip.textContent = 'Keep In Bag';
       skip.style.marginTop = '12px';
       skip.addEventListener('click', () => {
         if (!run.stash.includes(item)) run.addItem(item);
@@ -402,24 +402,43 @@
     }, settle);
   };
 
-  function statDelta(hero, item, cur) {
+  // Comparing the candidate against what the hero already wears. Gains read green,
+  // losses read red, so a downgrade is obvious before you commit to it.
+  function statDeltaEl(hero, item, cur) {
     const keys = ['atk', 'mag', 'def', 'spd', 'hp', 'mp'];
-    const out = [];
+    const wrap = UI.el('div', 'delta-row');
+    let any = false;
     for (const k of keys) {
       const a = (item.stats && item.stats[k]) || 0;
       const b = (cur && cur.stats && cur.stats[k]) || 0;
       const d = a - b;
-      if (d) out.push(`${d > 0 ? '+' : ''}${d} ${k.toUpperCase()}`);
+      if (!d) continue;
+      any = true;
+      const chip = UI.el('span', 'delta ' + (d > 0 ? 'up' : 'down'),
+        `${d > 0 ? '+' : '\u2212'}${Math.abs(d)} ${k.toUpperCase()}`);
+      wrap.appendChild(chip);
     }
-    return out.join('  ');
+    // A passive the old item did not have is itself an upgrade worth calling out.
+    const curPassive = cur && cur.passive;
+    if (item.passive && item.passive !== curPassive) {
+      any = true;
+      wrap.appendChild(UI.el('span', 'delta up', DJ.PASSIVE_DESC[item.passive] || item.passive));
+    } else if (curPassive && curPassive !== item.passive) {
+      any = true;
+      wrap.appendChild(UI.el('span', 'delta down', 'loses ' + (DJ.PASSIVE_DESC[curPassive] || curPassive)));
+    }
+    if (!any) { wrap.appendChild(UI.el('span', 'delta same', 'no change')); }
+    return wrap;
   }
 
-  P.chooseHero = function (title, fn) {
+
+  P.chooseHero = function (title, fn, candidates) {
     const run = DJ.run;
+    const pool = candidates && candidates.length ? candidates : run.party;
     UI.openOverlay((panel, close) => {
       UI.overlayHeader(panel, title, close);
       const list = UI.el('div', 'equip-list');
-      for (const h of run.party) {
+      for (const h of pool) {
         const row = UI.el('div', 'equip-slot');
         row.appendChild(UI.spriteEl(h.sprite, 1.8, h.name));
         const info = UI.el('div');
@@ -433,6 +452,36 @@
       panel.appendChild(list);
     });
   };
+
+  // Drinking a potion on the map: apply it, show what changed, then return to the bag.
+  function applyFieldPotion(pid, target) {
+    const run = DJ.run;
+    const res = run.usePotionOutOfBattle(pid, target);
+    if (!res) { DJ.sfx('error'); P.bag(); return; }
+    DJ.bump('potionsUsed');
+    DJ.bumpMap('potionsByType', pid);
+    DJ.saveRun(run);
+    DJ.checkAndAnnounce();
+    DJ.sfx(res.potion.effect.revive != null ? 'revive' : 'potion');
+    UI.closeOverlay(true);
+    UI.openOverlay((panel, close) => {
+      UI.overlayHeader(panel, res.potion.name, close);
+      for (const line of res.lines) {
+        const row = UI.el('div', 'loot-row');
+        row.appendChild(UI.spriteEl(line.unit.sprite, 1.8, line.unit.name));
+        const info = UI.el('div');
+        info.appendChild(UI.el('div', 'loot-name', line.unit.name));
+        info.appendChild(UI.el('div', 'loot-stats', line.text));
+        row.appendChild(info);
+        panel.appendChild(row);
+      }
+      const back = UI.el('button', 'btn wide');
+      back.textContent = 'Back to bag';
+      back.style.marginTop = '12px';
+      back.addEventListener('click', () => { UI.closeOverlay(true); P.bag(); });
+      panel.appendChild(back);
+    }, () => { if (UI.current === 'map') UI.Map.refresh(); });
+  }
 
   // ---------------- Bag ----------------
   P.bag = function () {
@@ -455,7 +504,25 @@
         const n = run.inventory[pid] || 0;
         if (n <= 0) continue;
         any = true;
-        pScroll.appendChild(UI.potionLine(pid, n));
+        const btn = UI.el('button', 'btn small');
+        btn.textContent = 'Use';
+        const inField = DJ.potionUsableOutOfBattle(pid);
+        const useful = inField && run.potionHasEffect(pid);
+        btn.disabled = !useful;
+        btn.title = !inField ? 'Only has an effect during battle'
+          : useful ? 'Use it now' : 'Nobody would benefit right now';
+        btn.addEventListener('click', () => {
+          DJ.sfx('click');
+          const e = DJ.POTIONS[pid].effect;
+          if (e.party) { applyFieldPotion(pid, null); return; }
+          const candidates = e.revive != null
+            ? run.party.filter((h) => !h.alive)
+            : run.party.filter((h) => h.alive);
+          if (candidates.length === 1) { applyFieldPotion(pid, candidates[0]); return; }
+          UI.closeOverlay(true);
+          P.chooseHero(`Use ${DJ.POTIONS[pid].name} on whom?`, (h) => applyFieldPotion(pid, h), candidates);
+        });
+        pScroll.appendChild(UI.potionLine(pid, n, btn));
       }
       if (!any) pScroll.appendChild(UI.el('p', 'empty-note', 'No potions. Merchants sell them; monsters drop them.'));
       potions.appendChild(pScroll);
