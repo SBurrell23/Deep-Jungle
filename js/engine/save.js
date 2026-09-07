@@ -9,7 +9,7 @@
       unlocked: ['elf_warrior', 'goblin_mage', 'kuata_lancer'],
       achievements: [],
       compendium: {},            // monsterId -> {seen, killed}
-      settings: { music: 0.5, sfx: 0.7, musicOn: true, sfxOn: true, speed: 1, autoSave: true, screenShake: true, damageNumbers: true },
+      settings: { music: 0.5, sfx: 0.7, musicOn: true, sfxOn: true, speed: 1, autoSave: true, screenShake: true, damageNumbers: true, loopOne: false },
       stats: {
         runsStarted: 0, runsWon: 0, runsLost: 0, battlesWon: 0, kills: 0, elitesKilled: 0,
         crits: 0, maxHit: 0, damageDealt: 0, damageTaken: 0, healingDone: 0, statusesInflicted: 0,

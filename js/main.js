@@ -29,7 +29,8 @@
     DJ.load();
     setBoot(25, 'Warming the drums…');
     DJ.Audio.init();
-    DJ.Audio.loadMusic('assets/audio/vinebridge_quest.mp3');
+    DJ.Audio.loadMusic();
+    DJ.Audio.loopOne = !!DJ.profile.settings.loopOne;
     setBoot(45, 'Painting the canopy…');
     await DJ.loadFxSheets('assets/FX');
     setBoot(75, 'Waking the monsters…');

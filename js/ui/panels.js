@@ -10,27 +10,29 @@
       const s = DJ.profile.settings;
       UI.overlayHeader(panel, 'Settings', close);
 
-      const slider = (label, key, fmt) => {
+      const slider = (label, key, onInput) => {
         const row = UI.el('div', 'set-row');
         row.appendChild(UI.el('label', null, label));
         const inp = document.createElement('input');
         inp.type = 'range'; inp.min = 0; inp.max = 100; inp.step = 1;
         inp.value = Math.round(s[key] * 100);
         inp.setAttribute('aria-label', label);
-        const out = UI.el('output', null, (fmt || ((v) => v + '%'))(inp.value));
+        const out = UI.el('output', null, inp.value + '%');
         inp.addEventListener('input', () => {
           s[key] = inp.value / 100;
-          out.textContent = (fmt || ((v) => v + '%'))(inp.value);
+          out.textContent = inp.value + '%';
           DJ.Audio.applySettings();
-          if (key === 'sfx') DJ.sfx('hover');
+          if (onInput) onInput();
         });
         inp.addEventListener('change', () => DJ.save());
         row.appendChild(inp); row.appendChild(out);
         return row;
       };
-      const toggle = (label, key, onChange) => {
+      const toggle = (label, key, onChange, title) => {
         const row = UI.el('div', 'switch-row');
-        row.appendChild(UI.el('span', null, label));
+        const lbl = UI.el('span', null, label);
+        if (title) { row.title = title; }
+        row.appendChild(lbl);
         const sw = UI.el('label', 'switch');
         const inp = document.createElement('input');
         inp.type = 'checkbox'; inp.checked = !!s[key];
@@ -42,24 +44,82 @@
           if (key === 'musicOn') { if (inp.checked) DJ.Audio.playMusic(); else DJ.Audio.pauseMusic(); }
           if (key === 'sfxOn' && inp.checked) DJ.sfx('confirm');
           DJ.save();
-          onChange && onChange();
+          onChange && onChange(inp.checked);
         });
         sw.appendChild(inp); sw.appendChild(track);
         row.appendChild(sw);
         return row;
       };
+      const heading = (t) => {
+        const h = UI.el('h4', 'set-head', t);
+        return h;
+      };
 
-      panel.appendChild(UI.el('h4', null, 'Audio')).style.cssText = 'margin:0 0 10px;font-size:14px;color:#8fe08a';
-      panel.appendChild(toggle('Music', 'musicOn'));
-      panel.appendChild(slider('Music volume', 'music'));
-      panel.appendChild(toggle('Sound effects', 'sfxOn'));
-      panel.appendChild(slider('Effects volume', 'sfx'));
+      const cols = UI.el('div', 'settings-cols');
 
-      panel.appendChild(UI.el('h4', null, 'Gameplay')).style.cssText = 'margin:16px 0 10px;font-size:14px;color:#8fe08a';
+      // ---------- left: sound and music ----------
+      const left = UI.el('div', 'settings-col');
+      left.appendChild(heading('Sound'));
+      left.appendChild(toggle('Sound effects', 'sfxOn'));
+      left.appendChild(slider('Effects volume', 'sfx', () => DJ.sfx('hover')));
+
+      left.appendChild(heading('Music'));
+      left.appendChild(toggle('Music', 'musicOn'));
+      left.appendChild(slider('Music volume', 'music'));
+
+      // Now-playing card with skip and single-track repeat.
+      const np = UI.el('div', 'now-playing');
+      const npLabel = UI.el('div', 'np-label', 'Now playing');
+      const npName = UI.el('div', 'np-name', '');
+      np.appendChild(npLabel);
+      np.appendChild(npName);
+      const npRow = UI.el('div', 'np-row');
+      const nextBtn = UI.el('button', 'btn small');
+      nextBtn.textContent = 'Next \u25b8';
+      nextBtn.title = 'Skip to the next track in the queue';
+      nextBtn.addEventListener('click', () => { DJ.sfx('click'); DJ.Audio.nextTrack(false); });
+      npRow.appendChild(nextBtn);
+
+      const loopWrap = UI.el('label', 'np-loop');
+      const loopBox = document.createElement('input');
+      loopBox.type = 'checkbox';
+      loopBox.checked = !!DJ.Audio.loopOne;
+      loopBox.addEventListener('change', () => {
+        DJ.Audio.setLoopOne(loopBox.checked);
+        DJ.sfx('click');
+        syncNowPlaying();
+      });
+      loopWrap.appendChild(loopBox);
+      loopWrap.appendChild(UI.el('span', null, 'Loop this song'));
+      loopWrap.title = 'Repeat the current track instead of moving on';
+      npRow.appendChild(loopWrap);
+      np.appendChild(npRow);
+      left.appendChild(np);
+
+      function syncNowPlaying() {
+        const t = DJ.Audio.currentTrack ? DJ.Audio.currentTrack() : null;
+        npName.textContent = t ? t.name : '\u2014';
+        const boss = DJ.Audio.bossMode;
+        npLabel.textContent = boss ? 'Boss music' : 'Now playing';
+        np.classList.toggle('boss', !!boss);
+        nextBtn.disabled = !!boss;
+        loopBox.disabled = !!boss;
+        loopBox.checked = !!DJ.Audio.loopOne;
+      }
+      syncNowPlaying();
+      const off = DJ.events.on('music', syncNowPlaying);
+      const npTimer = setInterval(syncNowPlaying, 1000);
+      panel.addEventListener('dj-overlay-closed', () => { off(); clearInterval(npTimer); });
+
+      cols.appendChild(left);
+
+      // ---------- right: gameplay and save data ----------
+      const right = UI.el('div', 'settings-col');
+      right.appendChild(heading('Gameplay'));
       const speedRow = UI.el('div', 'set-row');
       speedRow.appendChild(UI.el('label', null, 'Battle speed'));
       const sel = document.createElement('select');
-      sel.style.cssText = 'background:#0d1c12;border:1px solid #2c4d34;color:#e8f3e4;border-radius:8px;padding:7px 10px;font-size:13px;width:100%';
+      sel.className = 'set-select';
       [['1', 'Normal'], ['2', 'Fast'], ['3', 'Very fast']].forEach(([v, t]) => {
         const o = document.createElement('option'); o.value = v; o.textContent = t;
         if (String(s.speed) === v) o.selected = true;
@@ -68,23 +128,37 @@
       sel.addEventListener('change', () => { s.speed = parseInt(sel.value, 10); DJ.save(); DJ.sfx('click'); });
       speedRow.appendChild(sel);
       speedRow.appendChild(UI.el('output', null, ''));
-      panel.appendChild(speedRow);
-      panel.appendChild(toggle('Damage numbers', 'damageNumbers'));
-      panel.appendChild(toggle('Screen shake and flashes', 'screenShake'));
-      panel.appendChild(toggle('Autosave', 'autoSave'));
+      right.appendChild(speedRow);
+      right.appendChild(toggle('Damage numbers', 'damageNumbers'));
+      right.appendChild(toggle('Screen shake and flashes', 'screenShake'));
+      right.appendChild(toggle('Autosave', 'autoSave'));
 
-      panel.appendChild(UI.el('h4', null, 'Save data')).style.cssText = 'margin:16px 0 10px;font-size:14px;color:#8fe08a';
-      const stat = UI.el('p', 'muted');
-      stat.style.fontSize = '12.5px';
+      right.appendChild(heading('Save data'));
+      const stat = UI.el('p', 'muted set-stats');
       const st = DJ.profile.stats;
-      stat.textContent = `${DJ.profile.achievements.length}/${DJ.ACHIEVEMENTS.length} achievements · ${DJ.profile.unlocked.length}/23 adventurers · ${st.discovered}/100 monsters · ${st.runsWon} ${st.runsWon === 1 ? 'victory' : 'victories'}`;
-      panel.appendChild(stat);
+      stat.textContent = `${DJ.profile.achievements.length}/${DJ.ACHIEVEMENTS.length} achievements \u00b7 ${DJ.profile.unlocked.length}/23 adventurers \u00b7 ${st.discovered}/100 monsters \u00b7 ${st.runsWon} ${st.runsWon === 1 ? 'victory' : 'victories'}`;
+      right.appendChild(stat);
 
-      const btnRow = UI.el('div');
-      btnRow.style.cssText = 'display:flex;gap:8px;margin-top:14px;flex-wrap:wrap';
+      const inRun = !!(DJ.run && !DJ.run.finished);
+      const btnCol = UI.el('div', 'set-buttons');
+
+      // Leaving for the title screen keeps the expedition; only "Abandon" throws it away.
+      const toTitle = UI.el('button', 'btn small');
+      toTitle.textContent = 'Return to main menu';
+      toTitle.title = 'Keeps your expedition. You can continue it from the title screen.';
+      toTitle.disabled = UI.current === 'title';
+      toTitle.addEventListener('click', () => {
+        if (inRun) DJ.saveRun(DJ.run);
+        DJ.save();
+        UI.closeOverlay(true);
+        UI.Title.refresh();
+        UI.show('title');
+      });
+      btnCol.appendChild(toTitle);
+
       const abandon = UI.el('button', 'btn danger small');
       abandon.textContent = 'Abandon expedition';
-      abandon.disabled = !DJ.run || DJ.run.finished;
+      abandon.disabled = !inRun;
       abandon.addEventListener('click', () => {
         confirmDialog('Abandon this expedition?', 'Your progress in the jungle is lost. Achievements and unlocks are kept.', () => {
           DJ.bump('runsLost');
@@ -96,6 +170,8 @@
           UI.show('title');
         });
       });
+      btnCol.appendChild(abandon);
+
       const wipe = UI.el('button', 'btn danger small');
       wipe.textContent = 'Erase all save data';
       wipe.addEventListener('click', () => {
@@ -108,11 +184,12 @@
           UI.toast('Save erased', 'Starting fresh.', 'cancel');
         });
       });
-      btnRow.appendChild(abandon);
-      btnRow.appendChild(wipe);
-      panel.appendChild(btnRow);
+      btnCol.appendChild(wipe);
+      right.appendChild(btnCol);
 
-    });
+      cols.appendChild(right);
+      panel.appendChild(cols);
+    }, null, { wide: true });
   };
 
   function confirmDialog(title, text, onYes) {

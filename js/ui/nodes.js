@@ -507,7 +507,22 @@
     run.stats.merchants++;
     if (!node._counted) { node._counted = true; DJ.bump('merchants'); }
 
-    panel('Merchant', `${run.gold} gold`, 'node_merchant', (body) => {
+    panel('Merchant', null, 'node_merchant', (body) => {
+      // Gold is the whole decision here, so it gets a banner rather than a subtitle.
+      const purse = UI.el('div', 'purse');
+      const left = UI.el('div', 'purse-left');
+      left.appendChild(UI.el('span', 'purse-label', 'Your gold'));
+      const amt = UI.el('span', 'purse-amount');
+      if (DJ.SPRITES.icon_gold) amt.appendChild(UI.spriteEl('icon_gold', 1.6, 'gold'));
+      amt.appendChild(UI.el('span', null, String(run.gold)));
+      left.appendChild(amt);
+      purse.appendChild(left);
+      const bagBtn = UI.el('button', 'btn small');
+      bagBtn.textContent = 'View bag';
+      bagBtn.title = 'See what you are already carrying before you buy';
+      bagBtn.addEventListener('click', () => { DJ.sfx('click'); UI.Panels.bag(); });
+      purse.appendChild(bagBtn);
+      body.appendChild(purse);
       body.appendChild(UI.el('p', 'flavor', '"You look like people who lose things," says the trader, who is sitting on a crate in the middle of nowhere with a parasol. "Lucky for you, I find things."'));
 
       const mkBuy = (label, price, canAfford, onBuy) => {

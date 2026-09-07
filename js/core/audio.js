@@ -38,33 +38,195 @@
     if (!A.ctx) return;
     if (A.ctx.state === 'suspended') A.ctx.resume();
     A.unlocked = true;
-    if (A.musicEl && A.musicEl.paused && DJ.profile.settings.musicOn) A.musicEl.play().catch(() => {});
+    A._started = true;
+    if (DJ.profile.settings.musicOn) A.playMusic();
   };
 
   A.applySettings = function () {
     const s = (DJ.profile && DJ.profile.settings) || { music: 0.5, sfx: 0.7, musicOn: true, sfxOn: true };
     if (A.sfxGain) A.sfxGain.gain.value = s.sfxOn ? s.sfx : 0;
     if (A.musicGain) A.musicGain.gain.value = s.musicOn ? s.music : 0;
-    if (A.musicEl) A.musicEl.volume = s.musicOn ? s.music * 0.85 : 0;
+    for (const c of A._chans || []) applyChanVolume(c);
   };
 
   // ---------- Music ----------
-  A.loadMusic = function (url) {
-    if (A.musicEl) return;
+  // Exploration tracks play as a crossfading playlist. Boss fights swap to their own
+  // track and hand control back to the playlist when the fight ends.
+  DJ.MUSIC = {
+    playlist: [
+      { id: 'lost_temple',   name: 'Lost Temple Loop',      src: 'assets/audio/Lost Temple Loop.mp3' },
+      { id: 'canopy',        name: 'Canopy Quest',          src: 'assets/audio/Canopy Quest.mp3' },
+      { id: 'vinebridge',    name: 'Vinebridge Thicket',    src: 'assets/audio/Vinebridge Thicket.mp3' },
+      { id: 'unexplored',    name: 'Unexplored Adventures', src: 'assets/audio/Unexplored Adventures.mp3' },
+    ],
+    boss: { id: 'temple_breaker', name: 'Temple Breaker', src: 'assets/audio/boss-music/Temple Breaker.mp3' },
+  };
+
+  const CROSSFADE = 5;          // seconds of overlap between tracks
+  const FADE_STEP = 50;         // ms between volume updates
+
+  A.trackIndex = 0;             // where we are in the exploration playlist
+  A.bossMode = false;
+  A.loopOne = false;            // repeat the current track instead of advancing
+  A._chans = [];                // two elements so one can fade out while the other fades in
+  A._activeChan = 0;
+  A._fades = [];
+  A._watch = null;
+  A._started = false;
+
+  function mkChan() {
     const el = new Audio();
-    el.src = url;
-    el.loop = true;
     el.preload = 'auto';
     el.volume = 0;
-    A.musicEl = el;
-    el.addEventListener('canplaythrough', () => { A.applySettings(); }, { once: true });
+    el.crossOrigin = 'anonymous';
+    return { el, gain: 0, track: null };
+  }
+
+  function musicVolume() {
+    const s = (DJ.profile && DJ.profile.settings) || {};
+    return s.musicOn === false ? 0 : (s.music == null ? 0.5 : s.music) * 0.85;
+  }
+  function applyChanVolume(c) {
+    try { c.el.volume = DJ.clamp(c.gain * musicVolume(), 0, 1); } catch (e) {}
+  }
+
+  // Ramp one channel's envelope over `secs`, then optionally stop it.
+  function fadeChan(c, to, secs, stopAfter) {
+    A._fades = A._fades.filter((f) => f.c !== c);
+    if (secs <= 0) {
+      c.gain = to; applyChanVolume(c);
+      if (stopAfter && to === 0) { try { c.el.pause(); } catch (e) {} }
+      return;
+    }
+    A._fades.push({ c, from: c.gain, to, secs, t: 0, stopAfter });
+  }
+
+  function tickFades(dt) {
+    if (!A._fades.length) return;
+    for (const f of A._fades.slice()) {
+      f.t += dt;
+      const k = DJ.clamp(f.t / f.secs, 0, 1);
+      f.c.gain = f.from + (f.to - f.from) * k;
+      applyChanVolume(f.c);
+      if (k >= 1) {
+        A._fades = A._fades.filter((x) => x !== f);
+        if (f.stopAfter && f.to === 0) { try { f.c.el.pause(); f.c.el.currentTime = 0; } catch (e) {} }
+      }
+    }
+  }
+
+  A.initMusic = function () {
+    if (A._chans.length) return;
+    A._chans = [mkChan(), mkChan()];
+    // One timer drives both the fades and the "are we near the end?" check.
+    A._watch = setInterval(() => {
+      tickFades(FADE_STEP / 1000);
+      const c = A._chans[A._activeChan];
+      if (!c || !c.el.duration || c.el.paused) return;
+      const left = c.el.duration - c.el.currentTime;
+      if (A.bossMode) return;                 // boss track loops on its own
+      if (A.loopOne) return;                  // native loop handles the repeat
+      if (left <= CROSSFADE && !A._advancing) {
+        A._advancing = true;
+        A.nextTrack(true);
+      }
+    }, FADE_STEP);
   };
+
+  // Backwards-compatible entry point used by boot.
+  A.loadMusic = function () {
+    A.initMusic();
+    A.setTrack(0, 0);
+  };
+
+  function trackAt(i) {
+    const pl = DJ.MUSIC.playlist;
+    return pl[((i % pl.length) + pl.length) % pl.length];
+  }
+  A.currentTrack = function () {
+    return A.bossMode ? DJ.MUSIC.boss : trackAt(A.trackIndex);
+  };
+
+  // Swap to a track, crossfading over `fade` seconds.
+  function playOn(track, fade, loop) {
+    A.initMusic();
+    const from = A._chans[A._activeChan];
+    const to = A._chans[1 - A._activeChan];
+    A._activeChan = 1 - A._activeChan;
+    to.track = track;
+    if (to.el.src !== new URL(track.src, location.href).href) to.el.src = track.src;
+    to.el.loop = !!loop;
+    to.el.currentTime = 0;
+    to.gain = 0;
+    applyChanVolume(to);
+    const startPlaying = () => {
+      const pr = to.el.play();
+      if (pr && pr.catch) pr.catch(() => {});
+    };
+    startPlaying();
+    fadeChan(to, 1, fade);
+    if (from && !from.el.paused) fadeChan(from, 0, fade, true);
+    A._advancing = false;
+    DJ.events.emit('music', A.currentTrack());
+  }
+
+  A.setTrack = function (i, fade) {
+    A.trackIndex = ((i % DJ.MUSIC.playlist.length) + DJ.MUSIC.playlist.length) % DJ.MUSIC.playlist.length;
+    A.bossMode = false;
+    if (!A._started) {
+      // Cannot start until the browser has had a user gesture; remember the intent.
+      A._pendingTrack = trackAt(A.trackIndex);
+      DJ.events.emit('music', A.currentTrack());
+      return;
+    }
+    playOn(trackAt(A.trackIndex), fade == null ? CROSSFADE : fade, A.loopOne);
+  };
+
+  A.nextTrack = function (auto) {
+    if (A.bossMode) return;
+    A.setTrack(A.trackIndex + 1, auto ? CROSSFADE : 1.2);
+  };
+
+  A.setLoopOne = function (on) {
+    A.loopOne = !!on;
+    const c = A._chans[A._activeChan];
+    if (c) c.el.loop = A.loopOne && !A.bossMode;
+    if (DJ.profile) { DJ.profile.settings.loopOne = A.loopOne; DJ.save && DJ.save(); }
+  };
+
+  // Boss fights take over the music, then hand it back.
+  A.enterBossMusic = function () {
+    if (A.bossMode) return;
+    A._resumeIndex = A.trackIndex;
+    A.bossMode = true;
+    if (!A._started) { DJ.events.emit('music', A.currentTrack()); return; }
+    playOn(DJ.MUSIC.boss, 2.0, true);
+  };
+  A.exitBossMusic = function () {
+    if (!A.bossMode) return;
+    A.bossMode = false;
+    A.trackIndex = A._resumeIndex == null ? A.trackIndex : A._resumeIndex;
+    if (!A._started) { DJ.events.emit('music', A.currentTrack()); return; }
+    playOn(trackAt(A.trackIndex), 3.0, A.loopOne);
+  };
+
   A.playMusic = function () {
-    if (!A.musicEl) return;
-    A.applySettings();
-    if (DJ.profile.settings.musicOn) A.musicEl.play().catch(() => {});
+    A.initMusic();
+    A._started = true;
+    const s = DJ.profile.settings;
+    if (!s.musicOn) return;
+    const c = A._chans[A._activeChan];
+    if (c && c.el.src && c.el.paused) {
+      const pr = c.el.play();
+      if (pr && pr.catch) pr.catch(() => {});
+      if (c.gain === 0) fadeChan(c, 1, 1.5);
+      return;
+    }
+    if (!c || !c.el.src) playOn(A.bossMode ? DJ.MUSIC.boss : trackAt(A.trackIndex), 1.5, A.bossMode || A.loopOne);
   };
-  A.pauseMusic = function () { if (A.musicEl) A.musicEl.pause(); };
+  A.pauseMusic = function () {
+    for (const c of A._chans) { try { c.el.pause(); } catch (e) {} }
+  };
 
   // ---------- Procedural SFX toolkit ----------
   function now() { return A.ctx.currentTime; }

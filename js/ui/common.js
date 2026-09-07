@@ -115,6 +115,9 @@
   // actually chose something.
   UI.closeOverlay = function (silent) {
     const ov = UI.$('#overlay');
+    const panel = UI.$('#overlayPanel');
+    // Panels that subscribe to live events listen for this to tear down cleanly.
+    if (panel) panel.dispatchEvent(new CustomEvent('dj-overlay-closed'));
     ov.classList.add('hidden');
     UI.overlayOpen = false;
     if (silent !== true) DJ.sfx('cancel');
@@ -168,6 +171,8 @@
     row.appendChild(UI.spriteEl(item.icon, 2, item.slot));
     const info = UI.el('div');
     const nm = UI.el('div', 'loot-name rarity-' + item.rarity, item.name);
+    // The slot matters when deciding what to buy, so it rides next to the name.
+    nm.appendChild(UI.el('span', 'loot-slot', item.slot));
     info.appendChild(nm);
     const st = Object.entries(item.stats || {}).map(([k, v]) => `${v > 0 ? '+' : ''}${v} ${k.toUpperCase()}`).join('  ');
     if (st) info.appendChild(UI.el('div', 'loot-stats', st));
@@ -183,10 +188,11 @@
     const row = UI.el('div', 'loot-row');
     row.appendChild(UI.spriteEl(p.icon, 2, 'potion'));
     const info = UI.el('div');
-    info.appendChild(UI.el('div', 'loot-name', p.name + (count != null ? ` ×${count}` : '')));
+    info.appendChild(UI.el('div', 'loot-name', p.name));
     info.appendChild(UI.el('div', 'loot-desc', p.desc));
     row.appendChild(info);
-    if (extra) { const sp = UI.el('div'); sp.style.marginLeft = 'auto'; sp.appendChild(extra); row.appendChild(sp); }
+    if (count != null) row.appendChild(UI.el('div', 'loot-count', '×' + count));
+    if (extra) { const sp = UI.el('div'); sp.style.marginLeft = count != null ? '12px' : 'auto'; sp.appendChild(extra); row.appendChild(sp); }
     return row;
   };
 

@@ -594,7 +594,10 @@
     fx.clear();
     layoutUnits();
     UI.show('battle');
-    if (theNode.type === 'heart' || theNode.type === 'boss') { DJ.sfx('roar'); shake = 14; }
+    if (theNode.type === 'heart' || theNode.type === 'boss') {
+      DJ.sfx('roar'); shake = 14;
+      DJ.Audio.enterBossMusic();
+    }
 
     playEvents(battle.start(), advance);
   };
@@ -630,12 +633,12 @@
     const rail = UI.el('div', 'act-primary');
     rail.appendChild(attackBtn(u));
     const potCount = Object.values(DJ.run.inventory).reduce((a, n) => a + (n > 0 ? 1 : 0), 0);
-    rail.appendChild(utilBtn('act-item', 'potion_red', 'Item',
-      potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu));
-    rail.appendChild(utilBtn('act-defend', 'status_guard', 'Defend', 'guard + MP', false, () => submit({ type: 'defend' })));
-    rail.appendChild(utilBtn('act-auto', 'icon_check', 'Auto', 'let them decide', false, () => {
-      submit(battle.heroAutoAction(u, DJ.run.inventory));
-    }));
+    rail.appendChild(utilBtn('act-item', 'potion_red', 'Items',
+      potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
+      'Open your potions'));
+    rail.appendChild(utilBtn('act-defend', 'status_guard', 'Guard', 'raise DEF, regain MP', false,
+      () => submit({ type: 'defend' }),
+      'Guard: raises this hero’s DEF by 50% for 2 turns and restores a little MP.'));
     menu.appendChild(rail);
 
     // Right: the hero's skills as tinted cards.
@@ -664,16 +667,20 @@
     b.type = 'button';
     const weapon = u.equip && u.equip.weapon ? u.equip.weapon.icon : 'item_sword';
     if (DJ.SPRITES[weapon]) b.appendChild(UI.spriteEl(weapon, 2, 'attack'));
-    b.appendChild(UI.el('div', 'a-name', 'Attack'));
-    b.appendChild(UI.el('div', 'a-desc', 'always ready \u00b7 no MP'));
+    const txt = UI.el('div');
+    txt.appendChild(UI.el('div', 'a-name', 'Attack'));
+    txt.appendChild(UI.el('div', 'a-desc', '0 MP'));
+    b.appendChild(txt);
+    b.title = 'A basic weapon strike. Always available and costs no MP.';
     b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'attack' }, 'enemy'); });
     return b;
   }
 
-  function utilBtn(cls, icon, name, desc, disabled, fn) {
+  function utilBtn(cls, icon, name, desc, disabled, fn, tip) {
     const b = UI.el('button', 'act-btn act-util ' + cls);
     b.type = 'button';
-    if (DJ.SPRITES[icon]) b.appendChild(UI.spriteEl(icon, 1.2, name));
+    if (tip) b.title = tip;
+    if (DJ.SPRITES[icon]) b.appendChild(UI.spriteEl(icon, 1.4, name));
     const t = UI.el('div');
     t.style.minWidth = '0';
     t.appendChild(UI.el('div', null, name));
@@ -777,11 +784,9 @@
     const box = UI.$('#turnOrder');
     if (!box || !battle) return;
     box.innerHTML = '';
-    const order = battle.upcomingOrder(9);
+    const order = battle.upcomingOrder(10);
     if (!order.length) return;
-    let markedRound = false;
     for (const entry of order) {
-      if (entry.newRound && !markedRound) { box.appendChild(UI.el('div', 'to-round', 'next round')); markedRound = true; }
       const u = entry.unit;
       const slot = UI.el('div', 'to-slot' + (u.side === 'enemy' ? ' enemy' : '') + (entry.current ? ' now' : '') + (u.alive ? '' : ' dead'));
       slot.title = u.name + '  ' + u.hp + '/' + u.maxHp + ' HP';
@@ -825,6 +830,7 @@
     UI.$('#turnBanner').textContent = '';
     showTargetPrompt(false);
     waitingFor = null;
+    if (node && (node.type === 'boss' || node.type === 'heart')) DJ.Audio.exitBossMusic();
     setTimeout(() => {
       DJ.sfx(won ? 'victory' : 'defeat');
       const b = battle;

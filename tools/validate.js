@@ -13,7 +13,8 @@ const warn = (m) => warnings.push(m);
 
 // ---- load everything the page loads ----
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-const scripts = Array.from(html.matchAll(/<script src="([^"]+)"><\/script>/g)).map((m) => m[1]);
+const scripts = Array.from(html.matchAll(/<script src="([^"?]+)(?:\?[^"]*)?"><\/script>/g)).map((m) => m[1]);
+// The stamp tool appends ?v=<hash>; strip it before touching the filesystem.
 for (const s of scripts) {
   const p = path.join(ROOT, s);
   if (!fs.existsSync(p)) { err(`index.html references a missing script: ${s}`); continue; }
@@ -178,7 +179,25 @@ for (const ev of DJ.EVENTS) {
     for (const oc of o.outcomes) if (!oc.text) err(`event ${ev.id} has an outcome with no text`);
   }
 }
-if (!fs.existsSync(path.join(ROOT, 'assets/audio/vinebridge_quest.mp3'))) err('background music file is missing');
+// Every track the music player references must actually be on disk.
+for (const t of DJ.MUSIC.playlist.concat([DJ.MUSIC.boss])) {
+  if (!fs.existsSync(path.join(ROOT, t.src))) err(`music track "${t.name}" is missing (${t.src})`);
+}
+if (DJ.MUSIC.playlist.length < 2) err('the music playlist needs at least two tracks to crossfade');
+
+// Stamped asset URLs must match the file actually on disk, or a deploy serves stale JS.
+{
+  const crypto = require('crypto');
+  const stamped = Array.from(html.matchAll(/(?:src|href)="((?:js|css)\/[^"?]+)\?v=([a-f0-9]+)"/g));
+  const plain = Array.from(html.matchAll(/(?:src|href)="((?:js|css)\/[^"?]+)"/g));
+  for (const [, f] of plain) err(`asset ${f} is not cache-stamped; run node tools/stamp.js`);
+  for (const [, f, want] of stamped) {
+    const fp = path.join(ROOT, f);
+    if (!fs.existsSync(fp)) { err(`stamped asset missing: ${f}`); continue; }
+    const got = crypto.createHash('sha1').update(fs.readFileSync(fp)).digest('hex').slice(0, 8);
+    if (got !== want) err(`stale cache stamp on ${f} (html says ${want}, file is ${got}); run node tools/stamp.js`);
+  }
+}
 
 // ---- report ----
 if (warnings.length) {

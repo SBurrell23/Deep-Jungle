@@ -68,7 +68,11 @@ diffable, and means the only binary assets are the music track and the effect sh
 
 **Sound is generated.** Every sound effect is synthesized at play time with the Web Audio
 API in `js/core/audio.js` — oscillators, filtered noise, and envelopes. There are no sound
-files. Music is the one audio asset, and it loops.
+effect files.
+
+Music is the exception. Four exploration tracks play as a queue with a five-second
+crossfade between them, and boss fights swap to their own track and hand control back when
+the fight ends. Settings shows what is playing, with a skip button and a per-track repeat.
 
 **The engine is DOM-free.** `js/engine/` knows nothing about the browser, which is what
 lets the same battle code drive both the UI and the headless balance simulator.
@@ -76,13 +80,21 @@ lets the same battle code drive both the UI and the headless balance simulator.
 ## Tools
 
 ```bash
+node tools/stamp.js
+```
+
+Rewrites the `?v=<hash>` on every local script and stylesheet in `index.html`. Run it after
+changing anything under `js/` or `css/`, otherwise browsers keep serving the previous
+build. `validate.js` fails the build if a stamp is stale.
+
+```bash
 node tools/validate.js
 ```
 
 Checks that every sprite, skill, effect, item, achievement and map reference resolves, that
 all 100 monsters have unique stats, that every locked hero is reachable through some
-achievement, and that 40 generated maps have no unreachable nodes or dead ends. CI runs
-this before deploying.
+achievement, that every music track exists, that cache stamps are current, and that 40
+generated maps have no unreachable nodes or dead ends. CI runs this before deploying.
 
 ```bash
 node tools/sim.js 40
