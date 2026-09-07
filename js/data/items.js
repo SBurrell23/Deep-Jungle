@@ -70,7 +70,10 @@
     orange:  { id: 'orange', name: 'Orange Potion', icon: 'potion_orange', price: 40, desc: 'Fully heal one hero.', effect: { heal: 1.0 } },
     elixir:  { id: 'elixir', name: 'Elixir', icon: 'potion_elixir', price: 70, desc: 'Fully restore HP and MP of the whole party.', effect: { party: true, heal: 1.0, mp: 1.0, cure: true } },
     phoenix: { id: 'phoenix', name: 'Phoenix Down', icon: 'potion_phoenix', price: 90, desc: 'Revive all fallen heroes at full HP.', effect: { party: true, revive: 1.0 } },
+    // The rare one. Never sold, never dropped by ordinary monsters.
+    pink:    { id: 'pink', name: 'Heartbloom Nectar', icon: 'potion_pink', price: 0, rare: true, desc: 'Raises one adventurer a full level, instantly.', effect: { levelUp: 1 } },
   };
+  // 'pink' is deliberately absent: it is only granted by the boss/elite rules in run.js.
   DJ.POTION_DROP_WEIGHTS = [
     { v: 'red', w: 34 }, { v: 'blue', w: 22 }, { v: 'green', w: 16 }, { v: 'yellow', w: 10 },
     { v: 'purple', w: 8 }, { v: 'orange', w: 6 }, { v: 'elixir', w: 3 }, { v: 'phoenix', w: 1 },

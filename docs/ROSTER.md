@@ -175,3 +175,14 @@ Misc (16×16): `icon_gold` (coin), `icon_xp` (star), `icon_hp` (heart), `icon_mp
 Decorations: `deco_leaf` (16×16), `deco_vine` (16×32 hanging vine), `deco_flower` (16×16),
 `deco_mushroom` (16×16), `deco_torch` (16×24), `deco_rock` (24×16), `deco_tree` (32×48 jungle
 tree), `deco_fern` (24×16), `deco_totem` (16×32).
+
+## New adventurers #24–30 (32×32, face RIGHT) — js/sprites/heroes_c.js
+| # | id | name | look |
+|---|----|------|------|
+| 24 | toucan_bard | Toucan Bard | upright toucan with a huge orange-and-yellow beak, bright blue/green plumage, a small lute or drum held in one wing, a feathered cap |
+| 25 | scarab_alchemist | Scarab Alchemist | iridescent blue-green scarab beetle standing upright, goggles pushed up on its head, holding a bubbling glass flask, a satchel of vials |
+| 26 | sloth_sentinel | Sloth Sentinel | huge shaggy grey-brown sloth in heavy mossy stone armour, enormous curved claws, sleepy half-closed eyes, a slab-like shield |
+| 27 | peacock_duelist | Peacock Duelist | slender peacock humanoid, iridescent blue body, a fanned tail of green-gold eye-feathers behind it, a thin rapier raised in salute, plumed hat |
+| 28 | croc_warlord | Crocodile Warlord | massive dark green crocodile warrior on two legs, bone-and-bronze pauldrons, a war banner on its back, jagged tooth-studded club or axe |
+| 29 | axolotl_mystic | Axolotl Mystic | pale pink axolotl humanoid with feathery magenta external gills, robes of flowing water-blue cloth, glowing cyan orb floating above one webbed hand |
+| 30 | termite_swarmlord | Termite Swarmlord | armoured pale-tan termite lord with a broad mandibled head, dark chitin plates, a crown-like ridge, tiny termites swarming around its feet |

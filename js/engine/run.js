@@ -154,13 +154,14 @@
   // Buff potions only last for battle turns, so they are not offered on the map.
   DJ.potionUsableOutOfBattle = function (pid) {
     const e = DJ.POTIONS[pid].effect;
-    return !!(e.heal || e.mp || e.cure || e.revive != null);
+    return !!(e.heal || e.mp || e.cure || e.revive != null || e.levelUp);
   };
   // Would this potion actually do anything right now? Keeps the player from burning a
   // revive with nobody down, or a heal on a party already at full.
   R.potionHasEffect = function (pid) {
     const e = DJ.POTIONS[pid].effect;
     if (!DJ.potionUsableOutOfBattle(pid)) return false;
+    if (e.levelUp) return this.party.some((h) => h.alive && h.level < DJ.MAX_LEVEL);
     const pool = e.party ? this.party : this.party;
     if (e.revive != null) return pool.some((h) => !h.alive);
     return pool.some((h) => h.alive && (
@@ -177,6 +178,22 @@
     const targets = e.party ? this.party.slice() : [target].filter(Boolean);
     if (!targets.length) return null;
     const lines = [];
+    if (e.levelUp) {
+      const h = targets[0];
+      if (!h || !h.alive || h.level >= DJ.MAX_LEVEL) return null;
+      const before = h.level;
+      // Hand over exactly the XP still owed for the next level, so it is always one level.
+      const gains = DJ.grantXp(h, Math.max(1, h.xpNext - h.xp));
+      if (!gains.length) return null;
+      const d = gains.reduce((acc, g) => {
+        for (const k in acc) acc[k] += g.delta[k] || 0;
+        return acc;
+      }, { hp: 0, mp: 0, atk: 0, mag: 0, def: 0, spd: 0 });
+      const bits = Object.keys(d).filter((k) => d[k]).map((k) => `+${d[k]} ${k.toUpperCase()}`);
+      lines.push({ unit: h, text: `level ${before} \u2192 ${h.level}` + (bits.length ? '  ' + bits.join(', ') : ''), levelUp: true, gains });
+      this.inventory[pid]--;
+      return { potion: pot, lines };
+    }
     for (const h of targets) {
       if (e.revive != null) {
         if (h.alive) continue;
@@ -250,6 +267,10 @@
     if (rng.chance(boss ? 0.9 : elite ? 0.45 : 0.14)) drops.potions.push(DJ.rollPotion(rng));
     const iChance = boss ? 1 : elite ? 0.7 : 0.16;
     if (rng.chance(iChance)) drops.items.push(DJ.rollItem(rng, node.level, boss ? 3 : elite ? 2 : 0));
+    // Heartbloom Nectar is the run's rare prize: a guaranteed reward for a region boss,
+    // and an occasional one from an elite. Ordinary monsters never carry it.
+    if (node.type === 'boss') drops.potions.push('pink');
+    else if (elite && rng.chance(0.12)) drops.potions.push('pink');
     return drops;
   };
 

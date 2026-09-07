@@ -36,9 +36,9 @@ const expect = (label, actual, wanted) => {
   if (actual !== wanted) err(`${label}: expected ${wanted}, found ${actual}`);
 };
 expect('monsters', DJ.MONSTERS.length, 100);
-expect('heroes', DJ.HEROES.length, 23);
+expect('heroes', DJ.HEROES.length, 30);
 expect('achievements', DJ.ACHIEVEMENTS.length, 100);
-expect('achievements that unlock a hero', DJ.ACHIEVEMENTS.filter((a) => a.unlocks).length, 18);
+expect('achievements that unlock a hero', DJ.ACHIEVEMENTS.filter((a) => a.unlocks).length, 25);
 expect('starter heroes', DJ.HEROES.filter((h) => !h.unlock).length, 5);
 
 // ---- uniqueness ----

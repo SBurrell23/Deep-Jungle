@@ -105,6 +105,9 @@
   const STAT_ROWS = [
     ['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['mag', 'MAG'], ['def', 'DEF'], ['spd', 'SPD'],
   ];
+  // Same palette the adventurer screens use, so a stat is the same colour everywhere.
+  const STAT_COLOR = { hp: '#4fbf5a', mp: '#4f9fe0', atk: '#e05252', mag: '#a97fe0', def: '#7fc8ff', spd: '#e8c65a' };
+  const STAT_DIM = { hp: '#2c6b33', mp: '#2c5b7d', atk: '#7d2f2f', mag: '#5c447a', def: '#3f6e8c', spd: '#7d6a2c' };
 
   function levelUpCard(g) {
     const card = UI.el('div', 'lu-card');
@@ -130,9 +133,14 @@
       const track = UI.el('div', 'lu-track');
       const base = UI.el('i', 'lu-base');
       const add = UI.el('i', 'lu-gain');
+      base.style.background = STAT_DIM[key];
+      add.style.background = STAT_COLOR[key];
       track.appendChild(base); track.appendChild(add);
       row.appendChild(track);
-      row.appendChild(UI.el('span', 'lu-val', `+${gain}`));
+      const val = UI.el('span', 'lu-val', `+${gain}`);
+      val.style.color = STAT_COLOR[key];
+      row.appendChild(val);
+      UI.statTip(row, key);
       grid.appendChild(row);
       const before = DJ.clamp((now[key] - gain) / scale[key], 0, 1) * 100;
       const after = DJ.clamp(now[key] / scale[key], 0, 1) * 100;

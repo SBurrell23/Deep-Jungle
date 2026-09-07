@@ -114,6 +114,7 @@
         const b = UI.el('div', 'stat-box');
         b.appendChild(UI.el('b', null, String(v)));
         b.appendChild(UI.el('span', null, k));
+        UI.statTip(b, k.toLowerCase());
         grid.appendChild(b);
       }
       panel.appendChild(grid);
@@ -245,7 +246,10 @@
   const STAT_MAX = { hp: 130, mp: 60, atk: 20, mag: 20, def: 16, spd: 16 };
   const STAT_COLOR = { hp: '#4fbf5a', mp: '#4f9fe0', atk: '#e05252', mag: '#a97fe0', def: '#7fc8ff', spd: '#e8c65a' };
 
+  let rosterHover = null;
+
   R.open = function () {
+    rosterHover = null;
     R.render();
     UI.show('roster');
   };
@@ -253,80 +257,89 @@
   R.render = function () {
     const grid = UI.$('#rosterGrid');
     grid.innerHTML = '';
+    grid.onmouseleave = () => { rosterHover = null; renderPanel(); };
     for (const h of DJ.HEROES) {
       const unlocked = DJ.isUnlocked(h.id);
       const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked'));
+      card.tabIndex = 0;
       card.appendChild(unlocked ? UI.spriteEl(h.id, 2.5, h.name) : UI.silhouetteEl(h.id, 2.5));
       card.appendChild(UI.el('div', 'rc-name', unlocked ? h.name : '???'));
       card.appendChild(UI.el('div', 'rc-role', unlocked ? h.role : 'Locked'));
-      if (unlocked) {
-        if (!h.unlock) card.appendChild(UI.el('div', 'rc-tag', 'Starter'));
-        card.addEventListener('click', () => { DJ.sfx('page'); detail(h); });
-      } else {
+      if (unlocked && !h.unlock) card.appendChild(UI.el('div', 'rc-tag', 'Starter'));
+      else if (!unlocked) {
         const a = DJ.unlockRequirement(h.id);
         card.appendChild(UI.el('div', 'rc-tag locked', a ? a.name : 'Locked'));
-        card.addEventListener('click', () => { DJ.sfx('page'); detail(h); });
       }
+      const show = () => { rosterHover = h.id; renderPanel(); };
+      card.addEventListener('mouseenter', show);
+      card.addEventListener('focus', show);
+      card.addEventListener('click', () => { DJ.sfx('page'); rosterHover = h.id; renderPanel(); });
       grid.appendChild(card);
     }
     UI.$('#rosterCount').textContent = `${DJ.profile.unlocked.length} / ${DJ.HEROES.length}`;
+    renderPanel();
   };
 
-  function detail(h) {
+  // The right-hand panel mirrors the party-setup screen: hover to read a full kit.
+  function renderPanel() {
+    const box = UI.$('#rosterDetail');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!rosterHover) {
+      box.appendChild(UI.el('p', 'muted center', 'Hover an adventurer to see their stats and skills.'));
+      return;
+    }
+    const h = DJ.HERO_BY_ID[rosterHover];
     const unlocked = DJ.isUnlocked(h.id);
-    UI.openOverlay((panel, close) => {
-      UI.overlayHeader(panel, unlocked ? h.name : '???', close);
-      const sp = unlocked ? UI.spriteEl(h.id, 4, h.name) : UI.silhouetteEl(h.id, 4);
-      sp.className = 'detail-sprite';
-      panel.appendChild(sp);
 
-      if (!unlocked) {
-        const a = DJ.unlockRequirement(h.id);
-        const note = UI.el('div', 'unlock-note');
-        note.innerHTML = `<b>Locked.</b> Unlocks with the achievement <b>${a ? a.name : '???'}</b>.`;
-        if (a) note.appendChild(UI.el('div', null, a.desc));
-        panel.appendChild(note);
-        return;
-      }
+    const head = UI.el('div');
+    head.style.cssText = 'display:flex;gap:12px;align-items:center;margin-bottom:8px';
+    head.appendChild(unlocked ? UI.spriteEl(h.id, 2.5, h.name) : UI.silhouetteEl(h.id, 2.5));
+    const ht = UI.el('div');
+    ht.appendChild(UI.el('h3', null, unlocked ? h.name : '???'));
+    ht.appendChild(UI.el('div', 'role-line', unlocked ? h.role + (h.unlock ? '' : '  \u00b7  Starter') : 'Locked'));
+    head.appendChild(ht);
+    box.appendChild(head);
 
-      const sub = UI.el('p', 'center role-line', h.role + (h.unlock ? '' : '  ·  Starter'));
-      sub.style.cssText = 'margin:0 0 10px;text-align:center';
-      panel.appendChild(sub);
+    if (!unlocked) {
+      const a = DJ.unlockRequirement(h.id);
+      const note = UI.el('div', 'unlock-note');
+      note.innerHTML = `<b>Locked.</b> Unlocks with the achievement <b>${a ? a.name : '???'}</b>.`;
+      if (a) note.appendChild(UI.el('div', null, a.desc));
+      box.appendChild(note);
+      return;
+    }
 
-      const desc = UI.el('p', 'center');
-      desc.style.cssText = 'font-style:italic;color:#a8c0aa;font-size:13.5px;line-height:1.55;margin:0 4px 14px';
-      desc.textContent = h.desc;
-      panel.appendChild(desc);
+    box.appendChild(UI.el('p', 'desc', h.desc));
+    const stats = UI.el('div', 'stat-rows');
+    for (const k of ['hp', 'mp', 'atk', 'mag', 'def', 'spd']) {
+      stats.appendChild(UI.statBar(k.toUpperCase(), h.base[k], STAT_MAX[k], STAT_COLOR[k]));
+    }
+    box.appendChild(stats);
 
-      const stats = UI.el('div', 'stat-rows');
-      for (const k of ['hp', 'mp', 'atk', 'mag', 'def', 'spd']) {
-        stats.appendChild(UI.statBar(k.toUpperCase(), h.base[k], STAT_MAX[k], STAT_COLOR[k]));
-      }
-      panel.appendChild(stats);
+    const gt = UI.el('p', 'muted');
+    gt.style.cssText = 'font-size:11.5px;margin:0 0 4px';
+    gt.textContent = 'Per level: ' + ['hp', 'atk', 'mag', 'def', 'spd']
+      .filter((k) => h.grow[k] >= 0.5)
+      .map((k) => `+${h.grow[k]} ${k.toUpperCase()}`).join(', ');
+    box.appendChild(gt);
 
-      const gt = UI.el('p', 'muted');
-      gt.style.cssText = 'font-size:11.5px;margin:0 0 4px';
-      gt.textContent = 'Per level: ' + ['hp', 'atk', 'mag', 'def', 'spd']
-        .filter((k) => h.grow[k] >= 0.5)
-        .map((k) => `+${h.grow[k]} ${k.toUpperCase()}`).join(', ');
-      panel.appendChild(gt);
-
-      const sh = UI.el('h4', null, 'Skills');
-      sh.style.cssText = 'margin:14px 0 8px;font-size:14px;color:#8fe08a';
-      panel.appendChild(sh);
-      h.skills.forEach((sid, i) => {
-        const sk = DJ.SKILLS[sid];
-        if (!sk) return;
-        const item = UI.el('div', 'skill-item');
-        const hd = UI.el('div', 'sk-head');
-        hd.appendChild(UI.el('span', 'sk-name', sk.name));
-        hd.appendChild(UI.el('span', 'sk-cost', sk.mp ? sk.mp + ' MP' : 'Free'));
-        item.appendChild(hd);
-        item.appendChild(UI.el('div', 'sk-desc', sk.desc));
-        const lv = DJ.SKILL_UNLOCK_LEVELS[i];
-        if (lv > 1) item.appendChild(UI.el('div', 'sk-lvl', 'Unlocks at level ' + lv));
-        panel.appendChild(item);
-      });
-    }, null, { wide: false });
+    const sh = UI.el('h4', null, 'Skills');
+    sh.style.cssText = 'margin:14px 0 8px;font-size:14px;color:#8fe08a';
+    box.appendChild(sh);
+    h.skills.forEach((sid, i) => {
+      const sk = DJ.SKILLS[sid];
+      if (!sk) return;
+      const item = UI.el('div', 'skill-item');
+      const hd = UI.el('div', 'sk-head');
+      hd.appendChild(UI.el('span', 'sk-name', sk.name));
+      hd.appendChild(UI.el('span', 'sk-cost', sk.mp ? sk.mp + ' MP' : 'Free'));
+      item.appendChild(hd);
+      item.appendChild(UI.el('div', 'sk-desc', sk.desc));
+      const lv = DJ.SKILL_UNLOCK_LEVELS[i];
+      if (lv > 1) item.appendChild(UI.el('div', 'sk-lvl', 'Unlocks at level ' + lv));
+      box.appendChild(item);
+    });
   }
+
 })(typeof window !== 'undefined' ? window : globalThis);

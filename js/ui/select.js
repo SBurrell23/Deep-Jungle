@@ -5,7 +5,8 @@
   const S = (UI.Select = {});
 
   let picked = [];
-  let focused = null;
+  let focused = null;      // the card that was last clicked
+  let hovered = null;      // the card under the cursor, which wins for the preview
 
   const STAT_MAX = { hp: 130, mp: 60, atk: 20, mag: 20, def: 16, spd: 16 };
   const STAT_COLOR = { hp: '#4fbf5a', mp: '#4f9fe0', atk: '#e05252', mag: '#a97fe0', def: '#7fc8ff', spd: '#e8c65a' };
@@ -20,6 +21,7 @@
   function render() {
     const grid = UI.$('#heroGrid');
     grid.innerHTML = '';
+    grid.onmouseleave = () => { hovered = null; renderDetail(); };
     for (const h of DJ.HEROES) {
       const unlocked = DJ.isUnlocked(h.id);
       const card = UI.el('div', 'hero-card' + (unlocked ? '' : ' locked') + (picked.includes(h.id) ? ' selected' : ''));
@@ -36,6 +38,9 @@
       const act = () => selectCard(h, unlocked);
       card.addEventListener('click', act);
       card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+      // Hovering is enough to preview: no click needed just to read a kit.
+      card.addEventListener('mouseenter', () => { hovered = h.id; renderDetail(); });
+      card.addEventListener('focus', () => { hovered = h.id; renderDetail(); });
       grid.appendChild(card);
     }
     renderDetail();
@@ -55,11 +60,12 @@
   function renderDetail() {
     const box = UI.$('#heroDetail');
     box.innerHTML = '';
-    if (!focused) {
-      box.appendChild(UI.el('p', 'muted center', 'Select an adventurer to see their skills.'));
+    const showing = hovered || focused;
+    if (!showing) {
+      box.appendChild(UI.el('p', 'muted center', 'Hover an adventurer to see their stats and skills.'));
       return;
     }
-    const h = DJ.HERO_BY_ID[focused];
+    const h = DJ.HERO_BY_ID[showing];
     const unlocked = DJ.isUnlocked(h.id);
     const head = UI.el('div');
     head.style.cssText = 'display:flex;gap:12px;align-items:center;margin-bottom:8px';

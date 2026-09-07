@@ -144,6 +144,65 @@
     return head;
   };
 
+  // ---- Instant tooltips ----
+  // Native title= waits a second before appearing, which is useless for reading a
+  // status icon mid-fight. These show immediately and follow the cursor.
+  let tipEl = null;
+  function ensureTip() {
+    if (tipEl) return tipEl;
+    tipEl = UI.el('div', 'tip');
+    tipEl.setAttribute('role', 'tooltip');
+    document.body.appendChild(tipEl);
+    return tipEl;
+  }
+  UI.showTip = function (html, x, y) {
+    const t = ensureTip();
+    t.innerHTML = html;
+    t.classList.add('on');
+    UI.moveTip(x, y);
+  };
+  UI.moveTip = function (x, y) {
+    const t = ensureTip();
+    const r = t.getBoundingClientRect();
+    let left = x + 14;
+    let top = y + 16;
+    if (left + r.width > innerWidth - 8) left = x - r.width - 14;
+    if (top + r.height > innerHeight - 8) top = y - r.height - 12;
+    t.style.left = Math.max(6, left) + 'px';
+    t.style.top = Math.max(6, top) + 'px';
+  };
+  UI.hideTip = function () { if (tipEl) tipEl.classList.remove('on'); };
+
+  // Attach an instant tooltip to a DOM element. `html` may be a string or a function.
+  UI.tip = function (el, html) {
+    el.addEventListener('mouseenter', (e) => UI.showTip(typeof html === 'function' ? html() : html, e.clientX, e.clientY));
+    el.addEventListener('mousemove', (e) => UI.moveTip(e.clientX, e.clientY));
+    el.addEventListener('mouseleave', UI.hideTip);
+    el.addEventListener('click', UI.hideTip);
+    return el;
+  };
+
+  // What each stat actually does, for the tooltips on stat boxes and bars.
+  DJ.STAT_HELP = {
+    hp:  { name: 'Health', text: 'How much damage this adventurer can take before falling. Reaching 0 knocks them out until they are revived.' },
+    mp:  { name: 'Mana', text: 'Spent to cast abilities. Restored by Guarding, by resting at a campfire, and by blue potions.' },
+    atk: { name: 'Attack', text: 'Drives damage from physical abilities and basic attacks. Reduced by the target\u2019s DEF.' },
+    mag: { name: 'Magic', text: 'Drives damage from spells, and the strength of healing. Partly reduced by the target\u2019s DEF.' },
+    def: { name: 'Defence', text: 'Reduces incoming damage. Higher DEF means every hit lands for less; Guard raises it 50% for two turns.' },
+    spd: { name: 'Speed', text: 'Sets turn order, and adds a small bonus to critical hit chance against slower foes.' },
+  };
+  UI.statTip = function (el, key) {
+    const h = DJ.STAT_HELP[key];
+    if (!h) return el;
+    return UI.tip(el, `<b>${h.name}</b><span>${h.text}</span>`);
+  };
+  UI.statusTip = function (el, id, turns) {
+    const d = DJ.STATUS[id];
+    if (!d) return el;
+    return UI.tip(el, () => `<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span>` +
+      (turns ? `<i>${turns} turn${turns === 1 ? '' : 's'} remaining</i>` : ''));
+  };
+
   UI.flash = function () {
     if (!DJ.profile.settings.screenShake) return;
     const f = UI.$('#fxFlash');
@@ -156,6 +215,7 @@
   UI.statBar = function (label, value, max, color) {
     const row = UI.el('div', 'stat-row');
     row.appendChild(UI.el('b', null, label));
+    UI.statTip(row, label.toLowerCase());
     const track = UI.el('div', 'stat-track');
     const fill = UI.el('div', 'stat-fill');
     fill.style.width = DJ.clamp(value / max, 0, 1) * 100 + '%';

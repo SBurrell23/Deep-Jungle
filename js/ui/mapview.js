@@ -33,17 +33,26 @@
     });
     const byId = {};
     nodes.forEach((n) => (byId[n.nd.id] = n));
-    // decorative background props
+    // Decorative background props. Only ids that actually exist are used, so the extra
+    // scenery set can land without this needing to know about it.
+    const DECO = ['deco_tree', 'deco_fern', 'deco_rock', 'deco_mushroom', 'deco_flower', 'deco_totem', 'deco_vine',
+      'deco_palm', 'deco_bush', 'deco_log', 'deco_stump', 'deco_boulder', 'deco_lilypad', 'deco_reeds',
+      'deco_orchid', 'deco_bones', 'deco_ruin', 'deco_campfire', 'deco_mushroom_cluster', 'deco_hangvine',
+      'deco_fern_big'].filter((id) => DJ.SPRITES[id]);
     const props = [];
-    for (let i = 0; i < cols.length * 2; i++) {
+    // Two bands: a dim far layer behind the paths and a slightly bolder near layer.
+    for (let i = 0; i < cols.length * 7; i++) {
+      const far = rng.chance(0.55);
       props.push({
-        x: rng.range(0, cols.length * COL_W + PAD_X * 2),
-        y: rng.range(-300, 300),
-        kind: rng.pick(['deco_tree', 'deco_fern', 'deco_rock', 'deco_mushroom', 'deco_flower', 'deco_totem', 'deco_vine']),
-        s: rng.range(0.8, 1.4),
-        a: rng.range(0.10, 0.24),
+        x: rng.range(-60, cols.length * COL_W + PAD_X * 2),
+        y: rng.range(-340, 340),
+        kind: DECO.length ? rng.pick(DECO) : 'deco_rock',
+        s: far ? rng.range(0.6, 1.0) : rng.range(1.0, 1.7),
+        a: far ? rng.range(0.07, 0.15) : rng.range(0.14, 0.30),
       });
     }
+    // Draw the faint ones first so the bolder props sit in front.
+    props.sort((a, b) => a.a - b.a);
     return { nodes, byId, width: cols.length * COL_W + PAD_X * 2, props };
   }
 

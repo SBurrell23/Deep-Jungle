@@ -1,4 +1,4 @@
-/* Deep Jungle — 23 adventurers. 5 are unlocked by default; 18 unlock via achievements. */
+/* Deep Jungle — 30 adventurers. 5 are unlocked by default; 25 unlock via achievements. */
 (function (root) {
   const DJ = (root.DJ = root.DJ || {});
   // base: level-1 stats. grow: automatic per-level gains. skills unlock at levels 1,1,4,8.
@@ -96,6 +96,34 @@
       desc: 'The sun made flesh. Smites, shields, and heals: the complete hero.',
       base: { hp: 100, mp: 30, atk: 14, mag: 10, def: 10, spd: 8 }, grow: { hp: 9.5, mp: 2.8, atk: 1.7, mag: 1.1, def: 1.1, spd: 0.6 },
       skills: ['sun_mace', 'lay_on_paws', 'solar_shield', 'judgement'] },
+    { id: 'toucan_bard', name: 'Toucan Bard', role: 'Bard', unlock: 'warden_slayer',
+      desc: 'Loud, colourful, and genuinely useful. Hastens the party and shouts the enemy into submission.',
+      base: { hp: 74, mp: 38, atk: 10, mag: 11, def: 6, spd: 12 }, grow: { hp: 6.8, mp: 3.6, atk: 1.1, mag: 1.3, def: 0.7, spd: 0.9 },
+      skills: ['beak_jab', 'rally_song', 'discord_cry', 'dawn_anthem'] },
+    { id: 'scarab_alchemist', name: 'Scarab Alchemist', role: 'Alchemist', unlock: 'heart_x3',
+      desc: 'Rolls a ball of reagents everywhere he goes. Everything he throws explodes eventually.',
+      base: { hp: 68, mp: 44, atk: 6, mag: 15, def: 6, spd: 8 }, grow: { hp: 6.2, mp: 4.1, atk: 0.5, mag: 1.9, def: 0.7, spd: 0.6 },
+      skills: ['acid_flask', 'smoke_screen', 'volatile_mix', 'philos_fire'] },
+    { id: 'sloth_sentinel', name: 'Sloth Sentinel', role: 'Sentinel', unlock: 'champion',
+      desc: 'The slowest thing in the jungle and the hardest to move. Nothing gets past him, eventually.',
+      base: { hp: 118, mp: 20, atk: 13, mag: 4, def: 13, spd: 3 }, grow: { hp: 11.5, mp: 1.6, atk: 1.4, mag: 0.3, def: 1.5, spd: 0.25 },
+      skills: ['slow_swipe', 'immovable', 'canopy_hold', 'avalanche'] },
+    { id: 'peacock_duelist', name: 'Peacock Duelist', role: 'Duelist', unlock: 'crit_master',
+      desc: 'Fights like it is a performance, because it is. Enormous crits and infuriating footwork.',
+      base: { hp: 76, mp: 28, atk: 15, mag: 6, def: 6, spd: 13 }, grow: { hp: 7, mp: 2.5, atk: 1.9, mag: 0.5, def: 0.6, spd: 1.0 },
+      skills: ['riposte', 'feint', 'plume_flourish', 'perfect_thrust'] },
+    { id: 'croc_warlord', name: 'Crocodile Warlord', role: 'Warlord', unlock: 'exterminator',
+      desc: 'Came out of the river with a plan and a great many teeth. Rallies the party and cleaves the rest.',
+      base: { hp: 104, mp: 24, atk: 16, mag: 4, def: 9, spd: 6 }, grow: { hp: 10, mp: 2, atk: 2.0, mag: 0.3, def: 1.0, spd: 0.45 },
+      skills: ['jaw_crush', 'war_banner', 'tail_cleave', 'death_roll'] },
+    { id: 'axolotl_mystic', name: 'Axolotl Mystic', role: 'Mystic', unlock: 'great_healer',
+      desc: 'Regrows whatever it loses and considers death a temporary misunderstanding.',
+      base: { hp: 78, mp: 46, atk: 6, mag: 14, def: 7, spd: 8 }, grow: { hp: 7.2, mp: 4.3, atk: 0.5, mag: 1.7, def: 0.8, spd: 0.6 },
+      skills: ['water_lash', 'regrowth', 'tidal_surge', 'eternal_return'] },
+    { id: 'termite_swarmlord', name: 'Termite Swarmlord', role: 'Swarmlord', unlock: 'discover_85',
+      desc: 'Never arrives alone. Chews through armour, then through whatever the armour was protecting.',
+      base: { hp: 86, mp: 30, atk: 14, mag: 7, def: 8, spd: 9 }, grow: { hp: 8.2, mp: 2.7, atk: 1.7, mag: 0.6, def: 0.9, spd: 0.7 },
+      skills: ['gnawing_swarm', 'chitin_ward', 'hollow_bones', 'devour_tide'] },
   ];
   DJ.HERO_BY_ID = {};
   DJ.HEROES.forEach((h) => (DJ.HERO_BY_ID[h.id] = h));

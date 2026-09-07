@@ -58,6 +58,7 @@
       { id: 'canopy',        name: 'Canopy Quest',          src: 'assets/audio/Canopy Quest.mp3' },
       { id: 'vinebridge',    name: 'Vinebridge Thicket',    src: 'assets/audio/Vinebridge Thicket.mp3' },
       { id: 'unexplored',    name: 'Unexplored Adventures', src: 'assets/audio/Unexplored Adventures.mp3' },
+      { id: 'underbrush',    name: 'Underbrush Symphony',   src: 'assets/audio/Underbrush Symphony.mp3' },
     ],
     boss: { id: 'temple_breaker', name: 'Temple Breaker', src: 'assets/audio/boss-music/Temple Breaker.mp3' },
   };

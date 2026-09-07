@@ -245,8 +245,8 @@
       row.appendChild(lb); row.appendChild(b);
       return row;
     };
-    bars.appendChild(mk('hp', h.hp / h.maxHp, `HP ${h.hp}/${h.maxHp}`));
-    if (h.maxMp) bars.appendChild(mk('mp', h.mp / h.maxMp, `MP ${h.mp}/${h.maxMp}`));
+    bars.appendChild(UI.statTip(mk('hp', h.hp / h.maxHp, `HP ${h.hp}/${h.maxHp}`), 'hp'));
+    if (h.maxMp) bars.appendChild(UI.statTip(mk('mp', h.mp / h.maxMp, `MP ${h.mp}/${h.maxMp}`), 'mp'));
     bars.appendChild(mk('xp', h.xpNext ? h.xp / h.xpNext : 1, h.xpNext ? `XP ${h.xp}/${h.xpNext}` : 'MAX LEVEL'));
     ht.appendChild(bars);
     head.appendChild(ht);
@@ -257,6 +257,7 @@
       const box = UI.el('div', 'stat-box');
       box.appendChild(UI.el('b', null, String(DJ.effStat(h, k))));
       box.appendChild(UI.el('span', null, k));
+      UI.statTip(box, k);
       grid.appendChild(box);
     }
     wrap.appendChild(grid);
@@ -430,8 +431,28 @@
         row.appendChild(UI.spriteEl(h.sprite, 1.8, h.name));
         const info = UI.el('div');
         info.style.flex = '1';
-        info.appendChild(UI.el('div', 'slot-item', `${h.name}  ·  Lv ${h.level}`));
-        info.appendChild(UI.el('div', 'loot-desc', `HP ${h.hp}/${h.maxHp}   ATK ${DJ.effStat(h, 'atk')}   MAG ${DJ.effStat(h, 'mag')}   DEF ${DJ.effStat(h, 'def')}   SPD ${DJ.effStat(h, 'spd')}`));
+        // Bars read faster than numbers when you are deciding who needs the potion.
+        const nm = UI.el('div', 'slot-item');
+        nm.style.cssText = 'display:flex;justify-content:space-between;gap:8px';
+        nm.appendChild(UI.el('span', null, h.name));
+        nm.appendChild(UI.el('span', 'pb-hp', h.alive ? `Lv ${h.level}` : 'down'));
+        info.appendChild(nm);
+        const bars = UI.el('div', 'bp-bars');
+        const bar = (cls, pct, label, key) => {
+          const row = UI.el('div', 'choose-bar');
+          const b = UI.el('div', 'mini-bar ' + cls);
+          const i = UI.el('i');
+          i.style.width = DJ.clamp(pct, 0, 1) * 100 + '%';
+          b.appendChild(i);
+          row.appendChild(b);
+          row.appendChild(UI.el('span', 'cb-label', label));
+          if (key) UI.statTip(row, key);
+          return row;
+        };
+        bars.appendChild(bar('hp', h.hp / h.maxHp, `${h.hp}/${h.maxHp}`, 'hp'));
+        if (h.maxMp) bars.appendChild(bar('mp', h.mp / h.maxMp, `${h.mp}/${h.maxMp}`, 'mp'));
+        bars.appendChild(bar('xp', h.xpNext ? h.xp / h.xpNext : 1, h.xpNext ? `${h.xp}/${h.xpNext} XP` : 'MAX'));
+        info.appendChild(bars);
         row.appendChild(info);
         row.addEventListener('click', () => { DJ.sfx('confirm'); UI.closeOverlay(true); fn(h); });
         list.appendChild(row);

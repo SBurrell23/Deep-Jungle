@@ -19,6 +19,7 @@
   let hoverTarget = null;
   let battleOver = false;
   let stripTick = 0;
+  const statusHits = [];   // on-canvas status icon boxes, rebuilt every frame
 
   const SPEEDS = { 1: 1, 2: 1.55, 3: 2.3 };
   function sp() { return SPEEDS[DJ.profile.settings.speed] || 1; }
@@ -95,6 +96,7 @@
     drawBackground(w, h, region);   // full canvas gets the sky/ground wash
 
     // shadows + units, sorted so lower units draw in front
+    statusHits.length = 0;
     slots.heroes.forEach((s, i) => { s.labelRow = i; });
     slots.enemies.forEach((s, i) => { s.labelRow = i; });
     const all = slots.heroes.concat(slots.enemies).slice().sort((a, b) => a.y - b.y);
@@ -241,10 +243,12 @@
       }
     }
 
-    // active-turn marker: a large glowing gold chevron above the acting hero
+    // active-turn marker: a large glowing gold chevron, placed above this unit's
+    // status bars so it is never hidden behind them
     if (waitingFor === u) {
       ctx.save();
-      const ay = s.y - sh - 20 + Math.sin(lastT * 0.005) * 4;
+      const barTop = s.y - sh - 20 - ((s.labelRow || 0) % 3) * 15;
+      const ay = barTop - 26 + Math.sin(lastT * 0.005) * 4;
       ctx.shadowColor = 'rgba(255,220,90,.95)';
       ctx.shadowBlur = 16 + Math.sin(lastT * 0.006) * 6;
       const grad = ctx.createLinearGradient(0, ay - 4, 0, ay + 16);
@@ -297,6 +301,8 @@
       const iy = barBottom + 3;
       for (const st of u.statuses.slice(0, 6)) {
         const def = DJ.STATUS[st.id];
+        // Remember the hit box so hovering the icon can explain the effect.
+        statusHits.push({ x: ix - 1, y: iy - 1, w: 14, h: 14, id: st.id, turns: st.turns });
         const drew = DJ.drawSprite(ctx, def ? def.icon : 'status_poison', ix, iy + 12, 0.85, { center: true });
         if (!drew) { ctx.fillStyle = def ? def.color : '#fff'; ctx.fillRect(ix, iy, 7, 7); }
         ctx.save();
@@ -350,7 +356,7 @@
           const d = DJ.STATUS[x.id];
           const dot = UI.el('span', 'bp-dot', (d ? d.name[0] : '?'));
           dot.style.background = d ? d.color : '#888';
-          dot.title = d ? d.name : x.id;
+          UI.statusTip(dot, x.id, x.turns);
           st.appendChild(dot);
         }
         info.appendChild(st);
@@ -524,6 +530,14 @@
     if (!raf) raf = requestAnimationFrame(tick);
 
     canvas.addEventListener('mousemove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      const px = e.clientX - r.left, py = e.clientY - r.top;
+      const hit = statusHits.find((h) => px >= h.x && px <= h.x + h.w && py >= h.y && py <= h.y + h.h);
+      if (hit) {
+        const d = DJ.STATUS[hit.id];
+        if (d) UI.showTip(`<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span><i>${hit.turns} turn${hit.turns === 1 ? '' : 's'} remaining</i>`, e.clientX, e.clientY);
+      } else UI.hideTip();
+
       if (!pendingAction || !pendingAction.targets) {
         if (hoverTarget) hoverTarget = null;
         canvas.classList.remove('can-target');
@@ -532,6 +546,7 @@
       hoverTarget = hitTest(e);
       canvas.classList.toggle('can-target', !!hoverTarget);
     });
+    canvas.addEventListener('mouseleave', () => UI.hideTip());
     canvas.addEventListener('click', (e) => {
       if (!pendingAction || !pendingAction.targets) return;
       const u = hitTest(e);
@@ -545,6 +560,18 @@
     });
     const cancelBtn = UI.$('#targetCancel');
     if (cancelBtn) cancelBtn.addEventListener('click', cancelTargeting);
+
+    // Hotkeys: Q attack, W items, E guard, 1-4 abilities.
+    root.addEventListener('keydown', (e) => {
+      if (UI.current !== 'battle' || UI.overlayOpen) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const k = e.key.toLowerCase();
+      if (pendingAction) return;            // targeting is mouse-driven
+      const btn = hotkeys[k];
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      btn.click();
+    });
     canvas.addEventListener('touchend', (e) => {
       if (!pendingAction || !pendingAction.targets) return;
       const t = e.changedTouches[0];
@@ -621,31 +648,43 @@
     pendingAction = null;
     selectedTarget = null;
     hoverTarget = null;
-    UI.$('#turnBanner').textContent = u.name + "'s turn  \u00b7  HP " + u.hp + '/' + u.maxHp + (u.maxMp ? '  \u00b7  MP ' + u.mp + '/' + u.maxMp : '');
+    UI.$('#turnBanner').textContent = '';
     showTargetPrompt(false);
     refreshPartyStrip();
     refreshTurnOrder();
 
     const menu = UI.$('#actionMenu');
     menu.innerHTML = '';
+    hotkeys = {};
 
-    // Left rail: Attack (always available) plus the three utility actions.
+    // Left rail: Attack (always available) plus the two utility actions.
     const rail = UI.el('div', 'act-primary');
-    rail.appendChild(attackBtn(u));
+    rail.appendChild(bindKey('q', attackBtn(u)));
     const potCount = Object.values(DJ.run.inventory).reduce((a, n) => a + (n > 0 ? 1 : 0), 0);
-    rail.appendChild(utilBtn('act-item', 'potion_red', 'Items',
+    rail.appendChild(bindKey('w', utilBtn('act-item', 'potion_red', 'Items',
       potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
-      'Open your potions'));
-    rail.appendChild(utilBtn('act-defend', 'status_guard', 'Guard', 'raise DEF, regain MP', false,
+      'Open your potions and use one on the party.')));
+    rail.appendChild(bindKey('e', utilBtn('act-defend', 'status_guard', 'Guard', 'raise DEF, regain MP', false,
       () => submit({ type: 'defend' }),
-      'Guard: raises this hero’s DEF by 50% for 2 turns and restores a little MP.'));
+      'Guard: raises this hero\u2019s DEF by 50% for 2 turns and restores a little MP.')));
     menu.appendChild(rail);
 
-    // Right: the hero's skills as tinted cards.
+    // Right: four fixed skill slots. Locked ones stay as empty placeholders so the
+    // grid never resizes as a hero learns more.
     const skills = UI.el('div', 'act-skills');
-    for (const sid of u.skills) {
+    const hero = DJ.HERO_BY_ID[u.id];
+    const all = hero ? hero.skills : u.skills;
+    for (let i = 0; i < 4; i++) {
+      const sid = all[i];
+      const lv = DJ.SKILL_UNLOCK_LEVELS[i];
+      const known = sid && u.level >= lv;
+      if (!known) {
+        const slot = UI.el('div', 'act-slot-empty');
+        slot.appendChild(UI.el('div', 'slot-lock', sid ? 'Unlocks at level ' + lv : '\u2014'));
+        skills.appendChild(slot);
+        continue;
+      }
       const sk = DJ.SKILLS[sid];
-      if (!sk) continue;
       const usable = (sk.mp || 0) <= u.mp && battle.canUseSkill(u, sk);
       const b = UI.el('button', 'act-btn act-skill ' + (SKILL_KIND_CLASS[sk.kind] || 'k-phys'));
       b.type = 'button';
@@ -657,9 +696,18 @@
       b.disabled = !usable;
       b.title = usable ? sk.desc : ((sk.mp || 0) > u.mp ? 'Not enough MP' : 'No valid target');
       b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'skill', skillId: sid }, sk.target); });
-      skills.appendChild(b);
+      skills.appendChild(bindKey(String(i + 1), b));
     }
     menu.appendChild(skills);
+  }
+
+  // Each action carries the key that triggers it, printed small in its corner.
+  let hotkeys = {};
+  function bindKey(key, btn) {
+    const tag = UI.el('span', 'hotkey', key.toUpperCase());
+    btn.appendChild(tag);
+    hotkeys[key] = btn;
+    return btn;
   }
 
   function attackBtn(u) {
@@ -667,7 +715,8 @@
     b.type = 'button';
     const weapon = u.equip && u.equip.weapon ? u.equip.weapon.icon : 'item_sword';
     if (DJ.SPRITES[weapon]) b.appendChild(UI.spriteEl(weapon, 2, 'attack'));
-    b.appendChild(UI.el('div', 'a-name', 'Attack'));
+    const label = UI.el('div', 'a-name', 'Attack');
+    b.appendChild(label);
     b.title = 'A basic weapon strike. Always available and costs no MP.';
     b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'attack' }, 'enemy'); });
     return b;
@@ -743,7 +792,7 @@
     const inv = DJ.run.inventory;
     UI.openOverlay((panel, close) => {
       UI.overlayHeader(panel, 'Use an item', close);
-      const have = Object.keys(DJ.POTIONS).filter((pid) => (inv[pid] || 0) > 0);
+      const have = Object.keys(DJ.POTIONS).filter((pid) => (inv[pid] || 0) > 0 && !DJ.POTIONS[pid].effect.levelUp);
       if (!have.length) {
         panel.appendChild(UI.el('p', 'empty-note', 'Your bag is empty. Merchants sell potions, and monsters drop them.'));
         return;
