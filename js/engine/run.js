@@ -98,15 +98,31 @@
     this.visited[id] = true;
     this.path.push(id);
     this.nodesVisited++;
-    const n = this.node(id);
-    this.available = [];   // set after the node is resolved
+    this.available = [];   // set once the node is resolved
+    // From here until completeNode() the run is "inside" a node. If the player closes
+    // the tab or steps out to the menu now, resuming must drop them back into this
+    // node rather than onto a map with nothing to click. The RNG state is snapshotted
+    // so the rebuilt encounter is the same one they walked into.
+    this.pending = true;
+    this.pendingRng = this.rng.s;
     return true;
   };
   R.completeNode = function () {
     const n = this.node();
     n.done = true;
+    this.pending = false;
+    this.pendingRng = null;
     if (n.type === 'heart') { this.finished = true; this.won = true; this.available = []; return; }
     this.available = n.next.slice();
+  };
+  // True when the save was taken inside an unresolved node.
+  R.isMidNode = function () {
+    if (this.finished) return false;
+    const n = this.node();
+    if (!n) return false;
+    if (this.pending) return true;
+    // Older saves predate the flag: infer it from a node that has no way forward.
+    return !n.done && !this.available.length && n.type !== 'heart';
   };
   R.partyAlive = function () { return this.party.filter((h) => h.alive); };
   R.isWiped = function () { return this.party.every((h) => !h.alive); };
@@ -319,6 +335,7 @@
       stash: this.stash.map((i) => i.id), party: this.party.map(ser),
       currentId: this.currentId, visited: this.visited, path: this.path, available: this.available,
       nodesVisited: this.nodesVisited, flawless: this.flawless, finished: this.finished, won: this.won,
+      pending: !!this.pending, pendingRng: this.pendingRng == null ? null : this.pendingRng,
       elapsed: this.elapsed + (Date.now() - this.startedAt), stats: this.stats, discovered: this.discovered,
       doneNodes: Object.keys(this.map.nodeById).filter((k) => this.map.nodeById[k].done),
     };
@@ -339,6 +356,7 @@
     });
     r.currentId = d.currentId; r.visited = d.visited; r.path = d.path; r.available = d.available;
     r.nodesVisited = d.nodesVisited; r.flawless = d.flawless; r.finished = d.finished; r.won = d.won;
+    r.pending = !!d.pending; r.pendingRng = d.pendingRng == null ? null : d.pendingRng;
     r.elapsed = d.elapsed || 0; r.startedAt = Date.now();
     r.stats = d.stats || r.stats; r.discovered = d.discovered || {};
     for (const id of d.doneNodes || []) if (r.map.nodeById[id]) r.map.nodeById[id].done = true;

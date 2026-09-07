@@ -291,7 +291,11 @@
       if (!known) item.style.opacity = '.5';
       const hd = UI.el('div', 'sk-head');
       hd.appendChild(UI.el('span', 'sk-name', sk.name));
-      hd.appendChild(UI.el('span', 'sk-cost', known ? (sk.mp ? sk.mp + ' MP' : 'Free') : 'Lv ' + lv));
+      const meta = UI.el('span', 'sk-meta');
+      meta.appendChild(UI.el('span', 'sk-cost', known ? (sk.mp ? sk.mp + ' MP' : 'Free') : 'Lv ' + lv));
+      const sc = DJ.skillScaling(sk, h);
+      if (sc) meta.appendChild(UI.el('span', 'a-scale ' + (sc === 'MAG' ? 'sc-mag' : 'sc-phys'), sc));
+      hd.appendChild(meta);
       item.appendChild(hd);
       item.appendChild(UI.el('div', 'sk-desc', sk.desc));
       wrap.appendChild(item);

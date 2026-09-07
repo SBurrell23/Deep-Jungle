@@ -689,7 +689,17 @@
       b.type = 'button';
       const n = UI.el('div', 'a-name');
       n.appendChild(UI.el('span', null, sk.name));
-      if (sk.mp) n.appendChild(UI.el('span', 'a-cost', sk.mp + ' MP'));
+      const meta = UI.el('div', 'a-meta');
+      if (sk.mp) meta.appendChild(UI.el('span', 'a-cost', sk.mp + ' MP'));
+      const scaling = DJ.skillScaling(sk, u);
+      if (scaling) {
+        const tag = UI.el('span', 'a-scale ' + (scaling === 'MAG' ? 'sc-mag' : 'sc-phys'), scaling);
+        UI.tip(tag, scaling === 'MAG'
+          ? '<b>Scales with MAG</b><span>This ability\u2019s numbers come from Magic.</span>'
+          : '<b>Scales with ATK</b><span>This ability\u2019s numbers come from Attack.</span>');
+        meta.appendChild(tag);
+      }
+      n.appendChild(meta);
       b.appendChild(n);
       b.appendChild(UI.el('div', 'a-desc', sk.desc));
       b.disabled = !usable;

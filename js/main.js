@@ -77,7 +77,7 @@
       DJ.sfx('confirm');
       try {
         DJ.run = DJ.deserializeRun(DJ.profile.run);
-        UI.Map.open(true);
+        DJ.resumeRun();
       } catch (e) {
         console.error('could not load run', e);
         UI.toast('Could not load that expedition', 'Starting fresh instead.', 'error');
@@ -123,6 +123,20 @@
     DJ.saveRun(DJ.run);
     DJ.checkAndAnnounce();
     UI.Map.open(true);
+  };
+
+  // Drop the player back where they left off. If they closed the tab or stepped out
+  // to the menu partway through a node, that node is replayed from its saved RNG state
+  // rather than leaving the map with no onward path.
+  DJ.resumeRun = function () {
+    const run = DJ.run;
+    if (!run) return;
+    UI.Map.open(true);
+    if (!run.isMidNode()) return;
+    if (run.pendingRng != null) run.rng.s = run.pendingRng;
+    const node = run.node();
+    if (!node) return;
+    setTimeout(() => UI.Nodes.enter(node), 60);
   };
 
   // Called after a node screen resolves.

@@ -36,8 +36,10 @@ Levelling restores rather than fully heals: the increase to max HP and MP is add
 to the current values, and then a further 25% of max HP and 30% of max MP is topped up on
 top. A hero who levels at low health comes out better off, but not full.
 
-A full run takes roughly 40 minutes to an hour depending on your party. Progress saves to
-`localStorage` automatically, and you can leave and resume mid-expedition.
+A full run takes roughly an hour depending on your party. Progress saves to `localStorage`
+automatically, and you can leave and resume mid-expedition, including partway through a
+fight: the run is saved the moment you step onto a node, and resuming replays that node
+from its saved RNG state, so you drop back into the same encounter.
 
 ## Node types
 

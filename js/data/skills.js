@@ -290,6 +290,19 @@
   def('h_wrath',      { name: 'Wrath of the Wild', kind: 'mag', target: 'enemies', power: 1.55, mp: 0, status: { id: 'burn', turns: 2, chance: 0.5 }, fx: 'inferno', sfx: 'explosion', desc: 'The jungle itself burns with fury.' });
   def('h_drain_all',  { name: 'Devouring Roots', kind: 'drain', target: 'enemies', power: 1.0, mp: 0, drain: 0.3, fx: 'dark', sfx: 'drain', desc: 'Roots drain the whole party.' });
 
+  // Which stat a skill's numbers come from, so the UI can label it. Drain picks per
+  // caster (see applySkill in battle.js), which is why the unit is optional here.
+  DJ.skillScaling = function (sk, unit) {
+    if (!sk) return null;
+    if (sk.kind === 'phys') return 'PHYS';
+    if (sk.kind === 'mag' || sk.kind === 'heal') return 'MAG';
+    if (sk.kind === 'drain') {
+      if (!unit || !unit.base) return 'PHYS/MAG';
+      return unit.base.mag >= unit.base.atk ? 'MAG' : 'PHYS';
+    }
+    return null;   // buffs, debuffs, revives and summons do not scale off a stat
+  };
+
   // ---- Status definitions ----
   DJ.STATUS = {
     poison: { name: 'Poison', icon: 'status_poison', color: '#7dd66a', bad: true, desc: 'Takes damage each turn.' },

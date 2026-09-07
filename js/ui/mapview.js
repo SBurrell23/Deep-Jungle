@@ -381,6 +381,9 @@
     DJ.sfx('step');
     DJ.bump('nodesVisited');
     DJ.setMax('highestColumn', run.node().col);
+    // Persist immediately: everything from here to completeNode() is unsaved otherwise,
+    // so a refresh mid-battle used to leave the run stranded on the map.
+    DJ.saveRun(run);
     hover = null;
     canvas.classList.remove('over-node');
     // Freeze the board while we hand off. Without this the map repaints for a couple of

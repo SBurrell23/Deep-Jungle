@@ -351,6 +351,15 @@ button { font-family: inherit; }
 .act-btn:disabled { opacity: .38; cursor: not-allowed; }
 .act-btn .a-name { font-weight: 700; font-size: 15.5px; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; line-height: 1.2; }
 .act-btn .a-cost { color: var(--mp); font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+/* Which stat an ability scales off, so the player can tell why a number is small. */
+.a-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
+.a-scale {
+  font-size: 9.5px; font-weight: 900; letter-spacing: .6px;
+  padding: 1px 5px; border-radius: 4px; border: 1px solid transparent; white-space: nowrap;
+}
+.a-scale.sc-phys { color: #ffb0a0; background: rgba(216,115,94,.16); border-color: rgba(216,115,94,.4); }
+.a-scale.sc-mag  { color: #d0b0ff; background: rgba(169,127,224,.16); border-color: rgba(169,127,224,.42); }
+.sk-meta { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
 .act-btn .a-desc { font-size: 12.5px; color: var(--ink-dim); margin-top: 3px; line-height: 1.32; }
 
 /* Attack: always available, so it reads as the anchor of the menu. */
