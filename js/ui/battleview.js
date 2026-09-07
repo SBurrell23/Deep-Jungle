@@ -689,21 +689,16 @@
       b.type = 'button';
       const n = UI.el('div', 'a-name');
       n.appendChild(UI.el('span', null, sk.name));
-      const meta = UI.el('div', 'a-meta');
-      if (sk.mp) meta.appendChild(UI.el('span', 'a-cost', sk.mp + ' MP'));
-      const scaling = DJ.skillScaling(sk, u);
-      if (scaling) {
-        const tag = UI.el('span', 'a-scale ' + (scaling === 'MAG' ? 'sc-mag' : 'sc-phys'), scaling);
-        UI.tip(tag, scaling === 'MAG'
-          ? '<b>Scales with MAG</b><span>This ability\u2019s numbers come from Magic.</span>'
-          : '<b>Scales with ATK</b><span>This ability\u2019s numbers come from Attack.</span>');
-        meta.appendChild(tag);
-      }
-      n.appendChild(meta);
+      // The card's left border already carries the school colour, so a PHYS/MAG tag
+      // beside the cost was redundant. The tooltip still spells the scaling out.
+      if (sk.mp) n.appendChild(UI.el('span', 'a-cost', sk.mp + ' MP'));
       b.appendChild(n);
       b.appendChild(UI.el('div', 'a-desc', sk.desc));
       b.disabled = !usable;
-      b.title = usable ? sk.desc : ((sk.mp || 0) > u.mp ? 'Not enough MP' : 'No valid target');
+      const sc = DJ.skillScaling(sk, u);
+      b.title = usable
+        ? sk.desc + (sc ? '  (scales with ' + (sc === 'MAG' ? 'MAG' : 'ATK') + ')' : '')
+        : ((sk.mp || 0) > u.mp ? 'Not enough MP' : 'No valid target');
       b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'skill', skillId: sid }, sk.target); });
       skills.appendChild(bindKey(String(i + 1), b));
     }
