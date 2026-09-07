@@ -33,9 +33,10 @@
     const base = pickScale(w);
 
     const heroes = battle.party;
+    const heroGap = Math.max(58, w * 0.085);
     slots.heroes = heroes.map((u, i) => ({
       u,
-      x: w * 0.20 - i * (w * 0.055),
+      x: w * 0.26 - i * heroGap,
       y: ground + i * depth,
       scale: base * (1 + i * 0.045),  // nearer heroes slightly larger
     }));
@@ -197,39 +198,80 @@
 
     // target highlight ring
     const isTargetable = pendingAction && pendingAction.targets && pendingAction.targets.includes(u);
+    const hovered = isTargetable && hoverTarget === u;
     if (isTargetable) {
       ctx.save();
-      const on = hoverTarget === u || selectedTarget === u;
-      ctx.strokeStyle = on ? '#ffe9a3' : 'rgba(232,198,90,.65)';
-      ctx.lineWidth = on ? 3 : 2;
+      ctx.strokeStyle = hovered ? '#ffe9a3' : 'rgba(232,198,90,.6)';
+      ctx.lineWidth = hovered ? 3 : 2;
       ctx.setLineDash([5, 4]);
       ctx.lineDashOffset = -lastT * 0.02;
-      ctx.beginPath(); ctx.ellipse(s.x, s.y + 2, sw * 0.42, sw * 0.16, 0, 0, 6.284); ctx.stroke();
-      ctx.restore();
-    }
-    // active-turn marker
-    if (waitingFor === u) {
-      ctx.save();
-      ctx.fillStyle = '#8fe08a';
-      const ay = s.y - sh - 16 + Math.sin(lastT * 0.005) * 3;
-      ctx.beginPath(); ctx.moveTo(s.x, ay + 9); ctx.lineTo(s.x - 7, ay); ctx.lineTo(s.x + 7, ay); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(s.x, s.y + 2, sw * 0.44, sw * 0.17, 0, 0, 6.284); ctx.stroke();
       ctx.restore();
     }
 
     const ok = DJ.drawSprite(ctx, u.sprite, s.x + lunge, s.y + bob, s.scale, {
       center: true, alpha,
-      flip: u.side === 'enemy' ? false : false,
       flash: u.flashT ? Math.min(1, u.flashT * 3) : 0,
       flashColor: u.flashColor || '#ffffff',
     });
     if (!ok) DJ.drawMissing(ctx, s.x - sw / 2, s.y - sh, sw, sh, u.name);
+
+    // Hovering a valid target lights the whole creature, so it is unmistakable which
+    // one the click will land on: a soft halo behind it plus an additive wash on top.
+    if (hovered) {
+      const pulse = 0.5 + Math.sin(lastT * 0.007) * 0.5;
+      const halo = DJ.spriteTinted(u.sprite, s.scale, '#ffe9a3', 1);
+      const dx = Math.round(s.x + lunge - sw / 2);
+      const dy = Math.round(s.y + bob - sh);
+      if (halo) {
+        // Halo behind the creature carries the glow; the wash on top stays light so the
+        // sprite itself is still readable.
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        ctx.shadowColor = 'rgba(255,226,120,.95)';
+        ctx.shadowBlur = 16 + pulse * 14;
+        ctx.globalCompositeOperation = 'destination-over';
+        for (let i = 0; i < 3; i++) ctx.drawImage(halo, dx, dy);
+        ctx.restore();
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.13 + pulse * 0.10;
+        ctx.drawImage(halo, dx, dy);
+        ctx.restore();
+      }
+    }
+
+    // active-turn marker: a large glowing gold chevron above the acting hero
+    if (waitingFor === u) {
+      ctx.save();
+      const ay = s.y - sh - 20 + Math.sin(lastT * 0.005) * 4;
+      ctx.shadowColor = 'rgba(255,220,90,.95)';
+      ctx.shadowBlur = 16 + Math.sin(lastT * 0.006) * 6;
+      const grad = ctx.createLinearGradient(0, ay - 4, 0, ay + 16);
+      grad.addColorStop(0, '#fff6c9');
+      grad.addColorStop(1, '#e8a815');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(s.x, ay + 16);
+      ctx.lineTo(s.x - 12, ay - 2);
+      ctx.lineTo(s.x - 5, ay - 2);
+      ctx.lineTo(s.x - 5, ay - 11);
+      ctx.lineTo(s.x + 5, ay - 11);
+      ctx.lineTo(s.x + 5, ay - 2);
+      ctx.lineTo(s.x + 12, ay - 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(90,60,5,.85)'; ctx.lineWidth = 1.4; ctx.stroke();
+      ctx.restore();
+    }
 
     if (!dead) drawUnitBars(s, u, sw, sh, s.labelRow || 0);
   }
 
   function drawUnitBars(s, u, sw, sh, idx) {
     const top = s.y - sh - 20 - (idx % 3) * 15;
-    const bw = Math.max(46, sw * 0.9);
+    const bw = u.side === 'hero' ? Math.min(Math.max(40, sw * 0.8), 54) : Math.max(46, sw * 0.9);
     const x = s.x - bw / 2;
     if (u.side === 'enemy') {
       ctx.save();
@@ -243,11 +285,16 @@
     }
 
     DJ.bar(ctx, x, top, bw, 5, u.hp / u.maxHp, u.side === 'hero' ? '#4fbf5a' : '#c9483f');
+    let barBottom = top + 5;
+    if (u.side === 'hero' && u.maxMp > 0) {
+      DJ.bar(ctx, x, top + 6, bw, 4, u.mp / u.maxMp, '#4f9fe0');
+      barBottom = top + 10;
+    }
 
     // statuses
     if (u.statuses.length) {
       let ix = x;
-      const iy = top + 8;
+      const iy = barBottom + 3;
       for (const st of u.statuses.slice(0, 6)) {
         const def = DJ.STATUS[st.id];
         const drew = DJ.drawSprite(ctx, def ? def.icon : 'status_poison', ix, iy + 12, 0.85, { center: true });
@@ -274,7 +321,7 @@
         if (u.lungeT) u.lungeT = Math.max(0, u.lungeT - dt * 3.4);
       }
       drawScene(dt);
-      if (++stripTick % 6 === 0) refreshPartyStrip();
+      if (++stripTick % 6 === 0) { refreshPartyStrip(); refreshTurnOrder(); }
     }
     raf = requestAnimationFrame(tick);
   }
@@ -477,14 +524,27 @@
     if (!raf) raf = requestAnimationFrame(tick);
 
     canvas.addEventListener('mousemove', (e) => {
-      if (!pendingAction || !pendingAction.targets) { hoverTarget = null; return; }
+      if (!pendingAction || !pendingAction.targets) {
+        if (hoverTarget) hoverTarget = null;
+        canvas.classList.remove('can-target');
+        return;
+      }
       hoverTarget = hitTest(e);
+      canvas.classList.toggle('can-target', !!hoverTarget);
     });
     canvas.addEventListener('click', (e) => {
       if (!pendingAction || !pendingAction.targets) return;
       const u = hitTest(e);
       if (u) chooseTarget(u);
+      else DJ.sfx('error');
     });
+    canvas.addEventListener('contextmenu', (e) => {
+      if (!pendingAction) return;
+      e.preventDefault();
+      cancelTargeting();
+    });
+    const cancelBtn = UI.$('#targetCancel');
+    if (cancelBtn) cancelBtn.addEventListener('click', cancelTargeting);
     canvas.addEventListener('touchend', (e) => {
       if (!pendingAction || !pendingAction.targets) return;
       const t = e.changedTouches[0];
@@ -517,6 +577,7 @@
     bgSeed = DJ.seedFromString(theNode.id + DJ.run.seed);
     UI.$('#battleLog').innerHTML = '';
     UI.$('#actionMenu').innerHTML = '';
+    UI.$('#turnOrder').innerHTML = '';
     UI.$('#turnBanner').textContent = '';
     UI.$('#battleRound').textContent = 'Round 1';
     const info = DJ.NODE_INFO[theNode.type];
@@ -550,48 +611,92 @@
   }
 
   // ---------------- action menu ----------------
+  const SKILL_KIND_CLASS = { phys: 'k-phys', mag: 'k-mag', heal: 'k-heal', buff: 'k-buff', debuff: 'k-debuff', drain: 'k-drain', revive: 'k-revive', summon: 'k-mag' };
+
   function askAction(u) {
     waitingFor = u;
     pendingAction = null;
     selectedTarget = null;
-    UI.$('#turnBanner').textContent = `${u.name} — HP ${u.hp}/${u.maxHp}${u.maxMp ? `  ·  MP ${u.mp}/${u.maxMp}` : ''}`;
-    UI.$('#targetHint').classList.add('hidden');
+    hoverTarget = null;
+    UI.$('#turnBanner').textContent = u.name + "'s turn  \u00b7  HP " + u.hp + '/' + u.maxHp + (u.maxMp ? '  \u00b7  MP ' + u.mp + '/' + u.maxMp : '');
+    showTargetPrompt(false);
     refreshPartyStrip();
+    refreshTurnOrder();
+
     const menu = UI.$('#actionMenu');
     menu.innerHTML = '';
 
-    menu.appendChild(actBtn('Attack', 'Basic strike. No MP.', false, () => beginAction({ type: 'attack' }, 'enemy')));
+    // Left rail: Attack (always available) plus the three utility actions.
+    const rail = UI.el('div', 'act-primary');
+    rail.appendChild(attackBtn(u));
+    const potCount = Object.values(DJ.run.inventory).reduce((a, n) => a + (n > 0 ? 1 : 0), 0);
+    rail.appendChild(utilBtn('act-item', 'potion_red', 'Item',
+      potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu));
+    rail.appendChild(utilBtn('act-defend', 'status_guard', 'Defend', 'guard + MP', false, () => submit({ type: 'defend' })));
+    rail.appendChild(utilBtn('act-auto', 'icon_check', 'Auto', 'let them decide', false, () => {
+      submit(battle.heroAutoAction(u, DJ.run.inventory));
+    }));
+    menu.appendChild(rail);
+
+    // Right: the hero's skills as tinted cards.
+    const skills = UI.el('div', 'act-skills');
     for (const sid of u.skills) {
       const sk = DJ.SKILLS[sid];
       if (!sk) continue;
-      const affordable = (sk.mp || 0) <= u.mp;
-      const usable = affordable && battle.canUseSkill(u, sk);
-      menu.appendChild(actBtn(sk.name, sk.desc, !usable, () => beginAction({ type: 'skill', skillId: sid }, sk.target), sk.mp));
+      const usable = (sk.mp || 0) <= u.mp && battle.canUseSkill(u, sk);
+      const b = UI.el('button', 'act-btn act-skill ' + (SKILL_KIND_CLASS[sk.kind] || 'k-phys'));
+      b.type = 'button';
+      const n = UI.el('div', 'a-name');
+      n.appendChild(UI.el('span', null, sk.name));
+      if (sk.mp) n.appendChild(UI.el('span', 'a-cost', sk.mp + ' MP'));
+      b.appendChild(n);
+      b.appendChild(UI.el('div', 'a-desc', sk.desc));
+      b.disabled = !usable;
+      b.title = usable ? sk.desc : ((sk.mp || 0) > u.mp ? 'Not enough MP' : 'No valid target');
+      b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'skill', skillId: sid }, sk.target); });
+      skills.appendChild(b);
     }
-    const potCount = Object.entries(DJ.run.inventory).filter(([, n]) => n > 0).length;
-    menu.appendChild(actBtn('Item', potCount ? `${potCount} kind${potCount > 1 ? 's' : ''} of potion` : 'No potions', !potCount, openItemMenu));
-    menu.appendChild(actBtn('Defend', 'Raise guard and recover MP.', false, () => submit({ type: 'defend' })));
-    menu.appendChild(actBtn('Auto', 'Let this hero decide.', false, () => {
-      const a = battle.heroAutoAction(u, DJ.run.inventory);
-      submit(a);
-    }));
+    menu.appendChild(skills);
   }
 
-  function actBtn(name, desc, disabled, fn, mp) {
-    const b = UI.el('button', 'act-btn');
+  function attackBtn(u) {
+    const b = UI.el('button', 'act-btn act-attack');
     b.type = 'button';
-    const n = UI.el('div', 'a-name');
-    n.appendChild(UI.el('span', null, name));
-    if (mp) n.appendChild(UI.el('span', 'a-cost', mp + ' MP'));
-    b.appendChild(n);
-    b.appendChild(UI.el('div', 'a-desc', desc));
+    const weapon = u.equip && u.equip.weapon ? u.equip.weapon.icon : 'item_sword';
+    if (DJ.SPRITES[weapon]) b.appendChild(UI.spriteEl(weapon, 2, 'attack'));
+    b.appendChild(UI.el('div', 'a-name', 'Attack'));
+    b.appendChild(UI.el('div', 'a-desc', 'always ready \u00b7 no MP'));
+    b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'attack' }, 'enemy'); });
+    return b;
+  }
+
+  function utilBtn(cls, icon, name, desc, disabled, fn) {
+    const b = UI.el('button', 'act-btn act-util ' + cls);
+    b.type = 'button';
+    if (DJ.SPRITES[icon]) b.appendChild(UI.spriteEl(icon, 1.2, name));
+    const t = UI.el('div');
+    t.style.minWidth = '0';
+    t.appendChild(UI.el('div', null, name));
+    if (desc) { const d = UI.el('div', 'a-desc', desc); d.style.marginTop = '0'; t.appendChild(d); }
+    b.appendChild(t);
     b.disabled = !!disabled;
     b.addEventListener('click', () => { DJ.sfx('click'); fn(); });
     return b;
   }
 
+  // Targeting happens on the battlefield, never in the menu: the prompt replaces the
+  // action list so the only way forward is to click a creature.
+  function showTargetPrompt(on, label) {
+    const hint = UI.$('#targetHint');
+    const menu = UI.$('#actionMenu');
+    if (!hint || !menu) return;
+    hint.classList.toggle('hidden', !on);
+    menu.classList.toggle('hidden', !!on);
+    if (on) { const big = hint.querySelector('.th-big'); if (big) big.textContent = label || 'Choose a target'; }
+    document.body.classList.toggle('targeting', !!on);
+  }
+
   function beginAction(action, targetKind) {
-    const u = waitingFor;
     const needsPick = ['enemy', 'ally', 'deadAlly'].includes(targetKind);
     if (!needsPick) { submit(action); return; }
     let targets;
@@ -601,28 +706,21 @@
     if (!targets.length) { DJ.sfx('error'); return; }
     if (targets.length === 1) { action.target = targets[0]; submit(action); return; }
     pendingAction = { action, targets };
-    UI.$('#targetHint').classList.remove('hidden');
-    const menu = UI.$('#actionMenu');
-    menu.innerHTML = '';
-    for (const t of targets) {
-      const b = UI.el('button', 'act-btn');
-      b.type = 'button';
-      const n = UI.el('div', 'a-name');
-      n.appendChild(UI.el('span', null, t.name));
-      n.appendChild(UI.el('span', 'a-cost', `${t.hp}/${t.maxHp}`));
-      b.appendChild(n);
-      if (t.statuses.length) b.appendChild(UI.el('div', 'a-desc', t.statuses.map((s) => (DJ.STATUS[s.id] || {}).name || s.id).join(', ')));
-      b.addEventListener('mouseenter', () => { hoverTarget = t; });
-      b.addEventListener('mouseleave', () => { hoverTarget = null; });
-      b.addEventListener('click', () => chooseTarget(t));
-      menu.appendChild(b);
-    }
-    const cancel = UI.el('button', 'act-btn');
-    cancel.type = 'button';
-    cancel.appendChild(UI.el('div', 'a-name', 'Back'));
-    cancel.addEventListener('click', () => { DJ.sfx('cancel'); pendingAction = null; askAction(waitingFor); });
-    menu.appendChild(cancel);
+    const label = targetKind === 'enemy' ? 'Choose a target'
+      : targetKind === 'deadAlly' ? 'Choose a fallen ally' : 'Choose an ally';
+    showTargetPrompt(true, label);
   }
+
+  function cancelTargeting() {
+    if (!pendingAction) return;
+    pendingAction = null;
+    hoverTarget = null;
+    showTargetPrompt(false);
+    DJ.sfx('cancel');
+    if (waitingFor) askAction(waitingFor);
+  }
+  B.cancelTargeting = cancelTargeting;
+  B.isTargeting = () => !!pendingAction;
 
   function chooseTarget(t) {
     if (!pendingAction) return;
@@ -630,67 +728,80 @@
     a.target = t;
     pendingAction = null;
     hoverTarget = null;
-    UI.$('#targetHint').classList.add('hidden');
+    showTargetPrompt(false);
     DJ.sfx('confirm');
     submit(a);
   }
 
+  // ---------------- item modal ----------------
   function openItemMenu() {
     const u = waitingFor;
-    const menu = UI.$('#actionMenu');
-    menu.innerHTML = '';
     const inv = DJ.run.inventory;
-    let any = false;
-    for (const pid of Object.keys(DJ.POTIONS)) {
-      const n = inv[pid] || 0;
-      if (n <= 0) continue;
-      any = true;
-      const p = DJ.POTIONS[pid];
-      menu.appendChild(actBtn(`${p.name} ×${n}`, p.desc, false, () => {
-        const e = p.effect;
-        if (e.party) { submit({ type: 'item', potion: pid, inventory: inv }); return; }
-        const targets = e.revive != null ? battle.party.filter((x) => !x.alive) : battle.alive('hero');
-        if (!targets.length) { DJ.sfx('error'); return; }
-        if (targets.length === 1) { submit({ type: 'item', potion: pid, target: targets[0], inventory: inv }); return; }
-        pendingAction = { action: { type: 'item', potion: pid, inventory: inv }, targets };
-        beginItemTarget(targets, pid);
-      }));
-    }
-    if (!any) menu.appendChild(actBtn('No potions', 'Your bag is empty.', true, () => {}));
-    const back = UI.el('button', 'act-btn');
-    back.type = 'button';
-    back.appendChild(UI.el('div', 'a-name', 'Back'));
-    back.addEventListener('click', () => { DJ.sfx('cancel'); askAction(u); });
-    menu.appendChild(back);
+    UI.openOverlay((panel, close) => {
+      UI.overlayHeader(panel, 'Use an item', close);
+      const have = Object.keys(DJ.POTIONS).filter((pid) => (inv[pid] || 0) > 0);
+      if (!have.length) {
+        panel.appendChild(UI.el('p', 'empty-note', 'Your bag is empty. Merchants sell potions, and monsters drop them.'));
+        return;
+      }
+      const grid = UI.el('div', 'item-grid');
+      for (const pid of have) {
+        const p = DJ.POTIONS[pid];
+        const card = UI.el('button', 'item-card');
+        card.type = 'button';
+        const top = UI.el('div', 'ic-top');
+        top.appendChild(UI.spriteEl(p.icon, 3, p.name));
+        top.appendChild(UI.el('span', 'ic-count', '\u00d7' + inv[pid]));
+        card.appendChild(top);
+        card.appendChild(UI.el('div', 'ic-name', p.name));
+        card.appendChild(UI.el('div', 'ic-desc', p.desc));
+        card.addEventListener('click', () => {
+          DJ.sfx('confirm');
+          UI.closeOverlay(true);
+          const e = p.effect;
+          if (e.party) { submit({ type: 'item', potion: pid, inventory: inv }); return; }
+          const targets = e.revive != null ? battle.party.filter((x) => !x.alive) : battle.alive('hero');
+          if (!targets.length) { DJ.sfx('error'); askAction(u); return; }
+          if (targets.length === 1) { submit({ type: 'item', potion: pid, target: targets[0], inventory: inv }); return; }
+          pendingAction = { action: { type: 'item', potion: pid, inventory: inv }, targets };
+          showTargetPrompt(true, e.revive != null ? 'Choose a fallen ally' : 'Choose an ally');
+        });
+        grid.appendChild(card);
+      }
+      panel.appendChild(grid);
+    }, () => { if (waitingFor && !pendingAction) askAction(waitingFor); });
   }
 
-  function beginItemTarget(targets, pid) {
-    const menu = UI.$('#actionMenu');
-    menu.innerHTML = '';
-    UI.$('#targetHint').classList.remove('hidden');
-    for (const t of targets) {
-      const b = UI.el('button', 'act-btn');
-      b.type = 'button';
-      const n = UI.el('div', 'a-name');
-      n.appendChild(UI.el('span', null, t.name));
-      n.appendChild(UI.el('span', 'a-cost', `${t.hp}/${t.maxHp}`));
-      b.appendChild(n);
-      b.addEventListener('click', () => chooseTarget(t));
-      menu.appendChild(b);
+  // ---------------- turn order strip ----------------
+  function refreshTurnOrder() {
+    const box = UI.$('#turnOrder');
+    if (!box || !battle) return;
+    box.innerHTML = '';
+    const order = battle.upcomingOrder(9);
+    if (!order.length) return;
+    let markedRound = false;
+    for (const entry of order) {
+      if (entry.newRound && !markedRound) { box.appendChild(UI.el('div', 'to-round', 'next round')); markedRound = true; }
+      const u = entry.unit;
+      const slot = UI.el('div', 'to-slot' + (u.side === 'enemy' ? ' enemy' : '') + (entry.current ? ' now' : '') + (u.alive ? '' : ' dead'));
+      slot.title = u.name + '  ' + u.hp + '/' + u.maxHp + ' HP';
+      const sc = u.size >= 64 ? 0.5 : u.size >= 48 ? 0.66 : u.size >= 40 ? 0.8 : 1;
+      slot.appendChild(UI.spriteEl(u.sprite, sc, u.name));
+      const hp = UI.el('div', 'to-hp');
+      const fill = UI.el('i');
+      fill.style.width = DJ.clamp(u.hp / u.maxHp, 0, 1) * 100 + '%';
+      hp.appendChild(fill);
+      slot.appendChild(hp);
+      box.appendChild(slot);
     }
-    const back = UI.el('button', 'act-btn');
-    back.type = 'button';
-    back.appendChild(UI.el('div', 'a-name', 'Back'));
-    back.addEventListener('click', () => { DJ.sfx('cancel'); pendingAction = null; openItemMenu(); });
-    menu.appendChild(back);
   }
 
   function submit(action) {
     const u = waitingFor;
     waitingFor = null;
     pendingAction = null;
+    showTargetPrompt(false);
     UI.$('#actionMenu').innerHTML = '';
-    UI.$('#targetHint').classList.add('hidden');
     UI.$('#turnBanner').textContent = '';
     const events = battle.act(u, action);
     battle.checkEnd();
@@ -710,7 +821,9 @@
     B._finished = true;
     const won = battle.result === 'victory';
     UI.$('#actionMenu').innerHTML = '';
+    UI.$('#turnOrder').innerHTML = '';
     UI.$('#turnBanner').textContent = '';
+    showTargetPrompt(false);
     waitingFor = null;
     setTimeout(() => {
       DJ.sfx(won ? 'victory' : 'defeat');

@@ -8,7 +8,7 @@
   P.settings = function () {
     UI.openOverlay((panel, close) => {
       const s = DJ.profile.settings;
-      panel.appendChild(UI.el('h3', null, 'Settings'));
+      UI.overlayHeader(panel, 'Settings', close);
 
       const slider = (label, key, fmt) => {
         const row = UI.el('div', 'set-row');
@@ -112,17 +112,12 @@
       btnRow.appendChild(wipe);
       panel.appendChild(btnRow);
 
-      const done = UI.el('button', 'btn primary wide');
-      done.textContent = 'Done';
-      done.style.marginTop = '14px';
-      done.addEventListener('click', close);
-      panel.appendChild(done);
     });
   };
 
   function confirmDialog(title, text, onYes) {
     UI.openOverlay((panel, close) => {
-      panel.appendChild(UI.el('h3', null, title));
+      UI.overlayHeader(panel, title, close);
       const p = UI.el('p', 'muted', text);
       p.style.cssText = 'font-size:13.5px;line-height:1.55;margin-bottom:16px';
       panel.appendChild(p);
@@ -143,44 +138,26 @@
   P.confirm = confirmDialog;
 
   // ---------------- Party ----------------
+  // All three adventurers side by side, so gear can be compared without switching tabs.
   P.party = function (onClose) {
     UI.openOverlay((panel, close) => {
       const run = DJ.run;
-      panel.appendChild(UI.el('h3', null, 'Party'));
-      const tabs = UI.el('div', 'tabs');
-      const content = UI.el('div');
-      let active = 0;
-      const renderTab = () => {
-        Array.from(tabs.children).forEach((c, i) => c.classList.toggle('on', i === active));
-        content.innerHTML = '';
-        content.appendChild(heroPanelBody(run.party[active], () => { P.party(onClose); }));
-      };
-      run.party.forEach((h, i) => {
-        const t = UI.el('div', 'tab', h.name);
-        t.addEventListener('click', () => { active = i; DJ.sfx('click'); renderTab(); });
-        tabs.appendChild(t);
-      });
-      panel.appendChild(tabs);
-      panel.appendChild(content);
-      renderTab();
-      const done = UI.el('button', 'btn primary wide');
-      done.textContent = 'Close';
-      done.style.marginTop = '14px';
-      done.addEventListener('click', close);
-      panel.appendChild(done);
-    }, onClose);
+      UI.overlayHeader(panel, 'Party', close);
+      const cols = UI.el('div', 'party-cols');
+      for (const h of run.party) {
+        const col = UI.el('div', 'party-col' + (h.alive ? '' : ' dead'));
+        col.appendChild(heroPanelBody(h, () => { UI.closeOverlay(true); P.party(onClose); }));
+        cols.appendChild(col);
+      }
+      panel.appendChild(cols);
+    }, onClose, { xwide: true });
   };
 
   P.heroPanel = function (hero) {
     UI.openOverlay((panel, close) => {
-      panel.appendChild(UI.el('h3', null, hero.name));
-      panel.appendChild(heroPanelBody(hero, () => P.heroPanel(hero)));
-      const done = UI.el('button', 'btn primary wide');
-      done.textContent = 'Close';
-      done.style.marginTop = '14px';
-      done.addEventListener('click', close);
-      panel.appendChild(done);
-    });
+      UI.overlayHeader(panel, hero.name, close);
+      panel.appendChild(heroPanelBody(hero, () => { UI.closeOverlay(true); P.heroPanel(hero); }));
+    }, null, { wide: false });
   };
 
   function heroPanelBody(h, refresh) {
@@ -211,7 +188,7 @@
     head.appendChild(ht);
     wrap.appendChild(head);
 
-    const grid = UI.el('div', 'stat-grid');
+    const grid = UI.el('div', 'stat-grid four');
     for (const k of ['atk', 'mag', 'def', 'spd']) {
       const box = UI.el('div', 'stat-box');
       box.appendChild(UI.el('b', null, String(DJ.effStat(h, k))));
@@ -270,7 +247,7 @@
   function slotChooser(hero, slot, refresh) {
     const run = DJ.run;
     UI.openOverlay((panel, close) => {
-      panel.appendChild(UI.el('h3', null, `${hero.name}: ${slot}`));
+      UI.overlayHeader(panel, `${hero.name}: ${slot}`, close);
       const cur = hero.equip[slot];
       if (cur) {
         const b = UI.el('button', 'btn small');
@@ -295,25 +272,27 @@
         });
         panel.appendChild(UI.itemLine(it, b));
       }
-      const done = UI.el('button', 'btn wide');
-      done.textContent = 'Back';
-      done.style.marginTop = '12px';
-      done.addEventListener('click', close);
-      panel.appendChild(done);
     });
   }
 
-  // Quick "give this new item to whom?" chooser
+  // Quick "give this new item to whom?" chooser. `after` fires once the item has been
+  // dealt with, either equipped or deliberately kept in the bag, so callers can drop it
+  // from a spoils list.
   P.equipChooser = function (item, after) {
     const run = DJ.run;
+    let settled = false;
+    const settle = () => { if (!settled) { settled = true; after && after(); } };
     UI.openOverlay((panel, close) => {
-      panel.appendChild(UI.el('h3', null, 'Equip ' + item.name));
+      UI.overlayHeader(panel, 'Equip ' + item.name, close);
       panel.appendChild(UI.itemLine(item));
-      panel.appendChild(UI.el('p', 'muted', 'Who takes it?')).style.cssText = 'font-size:13px;margin:12px 0 8px';
+      const q = UI.el('p', 'muted', 'Who takes it?');
+      q.style.cssText = 'font-size:13px;margin:14px 0 4px';
+      panel.appendChild(q);
+      const list = UI.el('div', 'equip-list');
       for (const h of run.party) {
         const cur = h.equip[item.slot];
         const row = UI.el('div', 'equip-slot');
-        row.appendChild(UI.spriteEl(h.sprite, 1.6, h.name));
+        row.appendChild(UI.spriteEl(h.sprite, 1.7, h.name));
         const info = UI.el('div');
         info.style.flex = '1';
         info.appendChild(UI.el('div', 'slot-item', h.name));
@@ -328,17 +307,22 @@
           DJ.bump('itemsEquipped');
           if (h.equip.weapon && h.equip.armor && h.equip.trinket) DJ.bump('fullSets');
           DJ.checkAndAnnounce();
-          UI.closeOverlay();
-          after && after();
+          UI.closeOverlay(true);
+          settle();
         });
-        panel.appendChild(row);
+        list.appendChild(row);
       }
+      panel.appendChild(list);
       const skip = UI.el('button', 'btn wide');
       skip.textContent = 'Keep it in the bag';
       skip.style.marginTop = '12px';
-      skip.addEventListener('click', () => { if (!run.stash.includes(item)) run.addItem(item); close(); after && after(); });
+      skip.addEventListener('click', () => {
+        if (!run.stash.includes(item)) run.addItem(item);
+        UI.closeOverlay(true);
+        settle();
+      });
       panel.appendChild(skip);
-    });
+    }, settle);
   };
 
   function statDelta(hero, item, cur) {
@@ -356,7 +340,8 @@
   P.chooseHero = function (title, fn) {
     const run = DJ.run;
     UI.openOverlay((panel, close) => {
-      panel.appendChild(UI.el('h3', null, title));
+      UI.overlayHeader(panel, title, close);
+      const list = UI.el('div', 'equip-list');
       for (const h of run.party) {
         const row = UI.el('div', 'equip-slot');
         row.appendChild(UI.spriteEl(h.sprite, 1.8, h.name));
@@ -365,9 +350,10 @@
         info.appendChild(UI.el('div', 'slot-item', `${h.name}  ·  Lv ${h.level}`));
         info.appendChild(UI.el('div', 'loot-desc', `HP ${h.hp}/${h.maxHp}   ATK ${DJ.effStat(h, 'atk')}   MAG ${DJ.effStat(h, 'mag')}   DEF ${DJ.effStat(h, 'def')}   SPD ${DJ.effStat(h, 'spd')}`));
         row.appendChild(info);
-        row.addEventListener('click', () => { DJ.sfx('confirm'); UI.closeOverlay(); fn(h); });
-        panel.appendChild(row);
+        row.addEventListener('click', () => { DJ.sfx('confirm'); UI.closeOverlay(true); fn(h); });
+        list.appendChild(row);
       }
+      panel.appendChild(list);
     });
   };
 
@@ -375,30 +361,43 @@
   P.bag = function () {
     UI.openOverlay((panel, close) => {
       const run = DJ.run;
-      panel.appendChild(UI.el('h3', null, `Bag  ·  ${run.gold} gold`));
-      panel.appendChild(UI.el('h4', null, 'Potions')).style.cssText = 'margin:0 0 8px;font-size:14px;color:#8fe08a';
+      const title = UI.el('div');
+      const h3 = UI.el('h3', null, 'Bag');
+      h3.style.cssText = 'display:flex;align-items:center;gap:10px';
+      h3.appendChild(UI.goldTag(run.gold));
+      title.appendChild(h3);
+      UI.overlayHeader(panel, title, close);
+
+      const cols = UI.el('div', 'bag-cols');
+
+      const potions = UI.el('div', 'bag-col');
+      potions.appendChild(UI.el('h4', null, 'Potions'));
+      const pScroll = UI.el('div', 'scroll');
       let any = false;
       for (const pid of Object.keys(DJ.POTIONS)) {
         const n = run.inventory[pid] || 0;
         if (n <= 0) continue;
         any = true;
-        panel.appendChild(UI.potionLine(pid, n));
+        pScroll.appendChild(UI.potionLine(pid, n));
       }
-      if (!any) panel.appendChild(UI.el('p', 'empty-note', 'No potions. Merchants sell them; monsters drop them.'));
+      if (!any) pScroll.appendChild(UI.el('p', 'empty-note', 'No potions. Merchants sell them; monsters drop them.'));
+      potions.appendChild(pScroll);
+      cols.appendChild(potions);
 
-      panel.appendChild(UI.el('h4', null, 'Unequipped gear')).style.cssText = 'margin:14px 0 8px;font-size:14px;color:#8fe08a';
-      if (!run.stash.length) panel.appendChild(UI.el('p', 'empty-note', 'Nothing spare. Everything you own is being worn.'));
+      const gear = UI.el('div', 'bag-col');
+      gear.appendChild(UI.el('h4', null, 'Unequipped gear'));
+      const gScroll = UI.el('div', 'scroll');
+      if (!run.stash.length) gScroll.appendChild(UI.el('p', 'empty-note', 'Nothing spare. Everything you own is being worn.'));
       for (const it of run.stash.slice()) {
         const b = UI.el('button', 'btn small');
         b.textContent = 'Equip';
-        b.addEventListener('click', () => { DJ.sfx('click'); UI.closeOverlay(); P.equipChooser(it, () => P.bag()); });
-        panel.appendChild(UI.itemLine(it, b));
+        b.addEventListener('click', () => { DJ.sfx('click'); UI.closeOverlay(true); P.equipChooser(it, () => P.bag()); });
+        gScroll.appendChild(UI.itemLine(it, b));
       }
-      const done = UI.el('button', 'btn primary wide');
-      done.textContent = 'Close';
-      done.style.marginTop = '14px';
-      done.addEventListener('click', close);
-      panel.appendChild(done);
-    });
+      gear.appendChild(gScroll);
+      cols.appendChild(gear);
+
+      panel.appendChild(cols);
+    }, null, { wide: true });
   };
 })(typeof window !== 'undefined' ? window : globalThis);

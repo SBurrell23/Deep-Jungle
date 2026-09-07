@@ -99,10 +99,11 @@
 
   // ---- Overlay ----
   UI.overlayOpen = false;
-  UI.openOverlay = function (build, onClose) {
+  UI.openOverlay = function (build, onClose, opts) {
     const ov = UI.$('#overlay');
     const panel = UI.$('#overlayPanel');
     panel.innerHTML = '';
+    panel.className = 'overlay-panel' + ((opts && opts.wide) ? ' wide' : '') + ((opts && opts.xwide) ? ' xwide' : '');
     build(panel, UI.closeOverlay);
     ov.classList.remove('hidden');
     UI.overlayOpen = true;
@@ -110,12 +111,34 @@
     DJ.sfx('open');
     ov.onclick = (e) => { if (e.target === ov) UI.closeOverlay(); };
   };
-  UI.closeOverlay = function () {
+  // `silent` suppresses the cancel blip when the panel closes because the player
+  // actually chose something.
+  UI.closeOverlay = function (silent) {
     const ov = UI.$('#overlay');
     ov.classList.add('hidden');
     UI.overlayOpen = false;
-    DJ.sfx('cancel');
+    if (silent !== true) DJ.sfx('cancel');
     if (UI._onClose) { const f = UI._onClose; UI._onClose = null; f(); }
+  };
+
+  // Every modal gets the same header: a title on the left and a small dismiss X on the
+  // right, instead of a full-width Close button eating the bottom of the panel.
+  UI.overlayHeader = function (panel, title, close, subtitleNode) {
+    const head = UI.el('div', 'ov-head');
+    const left = UI.el('div', 'ov-title');
+    if (typeof title === 'string') left.appendChild(UI.el('h3', null, title));
+    else if (title) left.appendChild(title);
+    if (subtitleNode) left.appendChild(subtitleNode);
+    head.appendChild(left);
+    const x = UI.el('button', 'ov-close');
+    x.type = 'button';
+    x.innerHTML = '&times;';
+    x.title = 'Close';
+    x.setAttribute('aria-label', 'Close');
+    x.addEventListener('click', () => close());
+    head.appendChild(x);
+    panel.appendChild(head);
+    return head;
   };
 
   UI.flash = function () {
@@ -165,6 +188,13 @@
     row.appendChild(info);
     if (extra) { const sp = UI.el('div'); sp.style.marginLeft = 'auto'; sp.appendChild(extra); row.appendChild(sp); }
     return row;
+  };
+
+  UI.goldTag = function (amount) {
+    const w = UI.el('span', 'gold-tag');
+    if (DJ.SPRITES.icon_gold) w.appendChild(UI.spriteEl('icon_gold', 1.1, 'gold'));
+    w.appendChild(UI.el('span', null, String(amount)));
+    return w;
   };
 
   UI.heroBadge = function (h, scale) {

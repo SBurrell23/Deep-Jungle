@@ -94,8 +94,6 @@
     DJ.events.on('screen', syncGear);
     syncGear(UI.current);
     UI.$('#btnMapCompendium').addEventListener('click', () => { DJ.sfx('page'); UI.Compendium.open(); });
-    UI.$('#btnParty').addEventListener('click', () => { DJ.sfx('click'); UI.Panels.party(() => UI.Map.refresh()); });
-    UI.$('#btnBag').addEventListener('click', () => { DJ.sfx('click'); UI.Panels.bag(); });
   }
 
   function wireKeys() {
@@ -104,6 +102,10 @@
         if (UI.overlayOpen) { UI.closeOverlay(); return; }
         if (UI.current === 'compendium' || UI.current === 'achievements') {
           UI.show(DJ.run && !DJ.run.finished ? 'map' : 'title');
+          return;
+        }
+        if (UI.current === 'battle' && UI.Battle.isTargeting && UI.Battle.isTargeting()) {
+          UI.Battle.cancelTargeting();
           return;
         }
         if (UI.current !== 'boot') UI.Panels.settings();

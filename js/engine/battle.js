@@ -58,6 +58,7 @@
     this.kind = o.kind || 'normal';
     this.round = 0;
     this.queue = [];
+    this.current = null;
     this.over = false;
     this.result = null;
     this.stats = { damageTaken: 0, damageDealt: 0, crits: 0, maxHit: 0, kills: [], heroKOs: 0, statuses: 0, healing: 0, killsBy: {}, summonKills: 0, skillsUsed: 0, defends: 0, revives: 0, potions: 0 };
@@ -101,6 +102,7 @@
     while (true) {
       if (this.queue.length === 0) { events = events.concat(this.newRound()); }
       const u = this.queue.shift();
+      this.current = u;
       if (!u || !u.alive) continue;
       // turn start: status ticks
       const tick = this.tickStatuses(u);
@@ -123,6 +125,31 @@
       // continue loop to next actor; but yield after each enemy action so UI can animate in chunks
       return { events, needInput: null, over: false };
     }
+  };
+
+  // The next few actors, for the turn-order display. The first entry is whoever is
+  // acting now. Once the current round's queue runs out we project the next round from
+  // speed alone, which is what the real ordering is drawn from.
+  P.upcomingOrder = function (limit) {
+    limit = limit || 8;
+    const out = [];
+    if (this.current && this.current.alive) out.push({ unit: this.current, current: true, newRound: false });
+    for (const u of this.queue) {
+      if (out.length >= limit) return out;
+      if (u.alive) out.push({ unit: u, current: false, newRound: false });
+    }
+    if (out.length >= limit) return out;
+    const next = this.alive('hero').concat(this.alive('enemy'))
+      .map((u) => ({ u, k: DJ.effStat(u, 'spd') }))
+      .sort((a, b) => b.k - a.k)
+      .map((x) => x.u);
+    let first = true;
+    for (const u of next) {
+      if (out.length >= limit) break;
+      out.push({ unit: u, current: false, newRound: first });
+      first = false;
+    }
+    return out;
   };
 
   P.tickStatuses = function (u) {

@@ -64,8 +64,6 @@
         <span id="mapProgress" class="pill">0%</span>
       </div>
       <div class="bar-right">
-        <button id="btnParty" class="btn small">Party</button>
-        <button id="btnBag" class="btn small">Bag</button>
         <button id="btnMapCompendium" class="btn small icon-only" title="Compendium">📖</button>
       </div>
     </header>
@@ -84,13 +82,19 @@
         <span id="battleTitle" class="battle-title">Battle</span>
         <span id="battleRound" class="pill">Round 1</span>
       </div>
+      <div id="turnOrder" class="turn-order" aria-label="Turn order"></div>
       <div id="battleLog" class="battle-log"></div>
     </div>
     <div id="battleUi" class="battle-ui">
       <div id="battleParty" class="battle-party"></div>
-      <div id="turnBanner" class="turn-banner"></div>
-      <div id="actionMenu" class="action-menu"></div>
-      <div id="targetHint" class="target-hint hidden">Choose a target</div>
+      <div class="battle-right">
+        <div id="turnBanner" class="turn-banner"></div>
+        <div id="actionMenu" class="action-menu"></div>
+        <div id="targetHint" class="target-hint hidden">
+          <span class="th-big">Choose a target</span>
+          <button id="targetCancel" class="btn small ghost">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -170,6 +174,7 @@
 <script src="js/sprites/ui.js"></script>
 <script src="js/sprites/ui_items.js"></script>
 <script src="js/sprites/ui_status.js"></script>
+<script src="js/sprites/ui_map.js"></script>
 <script src="js/engine/battle.js"></script>
 <script src="js/engine/map.js"></script>
 <script src="js/engine/run.js"></script>

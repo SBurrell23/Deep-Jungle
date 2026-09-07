@@ -12,7 +12,7 @@
   let canvas, ctx, raf = 0, t = 0;
   let camX = 0, targetCamX = 0;
   let hover = null, dragging = false, dragStartX = 0, dragCamX = 0, dragMoved = 0;
-  let layout = null, seedRng = null;
+  let layout = null, seedRng = null, frozen = false;
 
   function computeLayout() {
     const run = DJ.run;
@@ -254,7 +254,7 @@
 
   function loop(now) {
     t = now / 1000;
-    if (UI.current === 'map' && DJ.run) draw();
+    if (UI.current === 'map' && DJ.run && !frozen) draw();
     raf = requestAnimationFrame(loop);
   }
 
@@ -272,7 +272,9 @@
       }
       const prev = hover;
       hover = nodeAt(e.clientX - r.left, e.clientY - r.top);
-      if (hover !== prev && hover && DJ.run.available.includes(hover.nd.id)) DJ.sfx('hover');
+      const reachable = !!hover && DJ.run.available.includes(hover.nd.id);
+      canvas.classList.toggle('over-node', reachable);
+      if (hover !== prev && reachable) DJ.sfx('hover');
     });
     canvas.addEventListener('mousedown', (e) => {
       dragging = true; dragMoved = 0;
@@ -280,7 +282,7 @@
       canvas.classList.add('dragging');
     });
     root.addEventListener('mouseup', () => { dragging = false; canvas.classList.remove('dragging'); });
-    canvas.addEventListener('mouseleave', () => { hover = null; });
+    canvas.addEventListener('mouseleave', () => { hover = null; canvas.classList.remove('over-node'); });
     canvas.addEventListener('click', (e) => {
       if (dragMoved > 6) return;
       const r = canvas.getBoundingClientRect();
@@ -318,6 +320,7 @@
   };
 
   M.open = function (instant) {
+    frozen = false;
     layout = computeLayout();
     centerOnCurrent(instant !== false);
     M.refresh();
@@ -338,11 +341,28 @@
       : 'The path ends here';
     const bar = UI.$('#partyBar');
     bar.innerHTML = '';
+    const list = UI.el('div', 'pb-list');
     run.party.forEach((h) => {
       const b = UI.heroBadge(h, 1.5);
       b.addEventListener('click', () => UI.Panels.heroPanel(h));
-      bar.appendChild(b);
+      list.appendChild(b);
     });
+    bar.appendChild(list);
+
+    const actions = UI.el('div', 'map-actions');
+    const mk = (icon, label, badge, fn) => {
+      const b = UI.el('button', 'map-btn');
+      b.type = 'button';
+      if (DJ.SPRITES[icon]) b.appendChild(UI.spriteEl(icon, 1.3, label));
+      b.appendChild(UI.el('span', null, label));
+      if (badge) b.appendChild(UI.el('span', 'mb-badge', String(badge)));
+      b.addEventListener('click', () => { DJ.sfx('click'); fn(); });
+      return b;
+    };
+    const carrying = Object.values(run.inventory).reduce((a, n) => a + n, 0) + run.stash.length;
+    actions.appendChild(mk('icon_party', 'Party', 0, () => UI.Panels.party(() => M.refresh())));
+    actions.appendChild(mk('icon_bag', 'Bag', carrying, () => UI.Panels.bag()));
+    bar.appendChild(actions);
     centerOnCurrent();
   };
 
@@ -352,8 +372,12 @@
     DJ.sfx('step');
     DJ.bump('nodesVisited');
     DJ.setMax('highestColumn', run.node().col);
-    layout = computeLayout();
-    centerOnCurrent();
-    setTimeout(() => UI.Nodes.enter(run.node()), 240);
+    hover = null;
+    canvas.classList.remove('over-node');
+    // Freeze the board while we hand off. Without this the map repaints for a couple of
+    // frames with the *next* column already lit up, which flashes the upcoming choices
+    // before the battle loads.
+    frozen = true;
+    UI.Nodes.enter(run.node());
   };
 })(typeof window !== 'undefined' ? window : globalThis);

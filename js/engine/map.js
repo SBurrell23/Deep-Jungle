@@ -54,34 +54,56 @@
     // Column 0: start
     push([{ type: 'start', region: 0 }]);
 
-    let level = 1;
+    // Columns alternate between "forced" (every node is combat) and "free" (a mixed
+    // branch). Because the player takes exactly one node per column, alternating this way
+    // guarantees they can never travel two nodes in a row without a fight.
+    let lastWasCombat = false;   // the start hut is not a fight
     for (let r = 0; r < 3; r++) {
       const n = REGION_COLS[r];
       for (let c = 0; c < n; c++) {
-        // 2-4 nodes wide, occasionally 4 for real branching
         const width = rng.weighted([{ v: 2, w: 3 }, { v: 3, w: 5 }, { v: 4, w: 2.2 }]);
         const nodes = [];
-        const usedTypes = {};
-        for (let i = 0; i < width; i++) {
-          let t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
-          // avoid duplicates in the same column when possible (more meaningful choices)
-          let tries = 0;
-          // Special nodes should not repeat inside one column (that would waste a choice),
-          // but plain battles may, since combat is the default and should stay common.
-          while (t !== 'battle' && usedTypes[t] && tries++ < 6) t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
-          // no elite in the first column of region 0
-          if (t === 'elite' && r === 0 && c === 0) t = 'battle';
-          usedTypes[t] = true;
-          nodes.push({ type: t, region: r });
+        // Strict alternation. A free column is never adjacent to another free column,
+        // so no route can string two non-combat nodes together.
+        const forced = !lastWasCombat;
+
+        if (forced) {
+          // Every option is a fight, but the player still chooses which kind.
+          const eliteW = r === 0 ? 0.14 : r === 1 ? 0.24 : 0.34;
+          for (let i = 0; i < width; i++) {
+            const canElite = !(r === 0 && c === 0);
+            nodes.push({ type: canElite && rng.chance(eliteW) ? 'elite' : 'battle', region: r });
+          }
+          // Never make every option an elite; at least one ordinary battle stays available.
+          if (nodes.every((x) => x.type === 'elite')) nodes[rng.int(0, nodes.length - 1)].type = 'battle';
+        } else {
+          const usedTypes = {};
+          for (let i = 0; i < width; i++) {
+            let t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
+            // Special nodes should not repeat inside one column (that would waste a choice),
+            // but plain battles may, since combat is the default and should stay common.
+            let tries = 0;
+            while (t !== 'battle' && usedTypes[t] && tries++ < 6) t = rng.weighted(Object.entries(NODE_WEIGHTS[r]).map(([k, w]) => ({ v: k, w })));
+            if (t === 'elite' && r === 0 && c === 0) t = 'battle';
+            usedTypes[t] = true;
+            nodes.push({ type: t, region: r });
+          }
+          // A free column must always leave a non-combat option, otherwise it is just a
+          // forced column and the rhythm collapses.
+          if (nodes.every((x) => x.type === 'battle' || x.type === 'elite')) {
+            nodes[rng.int(0, nodes.length - 1)].type = rng.pick(['rest', 'treasure', 'shrine', 'event', 'merchant']);
+          }
+          // Guarantee a camp in the last free column before the boss, so the party can
+          // always arrive at a region boss rested if they choose to.
+          const lastFreeBeforeBoss = c >= n - 2;
+          if (lastFreeBeforeBoss && !nodes.some((x) => x.type === 'rest')) nodes[rng.int(0, nodes.length - 1)].type = 'rest';
         }
-        // guarantee at least one battle-ish node per column so progression feels consistent
-        if (!nodes.some((x) => x.type === 'battle' || x.type === 'elite')) nodes[rng.int(0, nodes.length - 1)].type = 'battle';
-        // guarantee a rest before each boss column
-        if (c === n - 1 && !nodes.some((x) => x.type === 'rest')) nodes[rng.int(0, nodes.length - 1)].type = 'rest';
         push(nodes);
+        lastWasCombat = forced;
       }
       // Region boss column (single node, everything converges)
       push([{ type: 'boss', region: r, boss: DJ.REGIONS[r].boss }]);
+      lastWasCombat = true;
     }
     // Final camp: a guaranteed full-rest before the Heart, so the finale is a fair fight.
     push([{ type: 'rest', region: 2, finalCamp: true }]);

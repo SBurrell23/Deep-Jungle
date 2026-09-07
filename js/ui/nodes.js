@@ -84,6 +84,85 @@
   }
   N.startBattle = startBattle;
 
+  // A hero can cross several levels from one fight. Fold those into a single card
+  // showing the whole jump and the summed stat gains, rather than one card per level.
+  function mergeGains(gains) {
+    const byHero = new Map();
+    for (const g of gains) {
+      let e = byHero.get(g.unit);
+      if (!e) {
+        e = { unit: g.unit, from: g.level - 1, to: g.level, newSkills: [],
+              delta: { hp: 0, mp: 0, atk: 0, mag: 0, def: 0, spd: 0 } };
+        byHero.set(g.unit, e);
+      }
+      e.to = Math.max(e.to, g.level);
+      for (const k in e.delta) e.delta[k] += g.delta[k] || 0;
+      e.newSkills.push(...g.newSkills);
+    }
+    return Array.from(byHero.values());
+  }
+
+  const STAT_ROWS = [
+    ['hp', 'HP'], ['mp', 'MP'], ['atk', 'ATK'], ['mag', 'MAG'], ['def', 'DEF'], ['spd', 'SPD'],
+  ];
+
+  function levelUpCard(g) {
+    const card = UI.el('div', 'lu-card');
+    card.appendChild(UI.spriteEl(g.unit.sprite, 2, g.unit.name));
+    const body = UI.el('div', 'lu-body');
+    const jumped = g.to - g.from > 1;
+    body.appendChild(UI.el('div', 'lu-head',
+      jumped ? `${g.unit.name} reached level ${g.to}!  (from ${g.from})`
+             : `${g.unit.name} reached level ${g.to}!`));
+
+    const grid = UI.el('div', 'lu-grid');
+    // Each bar animates from the pre-fight value up to the new one, so the growth is
+    // something you watch rather than a number you read.
+    const now = { hp: g.unit.maxHp, mp: g.unit.maxMp, atk: g.unit.base.atk,
+                  mag: g.unit.base.mag, def: g.unit.base.def, spd: g.unit.base.spd };
+    const scale = { hp: 340, mp: 140, atk: 60, mag: 60, def: 50, spd: 40 };
+    const anims = [];
+    for (const [key, label] of STAT_ROWS) {
+      const gain = g.delta[key] || 0;
+      if (!gain) continue;
+      const row = UI.el('div', 'lu-row');
+      row.appendChild(UI.el('b', null, label));
+      const track = UI.el('div', 'lu-track');
+      const base = UI.el('i', 'lu-base');
+      const add = UI.el('i', 'lu-gain');
+      track.appendChild(base); track.appendChild(add);
+      row.appendChild(track);
+      row.appendChild(UI.el('span', 'lu-val', `+${gain}`));
+      grid.appendChild(row);
+      const before = DJ.clamp((now[key] - gain) / scale[key], 0, 1) * 100;
+      const after = DJ.clamp(now[key] / scale[key], 0, 1) * 100;
+      base.style.width = before + '%';
+      anims.push(() => { add.style.width = after + '%'; });
+    }
+    body.appendChild(grid);
+    // let the browser paint the "before" state, then grow to the new value
+    requestAnimationFrame(() => requestAnimationFrame(() => anims.forEach((f) => f())));
+
+    for (const sid of g.newSkills) {
+      const sk = DJ.SKILLS[sid];
+      if (sk) body.appendChild(UI.el('div', 'lu-skill', `New skill: ${sk.name} — ${sk.desc}`));
+    }
+    card.appendChild(body);
+    return card;
+  }
+
+  function partyRow(party) {
+    const strip = UI.el('div', 'result-party');
+    for (const h of party) {
+      const c = UI.el('div', 'rp-hero' + (h.alive ? '' : ' dead'));
+      c.appendChild(UI.spriteEl(h.sprite, 2, h.name));
+      c.appendChild(UI.el('div', 'rp-name', h.name));
+      c.appendChild(UI.el('div', 'rp-lv', h.alive ? `Lv ${h.level}  ·  ${h.hp}/${h.maxHp}` : 'fallen'));
+      strip.appendChild(c);
+    }
+    return strip;
+  }
+
   function showVictory(node, rew, gains, drops) {
     const run = DJ.run;
     const isFinal = node.type === 'heart';
@@ -97,29 +176,44 @@
       p.textContent = 'The Heart splits, and every vine in the jungle goes slack at once. For the first time in a very long time, the deep green is quiet.';
       body.appendChild(p);
     }
+
+    body.appendChild(partyRow(run.party));
+
     const rl = UI.el('div', 'reward-line');
     rl.innerHTML = `<b>+${rew.xp}</b> XP    <b>+${rew.gold}</b> gold`;
     body.appendChild(rl);
-    for (const g of gains) {
-      const c = UI.el('div', 'levelup-card');
-      c.appendChild(UI.el('div', 'lu-head', `${g.unit.name} reached level ${g.level}!`));
-      const d = g.delta;
-      c.appendChild(UI.el('div', 'lu-stats', `+${d.hp} HP  +${d.mp} MP  +${d.atk} ATK  +${d.mag} MAG  +${d.def} DEF  +${d.spd} SPD`));
-      for (const sid of g.newSkills) {
-        const sk = DJ.SKILLS[sid];
-        if (sk) c.appendChild(UI.el('div', 'lu-skill', `New skill: ${sk.name} — ${sk.desc}`));
-      }
-      body.appendChild(c);
-    }
-    if (gains.length) DJ.sfx('levelup', 0.35);
+
+    const merged = mergeGains(gains);
+    for (const g of merged) body.appendChild(levelUpCard(g));
+    if (merged.length) DJ.sfx('levelup', 0.35);
+
+    // Spoils, with each item removable once it has been dealt with.
     if (drops && (drops.items.length || drops.potions.length)) {
-      body.appendChild(UI.el('h4', null, 'Spoils')).style.cssText = 'margin:14px 0 8px;font-size:14px';
-      for (const it of drops.items) body.appendChild(UI.itemLine(it));
+      const head = UI.el('h4', null, 'Spoils');
+      head.style.cssText = 'margin:14px 0 8px;font-size:14px';
+      body.appendChild(head);
+      const spoils = UI.el('div');
+      body.appendChild(spoils);
+      for (const it of drops.items) {
+        const btn = UI.el('button', 'btn small');
+        btn.textContent = 'Equip';
+        const row = UI.itemLine(it, btn);
+        btn.addEventListener('click', () => {
+          DJ.sfx('click');
+          // Whether they equip it or keep it in the bag, it leaves the spoils list.
+          UI.Panels.equipChooser(it, () => {
+            row.remove();
+            if (!spoils.children.length) { head.remove(); }
+          });
+        });
+        spoils.appendChild(row);
+      }
       const counts = {};
       for (const p of drops.potions) counts[p] = (counts[p] || 0) + 1;
-      for (const p in counts) body.appendChild(UI.potionLine(p, counts[p]));
+      for (const p in counts) spoils.appendChild(UI.potionLine(p, counts[p]));
       DJ.sfx('gold', 0.2);
     }
+
     const acts = UI.$('#resultActions');
     acts.innerHTML = '';
     if (isFinal) {
@@ -216,14 +310,7 @@
   function showTrainResult(gains) {
     panel('Drills', 'Sore, but sharper.', 'node_training', (body) => {
       if (!gains.length) { body.appendChild(UI.el('p', 'flavor', 'The party practises forms until their arms ache. Progress is progress.')); return; }
-      for (const g of gains) {
-        const c = UI.el('div', 'levelup-card');
-        c.appendChild(UI.el('div', 'lu-head', `${g.unit.name} reached level ${g.level}!`));
-        const d = g.delta;
-        c.appendChild(UI.el('div', 'lu-stats', `+${d.hp} HP  +${d.atk} ATK  +${d.mag} MAG  +${d.def} DEF  +${d.spd} SPD`));
-        for (const sid of g.newSkills) { const sk = DJ.SKILLS[sid]; if (sk) c.appendChild(UI.el('div', 'lu-skill', `New skill: ${sk.name}`)); }
-        body.appendChild(c);
-      }
+      for (const g of mergeGains(gains)) body.appendChild(levelUpCard(g));
       DJ.sfx('levelup');
     }, [continueBtn()]);
   }

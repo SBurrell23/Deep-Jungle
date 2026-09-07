@@ -77,12 +77,10 @@
 
   function detail(m, entry) {
     UI.openOverlay((panel, close) => {
+      UI.overlayHeader(panel, m.name, close);
       const sp = UI.spriteEl(m.id, 4, m.name);
       sp.className = 'detail-sprite';
       panel.appendChild(sp);
-      const h = UI.el('h3', 'center', m.name);
-      h.style.marginBottom = '2px';
-      panel.appendChild(h);
       const sub = UI.el('p', 'center muted');
       sub.style.cssText = 'font-size:12px;margin:0 0 4px;letter-spacing:.6px;text-transform:uppercase';
       sub.textContent = (m.kind === 'final' ? 'Final Boss' : m.kind === 'boss' ? 'Region Boss' : m.kind === 'elite' ? 'Elite' : TIER_NAME[m.tier]) + `  ·  Tier ${m.tier}`;
@@ -125,11 +123,6 @@
       rec.textContent = `Encountered ${entry.seen}×  ·  Defeated ${entry.killed}×`;
       panel.appendChild(rec);
 
-      const done = UI.el('button', 'btn primary wide');
-      done.textContent = 'Close';
-      done.style.marginTop = '12px';
-      done.addEventListener('click', close);
-      panel.appendChild(done);
     });
   }
 
