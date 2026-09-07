@@ -49,9 +49,10 @@
       const others = enemies.filter((e) => e.kind !== 'final' && e.kind !== 'boss');
       const j = others.indexOf(u);
       const m = Math.max(1, others.length);
-      const spanX = Math.min(w * 0.30, m > 1 ? w * 0.075 * (m - 1) : 0);
+      const hasBoss = enemies.some((e) => e.kind === 'final' || e.kind === 'boss');
+      const spanX = Math.min(w * 0.34, m > 1 ? w * 0.10 * (m - 1) : 0);
       const tt = m > 1 ? j / (m - 1) : 0.5;
-      const anchor = enemies.some((e) => e.kind === 'final' || e.kind === 'boss') ? w * 0.64 : w * 0.74;
+      const anchor = hasBoss ? w * 0.55 : w * 0.74;
       return {
         u,
         x: anchor + (tt - 0.5) * spanX,
@@ -227,7 +228,7 @@
   }
 
   function drawUnitBars(s, u, sw, sh, idx) {
-    const top = s.y - sh - 20 - (idx % 2) * 16;
+    const top = s.y - sh - 20 - (idx % 3) * 15;
     const bw = Math.max(46, sw * 0.9);
     const x = s.x - bw / 2;
     if (u.side === 'enemy') {
@@ -490,7 +491,6 @@
       const u = hitTest({ clientX: t.clientX, clientY: t.clientY });
       if (u) chooseTarget(u);
     });
-    UI.$('#btnBattleSettings').addEventListener('click', () => UI.Panels.settings());
   };
 
   function hitTest(e) {

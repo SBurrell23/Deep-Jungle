@@ -60,44 +60,44 @@
       g: '#3d6a22', // skin dark
       h: '#6fae36', // skin mid
       i: '#a8d85c', // skin light
-      p: '#3d2258', // robe dark
-      q: '#6f3f9a', // robe mid
-      r: '#a86ad0', // robe light
-      w: '#8a5a2a', // staff wood
+      p: '#2b1747', // hat dark
+      q: '#5a3a86', // hat mid
+      r: '#9a6ad8', // robe light
+      w: '#7a4c22', // staff wood / belt
       e: '#ffe14a', // orb glow / eyes
     },
     px: [
       '................................',
       '................................',
-      '..........kpk...................',
-      '..........kqpk..................',
-      '..........kqqpk..........kek....',
-      '...........kqqpk........keeek...',
-      '...........krqqpk.......keeek...',
-      '...........krqqqpk.......kek....',
-      '..........krqqqqpk.......kwk....',
-      '..........krqqqqqpk......kwk....',
-      '.........krqqqqqqppk.....kwk....',
-      '........krrqqqqqqqpppk...kwk....',
-      '...........khhhhhhk......kwk....',
-      '.........kgkhhhhhhhgk....kwk....',
-      '........kggkhhhehehggk...kwk....',
-      '..........kghhhhhhiik....kwk....',
-      '...........khhhhhhik.....kwk....',
-      '...........khhhhhhk......kwk....',
-      '............khhhhk.......kwk....',
-      '..........kpqqqqqqpk.....kwk....',
-      '.........kpqqrqqqqpk.....kwk....',
-      '.........kpqqrrqqqqhhhhhkkwk....',
-      '........kpqqrrrqqqqpk....kwk....',
-      '........kpqqrrrrqqqqpk...kwk....',
-      '.......kpqqqrrrrqqqqqpk..kwk....',
-      '.......kpqqqrrrrqqqqqpk..kwk....',
-      '......kpqqqqrrrrrqqqqqpk.kwk....',
-      '......kpqqqqrrrrrqqqqqpk.kwk....',
-      '.....kpqqqqqrrrrrqqqqqqpkkwk....',
-      '.....kpqqqqqrrrrrqqqqqqpkkwk....',
-      '.....kkkkkkkkkkkkkkkkkkkkkkk....',
+      '.....kqk........................',
+      '.....kqpk.......................',
+      '......kqqpk.....................',
+      '.......kqqqpk............kek....',
+      '........kqqqqpk.........keeek...',
+      '.........kqqqqqpk.......keeek...',
+      '.........kqqqqqqpk.......kek....',
+      '.........kqqqqqqqpk......kwk....',
+      '........kqqqqqqqqppk.....kwk....',
+      '.......kppqqqqqqqpppk....kwk....',
+      '..........khhhhhhhk......kwk....',
+      '........kggkhhhhhhhggk...kwk....',
+      '.......kgggkhhhehehgggk..kwk....',
+      '.........kgkhhhhhhiik....kwk....',
+      '..........khhhhhhhik.....kwk....',
+      '..........khhkikhhk......kwk....',
+      '...........khhhhhk.......kwk....',
+      '............khhhk........kwk....',
+      '.........kqrrrrrrrqk.....kwk....',
+      '........kqrrrrrrrrrqkhhhhkwk....',
+      '........kqrrrrrrrrrqk....kwk....',
+      '........kwwwwwwwwwwwk....kwk....',
+      '.......kqrrrrrrrrrrrrqk..kwk....',
+      '.......kqrrrrrrrrrrrrqk..kwk....',
+      '......kqqrrrrrrrrrrrrrqqk.kwk...',
+      '......kqqrrrrrrrrrrrrrqqk.kwk...',
+      '......kqqrrrrrrrrrrrrrqqk.kwk...',
+      '......kqqrrrrrrrrrrrrrqqk.kwk...',
+      '......kkkkkkkkkkkkkkkkkkk.kkk...',
       '................................',
     ],
   };
@@ -123,14 +123,14 @@
       '............krk.kyk.krkksssk....',
       '...........krrkkyykkrrk.ksk.....',
       '...........kyyyyyyyyyk..kwk.....',
-      '............kbccccccck..kwk.....',
-      '............kbccecccdk..kwk.....',
-      '............kbcccccdddk.kwk.....',
-      '............kbbcccccck..kwk.....',
-      '.............kbcccck....kwk.....',
+      '............kbcccccck...kwk.....',
+      '............kbcceccdddk.kwk.....',
+      '............kbccccddddkkkwk.....',
+      '............kbbccckkkk..kwk.....',
+      '.............kbcccdk....kwk.....',
       '..............kbcck.....kwk.....',
-      '...........kbccccccbk...kwk.....',
-      '..........kbcdcccccbk...kwk.....',
+      '...........kbccyyybbk...kwk.....',
+      '..........kbcdcyycccbk..kwk.....',
       '..........kbcddccccbcccckwk.....',
       '..........kbcddccccbk...kwk.....',
       '..........kbcddccccbk...kwk.....',
@@ -207,9 +207,9 @@
     w: 32, h: 32,
     pal: {
       k: '#161008', // outline
-      b: '#513622', // bark dark
-      c: '#8a6440', // bark mid
-      d: '#bb945f', // bark light
+      b: '#5a3d26', // bark dark
+      c: '#a07a52', // bark mid
+      d: '#d6b080', // bark light
       g: '#27612a', // leaf dark
       h: '#5fbf42', // leaf light
       f: '#f27ac0', // flower
@@ -218,35 +218,35 @@
     px: [
       '................................',
       '................................',
-      '.............khhhk..............',
-      '...........khhghhhk.............',
-      '.........kfhhhghhhhhk...........',
-      '........khhhghhhhghhhfk.........',
-      '.......kfhhhhhhghhhhhhhk........',
-      '.......khhghhhhhhhhhghhk........',
-      '.......kghhkcccccckhhgk.........',
-      '.......khhhkcdccecdkhhk.........',
-      '........khhkccccccdkhk..........',
-      '.........khkcccccckhk...........',
-      '..........kbccccck.....kek......',
-      '...........kbccck.....keeek.....',
-      '.........kbccdcccbk...keeek.....',
-      '........kbccddccccbkkcckkek.....',
-      '........kbccddccccbkkcddk.......',
-      '........kbccddccccbkkkkkk.......',
-      '.......kbccddggccccbk...........',
-      '.......kbccddghgccccbk..........',
+      '............khhhhk..............',
+      '..........khhghhhhk.............',
+      '........kfhhhghhhhhhk...........',
+      '.......khhhghhhhghhhhfk.........',
+      '......kfhhhhhhghhhhhhhhk........',
+      '......khhghhhhhhhhhhghhk........',
+      '......kghhkddcccdkhhhgk.........',
+      '......khhhkddcecdkhhk...........',
+      '.......khhkddcccdkhk............',
+      '.........khkdccdkhk....kek......',
+      '..........kbcccbk.....keeek.....',
+      '..........kbcdcbk.....keeek.....',
+      '.........kbcddccbkkkkkkkek......',
+      '........kbccddcccbkkccdk........',
+      '........kbccddcccbkkccdk........',
+      '........kbccddcccbkkkkkk........',
+      '.......kbccddggcccbk............',
+      '.......kbccddghgcccbk...........',
       '......kbcccddcccccccbk..........',
       '......kbcccddccccccccbk.........',
-      '.....kbccccddccccccccbk.........',
-      '.....kbccccddcccccccccbk........',
-      '....kbcccccddcccccccccbk........',
-      '....kbcccccddccccccccccbk.......',
-      '....kbbcccddcccccccccccbk.......',
-      '....kbbcccccccccccccccbbk.......',
-      '....kbbbcccccccccccccbbbk.......',
-      '...kbbbccccccccccccccbbbbk......',
-      '...kkkkkkkkkkkkkkkkkkkkkkk......',
+      '.....kbccccddccccccccccbk.......',
+      '.....kbccccddccccccccccbk.......',
+      '....kbcccccddccccccccccccbk.....',
+      '....kbcccccddccccccccccccbk.....',
+      '...kbccccccddccccccccccccccbk...',
+      '...kbccccccddccccccccccccccbk...',
+      '...kbbcccccddccccccccccccccbbk..',
+      '..kbbbcccccccccccccccccccccbbbk.',
+      '..kkkkkkkkkkkkkkkkkkkkkkkkkkkkk.',
       '................................',
     ],
   };
@@ -306,10 +306,10 @@
     w: 32, h: 32,
     pal: {
       k: '#191320', // outline
-      b: '#5f5070', // wing dark
-      c: '#9a89aa', // wing mid
-      d: '#d4c8de', // wing light
-      f: '#d8c8a8', // fuzz
+      b: '#4a3a5e', // wing vein / eyespot ring
+      c: '#a091bd', // wing mid
+      d: '#e2d8ee', // wing light
+      f: '#e0d0b0', // fuzz
       g: '#a89070', // fuzz shade
       e: '#ff9a3a', // compound eye
       s: '#7ae8ff', // crystal ball
@@ -327,20 +327,20 @@
       '..........kffeeffeegk...........',
       '..........kffeeffeegk...........',
       '..........kffffffffgk...........',
-      '.......kccckfffffffgk...........',
-      '.....kcccccckyyfffgk............',
-      '...kcccccccckyyyfffgk...........',
-      '..kbcccccccckffffffgk...........',
-      '.kbccddcccckffffffgk............',
-      '.kbccddcccckffffffgk............',
-      '.kbcccccccckffffffgk............',
-      '..kbcccccccckffffffffk.kkkk.....',
-      '..kbbccccccckffffffgk.kssssk....',
-      '...kbcccccckffffffgfkksdssk.....',
-      '....kbcccccckffffffgfkkssssk....',
-      '.....kbcccckffffffgk.kssssk.....',
-      '.......kbccckffffffgk..kkkk.....',
-      '.........kbckffffffgk...........',
+      '.......kdcckfffffffgk...........',
+      '.....kdcccbckyyfffgk............',
+      '...kdccccbcckyyyfffgk...........',
+      '..kdccccbccckffffffgk...........',
+      '.kdccbbbcccckffffffgk...........',
+      '.kdccbddbccckffffffgk...........',
+      '.kdccbbbccccckfffffgk...........',
+      '..kdcccbccckffffffffk..kkkkk....',
+      '..kdccbcccckffffffgk..kssssssk..',
+      '...kdcbcccckffffffgfkksdsssssk..',
+      '....kdccccckffffffgfkksdsssssk..',
+      '.....kdccbckffffffgk..kssssssk..',
+      '.......kdcckffffffgk..kssssssk..',
+      '.........kdckffffffgk..kkkkkk...',
       '............kgffffggk...........',
       '............kgfffffgk...........',
       '............kffk.kffk...........',
@@ -480,13 +480,13 @@
       '......kmnnmbbbbbbbmnnnmk........',
       '.......kabcbbccddcbbcak.........',
       '.......kabbcbcddcbcbbak.kkkkkk..',
-      '.......kabccbbccbbccbakkbccbbk..',
-      '.......kamnbbbccbbbnmakkbccbbk..',
-      '..kkkkkkamnnbbccbbbnmakkbccbbk..',
-      '.kbccbkkabnbbbbbbbbbbakkbccbbk..',
-      '.kbccbkkabbbbccccbbbbakkbccbbk..',
-      '.kbccbkkabbbbceecbbbbakkbccbbk..',
-      '.kbccbkkabbbbccccbbbbakkkkkkkk..',
+      '.......kabccbbccbbccbaakbccbbk..',
+      '.......kamnbbbccbbbnmaakbccbbk..',
+      '..kkkkkkamnnbbccbbbnmaakbccbbk..',
+      '.kbccbkaabnbbbbbbbbbbaakbccbbk..',
+      '.kbccbkaabbbbccccbbbbaakbccbbk..',
+      '.kbccbkaabbbbceecbbbbaakbccbbk..',
+      '.kbccbkaabbbbccccbbbbaakkkkkkk..',
       '.kkkkkkkabbbbbbbbbbbbak.........',
       '........kabbak..kabbak..........',
       '........kabbak..kabbak..........',
@@ -554,12 +554,12 @@
     w: 32, h: 32,
     pal: {
       k: '#101a14', // outline
-      b: '#1e3a2a', // cloak dark
-      c: '#33604a', // cloak mid
-      d: '#4f8a66', // cloak light
-      s: '#d8a878', // skin
-      w: '#6b4a2a', // bow wood
-      l: '#c8b890', // string / arrow
+      b: '#17301f', // cloak dark
+      c: '#3f7a55', // cloak mid
+      d: '#6cb682', // cloak light
+      s: '#eabb88', // skin
+      w: '#9a6a34', // bow wood
+      l: '#ffe9a8', // string / arrow
       e: '#eaff6a', // firefly / eye glow
       y: '#8fd94a', // glow halo
     },
@@ -572,10 +572,10 @@
       '.....y....kbcccbbk...y..........',
       '....yey..kbcccccbbk....kk.......',
       '.....y...kbccccccbk...kwk.......',
-      '.........kbccckssbk...lkwk......',
-      '.........kbccckesbk...l.kwk.....',
-      '.........kbccccssbk..l..kwk.....',
-      '..........kbccccsbk..l...kwk....',
+      '.........kbcckssssk...lkwk......',
+      '.........kbcckseskb...l.kwk.....',
+      '.........kbcckssssb..l..kwk.....',
+      '..........kbcksssbk..l...kwk....',
       '..........kbcccccbk..l...kwk....',
       '..........kbccdcccbkl....kwk....',
       '.........kbccddcccbkl....kwk....',

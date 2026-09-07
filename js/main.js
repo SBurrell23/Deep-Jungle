@@ -87,7 +87,12 @@
     UI.$('#btnCompendium').addEventListener('click', () => { DJ.sfx('page'); UI.Compendium.open(); });
     UI.$('#btnAchievements').addEventListener('click', () => { DJ.sfx('page'); UI.Achievements.open(); });
     UI.$('#btnSettings').addEventListener('click', () => UI.Panels.settings());
-    UI.$('#btnMapSettings').addEventListener('click', () => UI.Panels.settings());
+    // The gear floats above every screen, so settings are always one click away.
+    const gear = UI.$('#btnGlobalSettings');
+    gear.addEventListener('click', () => UI.Panels.settings());
+    const syncGear = (id) => gear.classList.toggle('hidden', id === 'boot' || id === 'title');
+    DJ.events.on('screen', syncGear);
+    syncGear(UI.current);
     UI.$('#btnMapCompendium').addEventListener('click', () => { DJ.sfx('page'); UI.Compendium.open(); });
     UI.$('#btnParty').addEventListener('click', () => { DJ.sfx('click'); UI.Panels.party(() => UI.Map.refresh()); });
     UI.$('#btnBag').addEventListener('click', () => { DJ.sfx('click'); UI.Panels.bag(); });
@@ -101,7 +106,7 @@
           UI.show(DJ.run && !DJ.run.finished ? 'map' : 'title');
           return;
         }
-        if (UI.current === 'map' || UI.current === 'battle') UI.Panels.settings();
+        if (UI.current !== 'boot') UI.Panels.settings();
       }
     });
   }

@@ -113,7 +113,8 @@ button { font-family: inherit; }
   border-bottom: 1px solid var(--line); flex: 0 0 auto;
   padding-top: max(10px, env(safe-area-inset-top));
 }
-.bar.bottom { border-bottom: 0; border-top: 1px solid var(--line); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+.bar.bottom { border-bottom: 0; border-top: 1px solid var(--line); padding-bottom: max(10px, env(safe-area-inset-bottom)); padding-right: 14px; }
+.screen:not(#title) > .bar:first-child { padding-right: 56px; }
 .bar h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .5px; flex: 1; }
 .bar-left, .bar-right { display: flex; align-items: center; gap: 8px; }
 .bar-right { margin-left: auto; }
@@ -232,6 +233,7 @@ button { font-family: inherit; }
 .battle-top {
   position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 10px;
   padding: 9px 12px; padding-top: max(9px, env(safe-area-inset-top));
+  padding-right: 56px;   /* clear the floating settings gear */
   background: linear-gradient(rgba(5,13,8,.92), rgba(5,13,8,0));
   pointer-events: none;
 }
@@ -436,9 +438,21 @@ input[type=range] { width: 100%; accent-color: var(--green); height: 22px; }
 .tab.on { background: #26492f; border-color: var(--green-2); color: #eafce8; }
 .empty-note { color: var(--ink-mute); font-size: 13px; text-align: center; padding: 24px 10px; }
 
+/* ---------- Always-available settings ---------- */
+.global-gear {
+  position: fixed; z-index: 55;
+  top: max(9px, env(safe-area-inset-top)); right: 12px;
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(13,28,18,.9); border: 1px solid var(--line-2);
+  color: var(--ink-dim); font-size: 16px; cursor: pointer; line-height: 1;
+  transition: color .15s, border-color .15s, transform .15s;
+}
+.global-gear:hover { color: var(--ink); border-color: var(--green); transform: rotate(35deg); }
+.global-gear.hidden { display: none !important; }
+
 /* ---------- Toasts ---------- */
 .toasts {
-  position: fixed; top: 12px; right: 12px; z-index: 80;
+  position: fixed; top: 54px; right: 12px; z-index: 80;
   display: flex; flex-direction: column; gap: 8px; pointer-events: none;
   max-width: min(330px, 84vw);
 }

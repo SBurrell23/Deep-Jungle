@@ -359,7 +359,6 @@
       h: '#57a83f', // stem light
       n: '#f2e6d0', // fangs
       e: '#ff8a2a', // gullet glow
-      y: '#ffe14a', // core glow
     },
     px: [
       '......kkkdddbdddkkkkckkkkk......',
@@ -376,9 +375,9 @@
       'kdkkknnnnknknknpnnnnkkkdddbbbccc',
       'kkknnnnkkkkekkkkppnnnnkbbbbccccc',
       '.kkknpnkkeeeeekkkpnpnkkbcccccccc',
-      '..kknpkkeeeyeeekkpppnkkccccccccc',
-      '..kppkkeeeyyyeeekkppppkccccbcccc',
-      '..kknpkkeeeyeeekkpppnkkcbbbbbbcc',
+      '..kknpkkeeeeeeekkpppnkkccccccccc',
+      '..kppkkeeeeeeeeekkppppkccccbcccc',
+      '..kknpkkeeeeeeekkpppnkkcbbbbbbcc',
       '.kkknpnkkeeeeekkkpnpnkkbbbbbbbbk',
       'kkknnnnkkkkenkkkppnnnnkbbbbbbbbb',
       'kckkknnnnknknknpnnnnkkkbbbbbbbbb',
@@ -453,13 +452,9 @@
       b: '#1d4a4e', // tail dark
       c: '#2f7a72', // tail mid
       d: '#59b39a', // tail light
-      i: '#2c5c3a', // body dark
-      j: '#43804d', // body mid
-      u: '#74b46b', // body light
       y: '#b8871e', // gold dark
       w: '#f6d24a', // gold light
       r: '#4a3320', // staff
-      t: '#7a5634', // staff light
       g: '#8ecf5a', // staff snake
       e: '#ff4a3a', // eyes / tongue
     },
@@ -468,34 +463,34 @@
       '.............kkyyyykkk..........',
       '...........kkkyyyyyyykkkk..kkk..',
       '..........kkykkkywwyyyyykkkkgkkk',
-      '.........kkkkkjkkkkwywyyyykggggk',
-      '.......kkkkjjjjjjjkkywwwyykggggg',
-      '......kkiiiiiijjjjjkywwwyykkkggg',
-      '...kkkkjjeeeuujjjjjkkwwwyyykkrgg',
-      '...kjjjjuekeuujjjjjjkwwwyyykrtgg',
-      '...kjjjjjjjjjjjjjjjkkyyyyyykrggg',
-      'kkkkjjjjjjjijjjjjjjkyyyyyyykrggg',
-      'eekeeiiiiiiiijjjjjkkyyyykkkkrtgk',
-      'keekkkkkkkkkkkjkkkkkkkkkk..krtrk',
-      'kekk...kyyyyykkkyyyyyyykkk.krtrk',
-      'ekk....kkyyyyyywyyyyyykkjkkkrtrk',
-      'kk......kkyyyyyyyyyyykkjjjjkrtrk',
-      '.......kkkkkkkkykkkkkkjjjjjkrtrk',
-      '.......kjjjjjukkkiiiiiijjjjkktrk',
-      '.......kjjjjuuuuuiiiiiikkjjjktrk',
-      '.......kjjjjuuuujiiiiiikkjjjktrk',
-      '......kkjjjjjujjiiiiiiiikjjjkrtk',
-      '.....kkkjjjjjjjjjiiiiiiijjjjkrtk',
-      '....kkdkjjjjjjjjjiiiiiiijjjjkrtk',
-      '....kckkjjjjjjjjjiiiiiijjjjjkrtr',
-      '....kkkjjjjjjjkkkkkkkkkkjjjjkrtr',
-      '....kkkkjjjjjkkbbbbbbbbkjjjjkrtr',
-      '...kkcckjjjjjkccccbcccckkkjkkrtr',
-      '..kkcddkkkjkkkdddddbccccckkkkrtr',
-      '..kcccccdkkkbbbbbbdbbbbbbbbbkrtr',
-      '..kkcccbbbbbbdbbbbbbbbbdbbbbkrtr',
-      '...kkccccbbbbbbbbbbbbbbbbbbbkrtr',
-      '....kkkkcccccccccccbccccccckkrtr',
+      '.........kkkkkckkkkwywyyyykggggk',
+      '.......kkkkccccccckkywwwyykggggg',
+      '......kkbbbbbbccccckywwwyykkkggg',
+      '...kkkkcceeeddccccckkwwwyyykkrgg',
+      '...kccccdekeddcccccckwwwyyykrrgg',
+      '...kccccccccccccccckkyyyyyykrggg',
+      'kkkkcccccccbccccccckyyyyyyykrggg',
+      'eekeebbbbbbbbccccckkyyyykkkkrrgk',
+      'keekkkkkkkkkkkckkkkkkkkkk..krrrk',
+      'kekk...kyyyyykkkyyyyyyykkk.krrrk',
+      'ekk....kkyyyyyywyyyyyykkckkkrrrk',
+      'kk......kkyyyyyyyyyyykkcccckrrrk',
+      '.......kkkkkkkkykkkkkkccccckrrrk',
+      '.......kcccccdkkkbbbbbbcccckkrrk',
+      '.......kccccdddddbbbbbbkkccckrrk',
+      '.......kccccddddcbbbbbbkkccckrrk',
+      '......kkcccccdccbbbbbbbbkccckrrk',
+      '.....kkkcccccccccbbbbbbbcccckrrk',
+      '....kkdkcccccccccbbbbbbbcccckrrk',
+      '....kckkcccccccccbbbbbbccccckrrr',
+      '....kkkccccccckkkkkkkkkkcccckrrr',
+      '....kkkkccccckkbbbbbbbbkcccckrrr',
+      '...kkcckccccckccccbcccckkkckkrrr',
+      '..kkcddkkkckkkdddddbccccckkkkrrr',
+      '..kcccccdkkkbbbbbbdbbbbbbbbbkrrr',
+      '..kkcccbbbbbbdbbbbbbbbbdbbbbkrrr',
+      '...kkccccbbbbbbbbbbbbbbbbbbbkrrr',
+      '....kkkkcccccccccccbccccccckkrrr',
     ],
   };
 
@@ -705,23 +700,21 @@
       d: '#8a5a32', // skin light
       g: '#5a2a2a', // loincloth
       m: '#9c4f3a', // cloth trim / feather
-      r: '#4a3320', // shaft / cord
       n: '#e6e0cc', // bone / skull
-      u: '#ffffff', // bone highlight
       y: '#e0a02a', // beads / feather
       e: '#ff3a2a', // eye glow
     },
     px: [
       '...knkk..............kkkk.......',
-      '..kkunk..........kkkkkmmkkkk....',
-      '.kknunkk......kkkkdkkkkmkyuk....',
-      '.knnunnk.....kkcdddndckkuuyk....',
-      '.knnuunkk....knuuuuuddckukkk....',
-      '.kknnunnk....kuuuuuudddkkkkkkk..',
-      '..knnunkk...kkekuekuddckkkmmmk..',
-      '..kknunk....knkknkknnccckmmmkk..',
+      '..kknnk..........kkkkkmmkkkk....',
+      '.kknnnkk......kkkkdkkkkmkynk....',
+      '.knnnnnk.....kkcdddndckknnyk....',
+      '.knnnnnkk....knnnnnnddcknkkk....',
+      '.kknnnnnk....knnnnnndddkkkkkkk..',
+      '..knnnnkk...kkekneknddckkkmmmk..',
+      '..kknnnk....knkknkknnccckmmmkk..',
       '...knnnk....knnkkknnncckkmkkk...',
-      '...kkrrk....kknnknnnncckkkk.....',
+      '...kkbbk....kknnknnnncckkkk.....',
       '...kyyykk...kkknknkkncckk.......',
       '...kkmyyk.kkkknnnnnnnckkkk......',
       '....kmykkkkcckkkccccckkckkk.....',
@@ -733,17 +726,17 @@
       '....kcccdckkddddddbbbbbbbbkcck..',
       '...kkccccckkcdddddbbbbbbbbkbck..',
       '...kccccckkkkkkkkkkkkkkkkkkbck..',
-      '...kkcccckrkkmmmmmmmmmmmmkkkkk..',
-      '....kcckkkbkkkmmmmmmmmmmmkkkrkk.',
+      '...kkcccckbkkmmmmmmmmmmmmkkkkk..',
+      '....kcckkkbkkkmmmmmmmmmmmkkkbkk.',
       '....kkkkbbbbbkgmggmggmgggkkkbkkk',
       '......kkbbgbbkkmggmggmggkkbbbbbk',
       '......kbbegebbkmkkmkkmkkkkbbgbbk',
       '......kkgggggkkkkkkkkkkkkbbegebb',
       '......kkbknkbkcccckkbbbbkkgggggk',
       '......kkkkgkkkcdddkkbbccckbknkbk',
-      '......krrkkkdccdddkkbbccckkkgkkk',
-      '......kkrkkccccccckkbbbbbbbkkk..',
-      '.......krkkccccccckkbbbbbbbk....',
+      '......kbbkkkdccdddkkbbccckkkgkkk',
+      '......kkbkkccccccckkbbbbbbbkkk..',
+      '.......kbkkccccccckkbbbbbbbk....',
     ],
   };
 
@@ -757,7 +750,6 @@
       d: '#45cf62', // scale light
       m: '#96f57e', // crest / claws
       u: '#dbe58c', // belly
-      w: '#123c30', // wing bone
       x: '#2f8560', // wing membrane
       n: '#f0f4d8', // teeth
       e: '#ffd23a', // eye
@@ -766,21 +758,21 @@
       '................................',
       '..............kkkk..............',
       '.............kkmmk....kkk.......',
-      '............kkmmmk....kwkkkk....',
-      '........kkkkkmmkkk...kkwwwwkkkkk',
-      '...kkkkkkdkmmmkkkk...kwwwwwwwwwk',
-      '...kbbbbbddmmkkmmk..kkwwwxxwwwwk',
-      '..kkkeeeddddddmmmk..kwxwwwxxxwkk',
-      'kkkccekeddddmmmkkk.kkwxwxwwxxwk.',
-      'kccccccccdddmmck...kwxxwxxwwwwk.',
-      'kcnnnnnncccccckk...kwxxwxxxwwkk.',
-      'kccccccbccccccck..kkxxxwwxxwwkk.',
-      'kknkbbbbccccccckk.kwxxxxwxwwwwkk',
-      'kbbbnbnbbccccccckkkkxxxxwxxwwwwk',
-      'kkkkkkkkkkccccccckkkkkkkwxxxwwwk',
-      '.........kcccccccckkmcckkxxxxxww',
-      '.........kkcccccccckdccckkxwwwkk',
-      '..........kkccccccckdcccckkwwkk.',
+      '............kkmmmk....kbkkkk....',
+      '........kkkkkmmkkk...kkbbbbkkkkk',
+      '...kkkkkkdkmmmkkkk...kbbbbbbbbbk',
+      '...kbbbbbddmmkkmmk..kkbbbxxbbbbk',
+      '..kkkeeeddddddmmmk..kbxbbbxxxbkk',
+      'kkkccekeddddmmmkkk.kkbxbxbbxxbk.',
+      'kccccccccdddmmck...kbxxbxxbbbbk.',
+      'kcnnnnnncccccckk...kbxxbxxxbbkk.',
+      'kccccccbccccccck..kkxxxbbxxbbkk.',
+      'kknkbbbbccccccckk.kbxxxxbxbbbbkk',
+      'kbbbnbnbbccccccckkkkxxxxbxxbbbbk',
+      'kkkkkkkkkkccccccckkkkkkkbxxxbbbk',
+      '.........kcccccccckkmcckkxxxxxbb',
+      '.........kkcccccccckdccckkxbbbkk',
+      '..........kkccccccckdcccckkbbkk.',
       '..........kkkcccccckddcccckkkk..',
       '..........kckkccccckbccccckk....',
       '.........kkcukccccckbbbbcckk....',
@@ -808,7 +800,6 @@
       d: '#736947', // fur light
       g: '#5a2430', // exposed flesh
       n: '#ddd6b8', // bone / claws
-      p: '#8f7a5a', // muzzle
       f: '#a84a1e', // fungus cap
       y: '#e8903a', // fungus light
       e: '#8ef07a', // eye glow
@@ -827,8 +818,8 @@
       '...kkkkffyffkdkdddkdkkfffyfffk..',
       '.kkkcckkfffkkdkdddkdkkkfffffkk..',
       'kkbbbbbkkfkkkdkdddkkkdkkkfkkkk..',
-      'ppkeeedckdkckkkddddddccckdkkykk.',
-      'ppdekeddkdkckkddddddcccckdkyyykk',
+      'ddkeeedckdkckkkddddddccckdkkykk.',
+      'dddekeddkdkckkddddddcccckdkyyykk',
       'cccccccckdkcckggcncccccckdffyffk',
       'cnnnnnnckkkckknnnncccccbkkkfffkk',
       'cccccgcccccckgggnngbbbbgggkkfkkk',
@@ -910,26 +901,24 @@
       u: '#c2cf7a', // belly
       r: '#7a5a2a', // crown / spine dark
       s: '#dcb85e', // crown light
-      m: '#e8e2c0', // claws / tail spike
       n: '#f4f0d8', // teeth
       e: '#ffe14a', // petrifying eyes
-      y: '#fffbc8', // eye core / glow
     },
     px: [
       '........krrrkk...kkkkk..................',
       '........krsrrk...krrrk..................',
       '........krssrk..kkrsrk..................',
       '........krssrkk.krssrk..................',
-      '........kyrssrk.krssrk..................',
+      '........knrssrk.krssrk..................',
       'kkk.....kkrssrkkkrssrk..................',
-      'kyk....kkkkkksrkkrssrk..kkkkk...........',
+      'knk....kkkkkksrkkrssrk..kkkkk...........',
       'kkkkkkkkckkdkkkkkrsrkk.kkrrrk...........',
       'kkkbbbbbbbddddddkksrk.kkrssrk...........',
-      'ykkkkkekkddddddddkkrkkkrsssrk...kkk.....',
-      'kkcckeeekcdddkddddkkkkrsssrkkkkkkmkk....',
-      'ccckeeyeekddkekdddckkrsssrkk.kmmmmmkkk..',
-      'bbbbkeeekcdkeeekddckksssrkk..kkmmmmmckk.',
-      'cccckkekkcddkekdcccckssrkkk...kkcmmmmckk',
+      'nkkkkkekkddddddddkkrkkkrsssrk...kkk.....',
+      'kkcckeeekcdddkddddkkkkrsssrkkkkkknkk....',
+      'ccckeeneekddkekdddckkrsssrkk.knnnnnkkk..',
+      'bbbbkeeekcdkeeekddckksssrkk..kknnnnnckk.',
+      'cccckkekkcddkekdcccckssrkkk...kkcnnnnckk',
       'cccccckccccdckccccckksrkkrk....kccddccck',
       'cccccnnnnncccccccccksrkkkrkkkkkkccdddccc',
       'knnnnnbbbccccccccckkrkkkrsrkkrkkkkkcddcc',
@@ -938,7 +927,7 @@
       'bbbbbbbbbbbccccccccckksrsssrssskrsrkkcdd',
       'kkkkkkkkkcccccccccccckkkkkkkkkkkkkkkkkdd',
       '.kkkkkcckkccccccccccckddddddddddccccckkd',
-      '.kykkcccckkcccccccccckdddddddccccccccckc',
+      '.knkkcccckkcccccccccckdddddddccccccccckc',
       '.kkkkkcckkkkcccccccckkccccbccccccccccckk',
       '.....kckkcckkccccccckbbbbkkkkkbbbbbcccck',
       '.....kkkcccckkkccckkkkbbkkccckkbbbbbbbkk',
@@ -952,9 +941,9 @@
       '...kcccckkbkccbbckkbkccbbckkkk..........',
       '..kkcccckbbkccccckbbkccccckbk...........',
       'kkkccccckbbkccccckbkkccccckbk...........',
-      'kmkcmccckkkkccccckkkkccccckbk...........',
-      'kmmmmmmmkkmkcmccckkmkcmccckbk...........',
-      'kkkkccckkkmmmmmmmkkmmmmmmmkbk...........',
+      'knkcnccckkkkccccckkkkccccckbk...........',
+      'knnnnnnnkknkcnccckknkcnccckbk...........',
+      'kkkkccckkknnnnnnnkknnnnnnnkbk...........',
       '...kkkkkkkkkkccckkkkkkccckkkk...........',
     ],
   };
@@ -967,7 +956,6 @@
       b: '#183a24', // scale dark
       c: '#2b5f34', // scale mid
       d: '#4f9349', // scale light
-      p: '#12291a', // pattern dark
       q: '#78b062', // pattern light
       g: '#8a3040', // mouth
       n: '#f0eed4', // fangs
@@ -997,20 +985,20 @@
       '.........kccccddccckkncccgggccccccckk...',
       '.......kkkkcccddcccckccggggggccccckk....',
       '......kkddkccccddccckcngnnnngkckkkk.....',
-      '.....kkcdpkkccccdcccknnnnggggkkk........',
+      '.....kkcdbkkccccdcccknnnnggggkkk........',
       '.....kccccckkccccccckccccccckkck........',
       '.....kkccccckccccccckccccccckckk........',
       '......kkkkkkkkccccckkkccccckkkkkkkk.....',
       '......kkkddddkkkkkkkdkkkkkkkdccccckkk...',
-      '.....kkcccpcccppqppcccpcccccpccccccckk..',
-      '.....kccppqppcccpcccppqppcppqppcccccck..',
-      '.....kkcccpcccbbbbbbbbpbbbbbpbbbbbbckk..',
+      '.....kkcccbcccbbqbbcccbcccccbccccccckk..',
+      '.....kccbbqbbcccbcccbbqbbcbbqbbcccccck..',
+      '.....kkcccbcccbbbbbbbbbbbbbbbbbbbbbckk..',
       '......kkkcccbbbbbbbbbbbbbbbbbbbbbbkkk...',
       '...kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-      '..kkccccccccccpcccccccccbcpcccccccccckk.',
-      '.kkcccccpcccppqppcccpcbcppqppcccpccccckk',
-      '.kccccppqppbbbpbbbppqppbbbpbbbppqppcccck',
-      '.kkccccbpbbbbbbbbbbbpbbbbbbbbbbbpbbbbbkk',
+      '..kkccccccccccbcccccccccbcbcccccccccckk.',
+      '.kkcccccbcccbbqbbcccbcbcbbqbbcccbccccckk',
+      '.kccccbbqbbbbbbbbbbbqbbbbbbbbbbbqbbcccck',
+      '.kkccccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbkk',
       '..kkccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbkk.',
       '...kkkcbbbbbbbbbbbbbbbbbbbbbbbbbbbbkkk..',
       '.....kkkkkcbbbbbbbbbbbbbbbbbbbbkkkkk....',

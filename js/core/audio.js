@@ -15,7 +15,16 @@
     A.ctx = new AC();
     A.master = A.ctx.createGain();
     A.master.gain.value = 1;
-    A.master.connect(A.ctx.destination);
+    // A limiter on the master keeps stacked effects (thunder over an explosion over a
+    // crit) from clipping, which otherwise crackles on the loudest moments of a boss fight.
+    A.limiter = A.ctx.createDynamicsCompressor();
+    A.limiter.threshold.value = -6;
+    A.limiter.knee.value = 4;
+    A.limiter.ratio.value = 12;
+    A.limiter.attack.value = 0.003;
+    A.limiter.release.value = 0.18;
+    A.master.connect(A.limiter);
+    A.limiter.connect(A.ctx.destination);
     A.sfxGain = A.ctx.createGain();
     A.sfxGain.connect(A.master);
     A.musicGain = A.ctx.createGain();
@@ -175,13 +184,13 @@
       const n = noise(0.75); const f = filt('lowpass', 1400); const g = gain(0);
       n.connect(f); f.connect(g); g.connect(A.sfxGain);
       f.frequency.setValueAtTime(3200, t); f.frequency.exponentialRampToValueAtTime(180, t + 0.6);
-      env(g, t, 0.006, 0.68, 0.85); n.start(t); n.stop(t + 0.75);
+      env(g, t, 0.006, 0.68, 0.6); n.start(t); n.stop(t + 0.75);
       const g2 = gain(0); g2.connect(A.sfxGain); env(g2, t, 0.004, 0.5, 0.7); osc('sine', 130, 34, t, 0.55, g2);
     },
     thunder: (t) => {
       const n = noise(0.6); const f = filt('highpass', 1800); const g = gain(0);
       n.connect(f); f.connect(g); g.connect(A.sfxGain);
-      env(g, t, 0.001, 0.1, 0.7, 0.12, 0.42); n.start(t); n.stop(t + 0.62);
+      env(g, t, 0.001, 0.1, 0.5, 0.09, 0.42); n.start(t); n.stop(t + 0.62);
       const g2 = gain(0); g2.connect(A.sfxGain); env(g2, t, 0.001, 0.16, 0.55); osc('sawtooth', 2600, 300, t, 0.18, g2);
       const g3 = gain(0); const f3 = filt('lowpass', 300); g3.connect(A.sfxGain);
       const n3 = noise(0.7); n3.connect(f3); f3.connect(g3); env(g3, t + 0.06, 0.02, 0.6, 0.5); n3.start(t + 0.06); n3.stop(t + 0.76);
