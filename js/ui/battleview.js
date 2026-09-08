@@ -40,6 +40,7 @@
       x: w * 0.26 - i * heroGap,
       y: ground + i * depth,
       scale: base * (1 + i * 0.045),  // nearer heroes slightly larger
+      gap: heroGap,                   // bars are capped to this, so they never touch
     }));
 
     const enemies = battle.enemies;
@@ -278,8 +279,10 @@
   function barTopFor(s, sh, idx) {
     const row = (idx || 0) % 3;
     const floor = barFloor();
-    let top = s.y - sh - 21 - (row === 0 ? 7 : 0) - row * 18;
-    if (top < floor) top = floor + row * 18;
+    // 28, 39, 50: the outer two pulled seven pixels toward the middle one, so the three
+    // read as a gentle fan rather than a staircase.
+    let top = s.y - sh - 28 - row * 11;
+    if (top < floor) top = floor + row * 11;
     return top;
   }
 
@@ -303,7 +306,11 @@
     // There is room above the battlefield, so the bars take it: wide enough that the
     // segment ticks are countable and tall enough to read at a glance.
     const top = barTopFor(s, sh, idx);
-    const bw = u.side === 'hero' ? Math.min(Math.max(56, sw * 1.05), 84) : Math.max(66, sw * 1.15);
+    // Hero bars used to run 84 wide on a 79 wide gap, overlapping their neighbour. The
+    // vertical stagger hid that; with the stagger halved it would not have.
+    const bw = u.side === 'hero'
+      ? Math.min(Math.max(50, sw * 1.05), 84, (s.gap || 84) - 6)
+      : Math.max(66, sw * 1.15);
     const x = s.x - bw / 2;
     if (u.side === 'enemy') {
       ctx.save();
