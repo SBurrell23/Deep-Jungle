@@ -70,7 +70,7 @@
   def('spark',        { name: 'Spark', kind: 'mag', target: 'enemy', power: 1.6, mp: 4, fx: 'arcane', sfx: 'magic', desc: 'A crackle of green sorcery.' });
   def('fire_gout',    { name: 'Fire Gout', kind: 'mag', target: 'enemy', power: 1.9, mp: 7, status: { id: 'burn', turns: 3, chance: 0.6 }, fx: 'fire', sfx: 'fire', desc: 'Burns the target, may inflict Burn.' });
   def('mana_storm',   { name: 'Mana Storm', kind: 'mag', target: 'enemies', power: 1.22, mp: 13, fx: 'arcane_burst', sfx: 'magic', desc: 'Arcane blast hitting all enemies.' });
-  def('meteor',       { name: 'Goblin Meteor', kind: 'mag', target: 'enemies', power: 2.2, mp: 22, status: { id: 'burn', turns: 2, chance: 0.5 }, fx: 'inferno', sfx: 'explosion', desc: 'Devastating fire on all foes.' });
+  def('meteor',       { name: 'Goblin Meteor', kind: 'mag', target: 'enemies', power: 2.0, mp: 23, status: { id: 'burn', turns: 2, chance: 0.5 }, fx: 'inferno', sfx: 'explosion', desc: 'Devastating fire on all foes.' });
   // -- Kua Ta Lancer --
   def('lunge',        { name: 'Lunge', kind: 'phys', target: 'enemy', power: 1.95, mp: 5, fx: 'pierce', sfx: 'pierce', desc: 'A piercing thrust.' });
   def('sweep',        { name: 'Spear Sweep', kind: 'phys', target: 'enemies', power: 1.35, mp: 9, fx: 'slash', sfx: 'slash', desc: 'Sweep the spear across all enemies.' });
@@ -98,19 +98,19 @@
   def('prophecy',     { name: 'Prophecy', kind: 'mag', target: 'enemies', power: 2.05, mp: 13, status: { id: 'weak', turns: 2, chance: 0.7 }, fx: 'holy', sfx: 'magic', desc: 'Foretold doom: damage + Weak.' });
   // -- Pygmy Beastmaster --
   def('whip_crack',   { name: 'Whip Crack', kind: 'phys', target: 'enemy', power: 1.62, mp: 4, status: { id: 'weak', turns: 2, chance: 0.65 }, fx: 'slash', sfx: 'whip', desc: 'Lashing strike that weakens.' });
-  def('boar_charge',  { name: 'Boar Charge', kind: 'phys', target: 'enemy', power: 2.0, mp: 7, status: { id: 'stun', turns: 1, chance: 0.4 }, fx: 'hit_big', sfx: 'hit', desc: 'Your boar tramples a foe.' });
+  def('boar_charge',  { name: 'Boar Charge', kind: 'phys', target: 'enemy', power: 2.2, mp: 7, status: { id: 'stun', turns: 1, chance: 0.5 }, fx: 'hit_big', sfx: 'hit', desc: 'Your boar tramples a foe.' });
   def('call_of_wild', { name: 'Call of the Wild', kind: 'buff', target: 'allies', mp: 9, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'roar', sfx: 'roar', desc: 'The pack rallies: party gains Rage.' });
-  def('stampede',     { name: 'Stampede', kind: 'phys', target: 'enemies', power: 1.78, mp: 15, fx: 'earth', sfx: 'explosion', desc: 'Beasts trample all enemies.' });
+  def('stampede',     { name: 'Stampede', kind: 'phys', target: 'enemies', power: 1.95, mp: 15, fx: 'earth', sfx: 'explosion', desc: 'Beasts trample all enemies.' });
   // -- Orchid Witch --
   def('hex',          { name: 'Hex', kind: 'mag', target: 'enemy', power: 1.3, mp: 4, status: { id: 'weak', turns: 3, chance: 0.8 }, fx: 'curse', sfx: 'debuff', desc: 'Curse a target with Weak.' });
   def('venom_petals', { name: 'Venom Petals', kind: 'mag', target: 'enemies', power: 0.9, mp: 11, status: { id: 'poison', turns: 3, chance: 0.8 }, fx: 'poison', sfx: 'poison', desc: 'Poison every enemy.' });
   def('sleep_pollen', { name: 'Sleep Pollen', kind: 'debuff', target: 'enemies', mp: 12, status: { id: 'stun', turns: 1, chance: 0.42 }, fx: 'sparkle', sfx: 'debuff', desc: 'May stun all enemies.' });
-  def('wither',       { name: 'Wither', kind: 'drain', target: 'enemy', power: 2.1, mp: 15, drain: 0.42, fx: 'dark', sfx: 'drain', desc: 'Drain life; heals you for half.' });
+  def('wither',       { name: 'Wither', kind: 'drain', target: 'enemy', power: 1.95, mp: 16, drain: 0.38, fx: 'dark', sfx: 'drain', desc: 'Drain life; heals you for half.' });
   // -- Golem Guardian --
   def('boulder_fist', { name: 'Boulder Fist', kind: 'phys', target: 'enemy', power: 2.1, mp: 5, fx: 'earth', sfx: 'hit', desc: 'Crushing stone punch.' });
   def('bulwark',      { name: 'Bulwark', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'regen', turns: 2, chance: 1 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Harden: Guard, Regen, and every enemy comes for you.' });
   def('quake',        { name: 'Quake', kind: 'phys', target: 'enemies', power: 1.62, mp: 11, status: { id: 'slow', turns: 2, chance: 0.6 }, fx: 'earth', sfx: 'explosion', desc: 'Shake the ground; slows enemies.' });
-  def('mountain',     { name: 'Living Mountain', kind: 'buff', target: 'allies', mp: 14, status: { id: 'shield', turns: 3, chance: 1, val: 0.4 }, fx: 'shield', sfx: 'buff', desc: 'Big shield for the whole party.' });
+  def('mountain',     { name: 'Living Mountain', kind: 'buff', target: 'allies', mp: 13, status: { id: 'shield', turns: 3, chance: 1, val: 0.46 }, fx: 'shield', sfx: 'buff', desc: 'Big shield for the whole party.' });
   // -- Ratkin Corsair --
   def('cutlass',      { name: 'Cutlass Slash', kind: 'phys', target: 'enemy', power: 1.78, mp: 4, crit: 0.3, fx: 'slash', sfx: 'slash', desc: 'Slash with high crit chance.' });
   def('plunder',      { name: 'Plunder', kind: 'phys', target: 'enemy', power: 1.45, mp: 6, gold: 1, fx: 'steal', sfx: 'gold', desc: 'Strike and steal gold.' });
@@ -123,19 +123,19 @@
   def('piercing_light', { name: 'Piercing Light', kind: 'phys', target: 'enemy', power: 3.0, mp: 16, fx: 'holy', sfx: 'arrow', desc: 'A radiant arrow of enormous power.' });
   // -- Sporeling Druid --
   def('spore_puff',   { name: 'Spore Puff', kind: 'mag', target: 'enemy', power: 1.18, mp: 5, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison', sfx: 'poison', desc: 'Poisonous spores.' });
-  def('mycelium',     { name: 'Mycelium Mend', kind: 'heal', target: 'allies', power: 0.92, mp: 16, fx: 'heal', sfx: 'heal', desc: 'Heal the whole party.' });
-  def('toxic_bloom',  { name: 'Toxic Bloom', kind: 'mag', target: 'enemies', power: 1.02, mp: 16, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison_cloud', sfx: 'poison', desc: 'Poison cloud on all enemies.' });
-  def('fungal_rebirth', { name: 'Fungal Rebirth', kind: 'revive', target: 'deadAlly', power: 0.4, mp: 16, self: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'revive', desc: 'Revive an ally at 40% HP.' });
+  def('mycelium',     { name: 'Mycelium Mend', kind: 'heal', target: 'allies', power: 0.85, mp: 17, fx: 'heal', sfx: 'heal', desc: 'Heal the whole party.' });
+  def('toxic_bloom',  { name: 'Toxic Bloom', kind: 'mag', target: 'enemies', power: 0.92, mp: 17, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison_cloud', sfx: 'poison', desc: 'Poison cloud on all enemies.' });
+  def('fungal_rebirth', { name: 'Fungal Rebirth', kind: 'revive', target: 'deadAlly', power: 0.35, mp: 19, self: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'revive', desc: 'Revive an ally at 40% HP.' });
   // -- Tiger Shaman --
   def('totem_strike', { name: 'Totem Strike', kind: 'phys', target: 'enemy', power: 1.68, mp: 4, fx: 'hit', sfx: 'hit', desc: 'Smash with the totem staff.' });
   def('spirit_lightning', { name: 'Spirit Lightning', kind: 'mag', target: 'enemy', power: 2.35, mp: 7, status: { id: 'stun', turns: 1, chance: 0.3 }, fx: 'lightning', sfx: 'thunder', desc: 'Lightning that may stun.' });
   def('ancestor_ward', { name: 'Ancestor Ward', kind: 'buff', target: 'allies', mp: 10, status: { id: 'guard', turns: 3, chance: 1 }, fx: 'buff', sfx: 'buff', desc: 'Ancestors guard the party.' });
   def('tiger_spirit', { name: 'Tiger Spirit', kind: 'phys', target: 'enemies', power: 2.2, mp: 16, fx: 'claw', sfx: 'roar', desc: 'The tiger spirit mauls all enemies.' });
   // -- Harpy Skydancer --
-  def('dive',         { name: 'Sky Dive', kind: 'phys', target: 'enemy', power: 1.8, mp: 5, fx: 'pierce', sfx: 'wind', desc: 'Plunge from above.' });
+  def('dive',         { name: 'Sky Dive', kind: 'phys', target: 'enemy', power: 2.0, mp: 5, fx: 'pierce', sfx: 'wind', desc: 'Plunge from above.' });
   def('gale',         { name: 'Gale', kind: 'phys', target: 'enemies', power: 1.3, mp: 9, status: { id: 'slow', turns: 2, chance: 0.6 }, fx: 'wind', sfx: 'wind', desc: 'Winds slow all enemies.' });
   def('tailwind',     { name: 'Tailwind', kind: 'buff', target: 'allies', mp: 8, status: { id: 'haste', turns: 3, chance: 1 }, fx: 'wind', sfx: 'buff', desc: 'Party gains Haste.' });
-  def('talon_storm',  { name: 'Talon Storm', kind: 'phys', target: 'enemy', power: 1.32, hits: 4, mp: 15, fx: 'claw', sfx: 'slash', desc: 'Four raking talons.' });
+  def('talon_storm',  { name: 'Talon Storm', kind: 'phys', target: 'enemy', power: 1.45, hits: 4, mp: 15, fx: 'claw', sfx: 'slash', desc: 'Four raking talons.' });
   // -- Ghoul Necromancer --
   def('soul_drain',   { name: 'Soul Drain', kind: 'drain', target: 'enemy', power: 1.5, mp: 4, drain: 0.6, fx: 'dark', sfx: 'drain', desc: 'Drain life; heals you.' });
   def('bone_shards',  { name: 'Bone Shards', kind: 'mag', target: 'enemies', power: 1.2, mp: 9, status: { id: 'bleed', turns: 2, chance: 0.5 }, fx: 'curse', sfx: 'magic', desc: 'Shards cut all enemies.' });
@@ -144,7 +144,7 @@
   // -- Beetle Knight --
   def('lance_charge', { name: 'Lance Charge', kind: 'phys', target: 'enemy', power: 2.0, mp: 5, fx: 'pierce', sfx: 'pierce', desc: 'Charge with the lance.' });
   def('carapace',     { name: 'Carapace', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'shield', turns: 3, chance: 1, val: 0.3 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Guard, Shield, and every enemy comes for you.' });
-  def('shield_bash',  { name: 'Shield Bash', kind: 'phys', target: 'enemy', power: 1.5, mp: 7, status: { id: 'stun', turns: 1, chance: 0.6 }, fx: 'hit_big', sfx: 'hit', desc: 'Bash that often stuns.' });
+  def('shield_bash',  { name: 'Shield Bash', kind: 'phys', target: 'enemy', power: 1.68, mp: 7, status: { id: 'stun', turns: 1, chance: 0.7 }, fx: 'hit_big', sfx: 'hit', desc: 'Bash that often stuns.' });
   def('horn_toss',    { name: 'Horn Toss', kind: 'phys', target: 'enemies', power: 1.92, mp: 14, fx: 'slash_big', sfx: 'slash', desc: 'Toss all enemies with your horns.' });
   // -- Naga Assassin --
   def('fang_strike',  { name: 'Fang Strike', kind: 'phys', target: 'enemy', power: 1.5, mp: 4, crit: 0.3, status: { id: 'poison', turns: 2, chance: 0.5 }, fx: 'slash', sfx: 'slash', desc: 'Poisoned blade, high crit.' });
@@ -155,7 +155,7 @@
   def('gourd_smash',  { name: 'Gourd Smash', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, fx: 'hit_big', sfx: 'hit', desc: 'Bonk with the gourd.' });
   def('healing_brew', { name: 'Healing Brew', kind: 'heal', target: 'ally', power: 1.8, mp: 6, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'heal', sfx: 'potion', desc: 'Heal an ally and grant Regen.' });
   def('fire_brew',    { name: 'Fire Brew', kind: 'mag', target: 'enemies', power: 1.4, mp: 10, status: { id: 'burn', turns: 2, chance: 0.6 }, fx: 'flame', sfx: 'fire', desc: 'Spit flaming brew at all foes.' });
-  def('master_brew',  { name: 'Master Brew', kind: 'heal', target: 'allies', power: 1.45, mp: 18, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'buff', sfx: 'potion', desc: 'Heal party and grant Rage.' });
+  def('master_brew',  { name: 'Master Brew', kind: 'heal', target: 'allies', power: 1.32, mp: 19, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'buff', sfx: 'potion', desc: 'Heal party and grant Rage.' });
   // -- Gorilla Stormcaller --
   def('thunder_fist', { name: 'Thunder Fist', kind: 'phys', target: 'enemy', power: 1.88, mp: 5, status: { id: 'stun', turns: 1, chance: 0.4 }, fx: 'thunder', sfx: 'thunder', desc: 'Electrified punch.' });
   def('chain_lightning', { name: 'Chain Lightning', kind: 'mag', target: 'enemies', power: 1.5, mp: 10, fx: 'lightning', sfx: 'thunder', desc: 'Lightning arcs to all enemies.' });
@@ -169,7 +169,7 @@
   // -- Treant Sage --
   def('root_grasp',   { name: 'Root Grasp', kind: 'mag', target: 'enemy', power: 1.4, mp: 4, status: { id: 'slow', turns: 2, chance: 0.7 }, fx: 'vine', sfx: 'magic', desc: 'Roots slow a target.' });
   def('sap_surge',    { name: 'Sap Surge', kind: 'heal', target: 'allies', power: 0.98, mp: 15, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal + Regen for the party.' });
-  def('ancient_word', { name: 'Ancient Word', kind: 'mag', target: 'enemies', power: 1.42, mp: 13, fx: 'holy', sfx: 'magic', desc: 'Words of power strike all enemies.' });
+  def('ancient_word', { name: 'Ancient Word', kind: 'mag', target: 'enemies', power: 1.32, mp: 13, fx: 'holy', sfx: 'magic', desc: 'Words of power strike all enemies.' });
   def('worldroot',    { name: 'Worldroot', kind: 'mag', target: 'enemies', power: 1.8, mp: 22, status: { id: 'stun', turns: 1, chance: 0.4 }, fx: 'vine', sfx: 'explosion', desc: 'The roots of the world erupt.' });
   // -- Jaguar Paladin --
   def('sun_mace',     { name: 'Sun Mace', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, fx: 'holy', sfx: 'hit', desc: 'A radiant blow.' });
@@ -179,7 +179,7 @@
 
   // -- Toucan Bard --
   def('beak_jab',     { name: 'Beak Jab', kind: 'phys', target: 'enemy', power: 1.55, mp: 4, fx: 'pierce', sfx: 'pierce', desc: 'A quick stab of that enormous beak.' });
-  def('rally_song',   { name: 'Rally Song', kind: 'buff', target: 'allies', mp: 8, status: { id: 'haste', turns: 3, chance: 1 }, self: { id: 'rage', turns: 3, chance: 1 }, fx: 'song', sfx: 'buff', desc: 'The party gains Haste; you gain Rage.' });
+  def('rally_song',   { name: 'Rally Song', kind: 'buff', target: 'allies', mp: 6, status: { id: 'haste', turns: 3, chance: 1 }, self: { id: 'rage', turns: 3, chance: 1 }, fx: 'song', sfx: 'buff', desc: 'The party gains Haste; you gain Rage.' });
   def('discord_cry',  { name: 'Discordant Cry', kind: 'debuff', target: 'enemies', mp: 10, status: { id: 'weak', turns: 3, chance: 0.8 }, fx: 'song', sfx: 'debuff', desc: 'An awful noise. All enemies are Weakened.' });
   def('dawn_anthem',  { name: 'Anthem of Dawn', kind: 'heal', target: 'allies', power: 1.32, mp: 17, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
 
@@ -187,10 +187,10 @@
   def('acid_flask',   { name: 'Acid Flask', kind: 'mag', target: 'enemy', power: 1.7, mp: 5, status: { id: 'weak', turns: 3, chance: 0.6 }, fx: 'poison', sfx: 'poison', desc: 'Corrosive glass. Eats armour as well as flesh.' });
   def('smoke_screen', { name: 'Smoke Screen', kind: 'buff', target: 'allies', mp: 7, status: { id: 'shield', turns: 3, chance: 1, val: 0.3 }, fx: 'debuff', sfx: 'debuff', desc: 'Cover the party in choking smoke: Shield for 3 turns.' });
   def('volatile_mix', { name: 'Volatile Mix', kind: 'mag', target: 'enemies', power: 1.32, mp: 13, status: { id: 'burn', turns: 2, chance: 0.6 }, fx: 'fireball', sfx: 'explosion', desc: 'Whatever was in the flask, it is angry now.' });
-  def('philos_fire',  { name: "Philosopher's Fire", kind: 'mag', target: 'enemies', power: 1.85, mp: 23, status: { id: 'burn', turns: 3, chance: 0.7 }, fx: 'inferno', sfx: 'explosion', desc: 'The reaction he has spent his life perfecting.' });
+  def('philos_fire',  { name: "Philosopher's Fire", kind: 'mag', target: 'enemies', power: 1.7, mp: 24, status: { id: 'burn', turns: 3, chance: 0.7 }, fx: 'inferno', sfx: 'explosion', desc: 'The reaction he has spent his life perfecting.' });
 
   // -- Sloth Sentinel --
-  def('slow_swipe',   { name: 'Slow Swipe', kind: 'phys', target: 'enemy', power: 2.3, mp: 5, fx: 'claw', sfx: 'slash', desc: 'It takes a while. It lands like a falling tree.' });
+  def('slow_swipe',   { name: 'Slow Swipe', kind: 'phys', target: 'enemy', power: 2.55, mp: 5, fx: 'claw', sfx: 'slash', desc: 'It takes a while. It lands like a falling tree.' });
   def('immovable',    { name: 'Immovable', kind: 'buff', target: 'self', mp: 5, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'shield', turns: 3, chance: 1, val: 0.32 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Guard, a solid Shield, and nothing gets past you.' });
   def('canopy_hold',  { name: 'Canopy Hold', kind: 'buff', target: 'allies', mp: 13, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'regen', turns: 3, chance: 1 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'nature', sfx: 'buff', desc: 'The party braces behind you and Guards.' });
   def('avalanche',    { name: 'Avalanche', kind: 'phys', target: 'enemies', power: 1.92, mp: 17, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'earth', sfx: 'explosion', desc: 'You finally let go. Everything below you regrets it.' });
