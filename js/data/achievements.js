@@ -28,7 +28,7 @@
   a('lore_seeker', 'Lore Seeker', 'Discover 45 monsters in the compendium.', ge('discovered', 45), 'moth_oracle');
   a('tamer', 'Tamer', 'Defeat 220 monsters.', ge('kills', 220), 'pygmy_beastmaster');
   a('green_thumb', 'Green Thumb', 'Solve 12 jungle puzzles.', ge('puzzlesSolved', 12), 'orchid_witch');
-  a('unbroken', 'Unbroken', 'Win 8 battles without taking any damage.', ge('perfectBattles', 8), 'golem_guardian');
+  a('unbroken', 'Unbroken', 'Win 5 battles without taking any damage.', ge('perfectBattles', 5), 'golem_guardian');
   a('treasure_hunter', 'Treasure Hunter', 'Earn 3,000 gold in total.', ge('goldEarned', 3000), 'ratkin_corsair');
   a('fang_breaker', 'Fang Breaker', 'Defeat the guardian of the Mire.', guardian(1), 'firefly_ranger');
   a('survivalist', 'Survivalist', 'Rest at 30 campfires.', ge('rests', 30), 'spore_druid');
@@ -53,7 +53,7 @@
   a('persistent', 'Persistent', 'Start 5 expeditions.', ge('runsStarted', 5));
   a('obsessed', 'Obsessed', 'Start 25 expeditions.', ge('runsStarted', 25));
   a('fallen', 'The Jungle Wins', 'Lose an expedition.', ge('runsLost', 1));
-  a('speedrunner', 'Speedrunner', 'Defeat the Heart in a run visiting 16 nodes or fewer.', (s) => (s.fastestWinNodes || 999) <= 16);
+  a('speedrunner', 'Speedrunner', 'Defeat the Heart of the Jungle in under 45 minutes.', (s) => (s.fastestWinMs || 0) > 0 && s.fastestWinMs <= 45 * 60 * 1000);
 
   // ===== Combat =====
   a('brawler', 'Brawler', 'Win 10 battles.', ge('battlesWon', 10));
@@ -66,7 +66,7 @@
   a('legendary_hit', 'Legendary Hit', 'Deal 400 damage in a single hit.', ge('maxHit', 400));
   a('crit_happens', 'Crit Happens', 'Land 20 critical hits.', ge('crits', 20));
   a('crit_master', 'Critical Mass', 'Land 300 critical hits.', ge('crits', 300), 'peacock_duelist');
-  a('flawless_x5', 'Untouchable', 'Win 5 battles without taking damage.', ge('perfectBattles', 5));
+  a('flawless_x5', 'Untouchable', 'Win 3 battles without taking damage.', ge('perfectBattles', 3));
   a('one_round', 'Blitz', 'Win a battle in a single round.', ge('oneRoundWins', 1));
   a('blitz_x10', 'Lightning War', 'Win 10 battles in a single round.', ge('oneRoundWins', 10));
   a('last_stand', 'Last Stand', 'Win a battle with only one hero standing.', ge('soloWins', 1));
@@ -126,7 +126,7 @@
   a('level_5', 'Growing Up', 'Raise a hero to level 5.', ge('heroMaxLevel', 5));
   a('level_15', 'Peak Form', 'Raise a hero to level 15.', ge('heroMaxLevel', 15));
   a('roster_10', 'Recruiter', 'Unlock 10 adventurers.', withProg((s, p) => (p.unlocked || []).length >= 10, (s, p) => ({ cur: (p.unlocked || []).length, goal: 10 })));
-  a('roster_23', 'Full Roster', 'Unlock all 23 adventurers.', withProg((s, p) => (p.unlocked || []).length >= 23, (s, p) => ({ cur: (p.unlocked || []).length, goal: 23 })));
+  a('roster_23', 'Full Roster', 'Unlock every adventurer.', withProg((s, p) => (p.unlocked || []).length >= DJ.HEROES.length, (s, p) => ({ cur: (p.unlocked || []).length, goal: DJ.HEROES.length })));
   a('variety', 'Variety Pack', 'Win the game with 6 different adventurers.', withProg((s) => Object.keys(s.wonWith || {}).length >= 6, (s) => ({ cur: Object.keys(s.wonWith || {}).length, goal: 6 })));
   a('starters', 'The Original Three', 'Win the game with Elf Warrior, Goblin Mage and Kua Ta Lancer together.', ge('starterWins', 1));
   a('all_casters', 'Spellbound', 'Win the game with a party of three magic users.', ge('casterWins', 1));

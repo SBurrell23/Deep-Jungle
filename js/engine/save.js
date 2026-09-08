@@ -20,7 +20,8 @@
         heroMaxLevel: 1, discovered: 0, highestColumn: 0, perfectBattles: 0, oneRoundWins: 0,
         soloWins: 0, lowHpWins: 0, longestBattle: 0, poisonKills: 0, burnKills: 0, bleedKills: 0,
         summonKills: 0, killsByTag: {}, bossKills: {}, wonWith: {}, flawlessRuns: 0,
-        fastestWinNodes: 999, starterWins: 0, casterWins: 0, playTime: 0,
+        fastestWinNodes: 999, fastestWinMs: 0,   // 0 means no win recorded yet
+        starterWins: 0, casterWins: 0, playTime: 0,
         deepestDepth: 0, beyondRuns: 0,
       },
       run: null,
@@ -211,6 +212,14 @@
     for (const h of run.party) DJ.bumpMap('wonWith', h.id);
     if (run.flawless) DJ.bump('flawlessRuns');
     DJ.setMin('fastestWinNodes', run.nodesVisited);
+    // How long the expedition took, for the speedrun achievement. The node count cannot
+    // serve that purpose: the map is a fixed chain of columns and one node is taken from
+    // each, so every winning run visits exactly the same number.
+    // setMin cannot be used here: the stat is seeded at 0 for "no win yet", and nothing
+    // is ever less than 0, so every time would have been silently discarded.
+    const ms = (run.elapsed || 0) + (run.startedAt ? Date.now() - run.startedAt : 0);
+    const best = DJ.profile.stats.fastestWinMs || 0;
+    if (ms > 0 && (!best || ms < best)) DJ.profile.stats.fastestWinMs = ms;
     const ids = run.party.map((h) => h.id).sort().join(',');
     if (ids === ['elf_warrior', 'goblin_mage', 'kuata_lancer'].sort().join(',')) DJ.bump('starterWins');
     const casters = run.party.filter((h) => { const b = DJ.HERO_BY_ID[h.id].base; return b.mag >= b.atk; });
