@@ -387,8 +387,8 @@
   // ---- Status definitions ----
   DJ.STATUS = {
     poison: { name: 'Poison', icon: 'status_poison', color: '#7dd66a', bad: true, desc: 'Damage each turn. Every fresh dose adds a stack and resets the timer.' },
-    burn:   { name: 'Burn',   icon: 'status_burn',   color: '#ff8a3d', bad: true, desc: 'Heavy fire damage each turn, for a short time.' },
-    bleed:  { name: 'Bleed',  icon: 'status_bleed',  color: '#ff4d6d', bad: true, desc: 'Light damage each turn, for a long time.' },
+    burn:   { name: 'Burn',   icon: 'status_burn',   color: '#ff8a3d', bad: true, desc: 'Heavy fire damage each turn.' },
+    bleed:  { name: 'Bleed',  icon: 'status_bleed',  color: '#ff4d6d', bad: true, desc: 'Light damage each turn.' },
     stun:   { name: 'Stun',   icon: 'status_stun',   color: '#ffe34d', bad: true, desc: 'Cannot act.' },
     weak:   { name: 'Weak',   icon: 'status_weak',   color: '#b48cff', bad: true, desc: 'ATK and MAG reduced 30%.' },
     slow:   { name: 'Slow',   icon: 'status_slow',   color: '#8fb4ff', bad: true, desc: 'SPD reduced 35%.' },

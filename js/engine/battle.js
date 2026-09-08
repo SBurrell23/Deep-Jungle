@@ -149,7 +149,9 @@
     // Round-based passive regen/mpregen for heroes
     const ev = [{ type: 'roundStart', round: this.round }];
     for (const u of this.alive('hero')) {
-      if (DJ.hasPassive(u, 'regen') && u.hp < u.maxHp) { const h = Math.max(1, Math.round(u.maxHp * 0.05)); u.hp = Math.min(u.maxHp, u.hp + h); ev.push({ type: 'heal', target: u, amount: h, fx: null, quiet: true }); }
+      // Five percent a round was most of a health bar back over a long fight, on top of
+      // everything else mending the party. A trinket should shade the attrition, not undo it.
+      if (DJ.hasPassive(u, 'regen') && u.hp < u.maxHp) { const h = Math.max(1, Math.round(u.maxHp * 0.03)); u.hp = Math.min(u.maxHp, u.hp + h); ev.push({ type: 'heal', target: u, amount: h, fx: null, quiet: true }); }
       // Measured over a run: at 4.5% a round this was still handing back 38% of a mana
       // bar during an average fight, which is more than most casters spend in one. A
       // trinket should shade a decision, not remove it.

@@ -30,12 +30,12 @@
   it('beetle_shell_mail', 'Beetle Shell Mail', 'armor', 2, 'rare', 'item_shell_armor', { def: 5, spd: -1 }, 'Iridescent and irritatingly sturdy.');
   it('spider_silk_robe', 'Spider Silk Robe', 'armor', 3, 'rare', 'item_robe', { def: 3, mag: 4, mp: 10 }, 'Woven by something with far too many legs.');
   it('bronze_scale', 'Bronze Scale Armor', 'armor', 3, 'rare', 'item_chain_armor', { def: 6, hp: 20 }, 'Taken from an armored tapir who no longer needed it.');
-  it('ruin_plate', 'Ruin Guardian Plate', 'armor', 4, 'epic', 'item_plate_armor', { def: 9, hp: 25, spd: -1 }, 'Regenerates 5% HP per turn.', 'regen');
+  it('ruin_plate', 'Ruin Guardian Plate', 'armor', 4, 'epic', 'item_plate_armor', { def: 9, hp: 25, spd: -1 }, 'Regenerates 3% HP per turn.', 'regen');
   it('wraith_cloak', 'Wraith Cloak', 'armor', 4, 'rare', 'item_cloak', { def: 4, spd: 3, mag: 4 }, 'Status effects land half as often.', 'resist');
-  it('mossback_hide', 'Mossback Hide', 'armor', 4, 'rare', 'item_hide_armor', { def: 7, hp: 30 }, 'Regenerates 5% HP per turn.', 'regen');
+  it('mossback_hide', 'Mossback Hide', 'armor', 4, 'rare', 'item_hide_armor', { def: 7, hp: 30 }, 'Regenerates 3% HP per turn.', 'regen');
   it('titan_carapace', 'Titan Carapace', 'armor', 5, 'epic', 'item_plate_armor', { def: 12, hp: 40, spd: -2 }, 'You could shelter under it. Now you do.');
   it('void_mantle', 'Void Mantle', 'armor', 5, 'epic', 'item_cloak', { def: 6, spd: 4, mag: 6 }, 'Status effects land half as often.', 'resist');
-  it('wardens_bark', 'Warden\'s Bark', 'armor', 5, 'epic', 'item_shell_armor', { def: 10, hp: 35, mag: 3 }, 'Regenerates 5% HP per turn.', 'regen');
+  it('wardens_bark', 'Warden\'s Bark', 'armor', 5, 'epic', 'item_shell_armor', { def: 10, hp: 35, mag: 3 }, 'Regenerates 3% HP per turn.', 'regen');
   // ---- Trinkets ----
   it('lucky_tooth', 'Lucky Tooth', 'trinket', 1, 'common', 'item_tooth', { spd: 2 }, 'Not yours. That is the lucky part.');
   it('copper_ring', 'Copper Ring', 'trinket', 1, 'common', 'item_ring', { hp: 10, mp: 4 }, 'Turns your finger green. Small price.');
@@ -47,16 +47,16 @@
   it('swift_boots', 'Swift Boots', 'trinket', 3, 'rare', 'item_boots', { spd: 5 }, 'Stolen from a bandit mid-stride.');
   it('thorn_amulet', 'Thorn Amulet', 'trinket', 4, 'rare', 'item_amulet', { def: 4, hp: 20 }, 'Attackers take 20% of damage back.', 'thorns');
   it('hunters_gem', 'Hunter\'s Gem', 'trinket', 4, 'epic', 'item_gem', { atk: 6, spd: 3 }, 'Crit chance +10%.', 'crit');
-  it('ancestor_charm', 'Ancestor Charm', 'trinket', 4, 'epic', 'item_charm', { hp: 30, def: 3 }, 'Regenerates 5% HP per turn.', 'regen');
+  it('ancestor_charm', 'Ancestor Charm', 'trinket', 4, 'epic', 'item_charm', { hp: 30, def: 3 }, 'Regenerates 3% HP per turn.', 'regen');
   it('sun_idol_shard', 'Sun Idol Shard', 'trinket', 5, 'epic', 'item_idol', { mag: 10, atk: 6 }, 'Regenerates MP every turn.', 'mpregen');
-  it('heart_seed', 'Heart Seed', 'trinket', 5, 'epic', 'item_gem', { hp: 50, def: 5, spd: 2 }, 'Regenerates 5% HP per turn. It beats.', 'regen');
+  it('heart_seed', 'Heart Seed', 'trinket', 5, 'epic', 'item_gem', { hp: 50, def: 5, spd: 2 }, 'Regenerates 3% HP per turn. It beats.', 'regen');
   it('phoenix_feather_charm', 'Phoenix Feather Charm', 'trinket', 5, 'epic', 'item_feather', { spd: 6, atk: 5, mag: 5 }, 'Status effects land half as often.', 'resist');
 
   DJ.ITEM_BY_ID = {};
   I.forEach((x) => (DJ.ITEM_BY_ID[x.id] = x));
 
   DJ.PASSIVE_DESC = {
-    crit: 'Crit +10%', lifesteal: 'Lifesteal 10%', regen: 'Regen 5%/turn', resist: 'Status resist',
+    crit: 'Crit +10%', lifesteal: 'Lifesteal 10%', regen: 'Regen 3%/turn', resist: 'Status resist',
     mpregen: 'MP regen', gold: '+25% gold', xp: '+20% XP', thorns: 'Thorns 20%',
   };
 
