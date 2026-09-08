@@ -6,14 +6,25 @@
 (function (root) {
   const DJ = (root.DJ = root.DJ || {});
 
+  // Each region keeps a roster of guardians. A map draws one per region, so which three
+  // bosses a run faces is part of what makes that run different. `boss` remains the
+  // first of each list purely so anything reading a region outside a run still resolves.
   DJ.REGIONS = [
-    { id: 'undergrowth', name: 'The Undergrowth', boss: 'bramble_king', tiers: [1, 2], color: '#3f7d3a', bg: '#0f2418',
+    { id: 'undergrowth', name: 'The Undergrowth', bosses: ['bramble_king'], boss: 'bramble_king', tiers: [1, 2], color: '#3f7d3a', bg: '#0f2418',
       blurb: 'Wet green dark. Everything here is small, hungry, and numerous.' },
-    { id: 'mireheart', name: 'The Mire', boss: 'mother_of_fangs', tiers: [2, 3, 4], color: '#7a6b2f', bg: '#1d2110',
+    { id: 'mireheart', name: 'The Mire', bosses: ['mother_of_fangs'], boss: 'mother_of_fangs', tiers: [2, 3, 4], color: '#7a6b2f', bg: '#1d2110',
       blurb: 'The ground stops being ground. Things move under the water.' },
-    { id: 'canopy', name: 'The High Canopy', boss: 'vine_warden', tiers: [4, 5], color: '#2f6b7a', bg: '#0d1c24',
+    { id: 'canopy', name: 'The High Canopy', bosses: ['vine_warden'], boss: 'vine_warden', tiers: [4, 5], color: '#2f6b7a', bg: '#0d1c24',
       blurb: 'Above the mist, where the old guardians still keep their posts.' },
   ];
+
+  // Every guardian a region can field, whether or not this run drew them. Used by the
+  // compendium and by the achievements that ask you to beat "a region's guardian".
+  DJ.regionBosses = function (r) {
+    const reg = DJ.REGIONS[r];
+    if (!reg) return [];
+    return (reg.bosses && reg.bosses.length ? reg.bosses : [reg.boss]).filter((id) => DJ.MONSTER_BY_ID[id]);
+  };
 
   // Node types and their base weights per region index.
   const NODE_WEIGHTS = [
@@ -71,6 +82,13 @@
     let colIndex = 0;
     const push = (nodes) => { cols.push(nodes); colIndex++; };
 
+    // Draw this run's three guardians up front, off the map's own seed, so the same seed
+    // always produces the same trio and a save reloads into the fight it left.
+    const bossFor = [0, 1, 2].map((r) => {
+      const pool = DJ.regionBosses(r);
+      return pool.length ? rng.pick(pool) : DJ.REGIONS[r].boss;
+    });
+
     // Column 0: start
     push([{ type: 'start', region: 0 }]);
 
@@ -123,7 +141,7 @@
       }
       ensureMerchants(cols, r, rng);
       // Region boss column (single node, everything converges)
-      push([{ type: 'boss', region: r, boss: DJ.REGIONS[r].boss }]);
+      push([{ type: 'boss', region: r, boss: bossFor[r] }]);
       lastWasCombat = true;
     }
     // Final camp: a guaranteed full-rest before the Heart, so the finale is a fair fight.
@@ -170,7 +188,7 @@
       b.forEach((t) => (t.prev = Array.from(new Set(t.prev))));
     }
 
-    return { seed, cols, nodeById, startId: cols[0][0].id, heartId: cols[cols.length - 1][0].id, totalCols: cols.length };
+    return { seed, cols, nodeById, bosses: bossFor, startId: cols[0][0].id, heartId: cols[cols.length - 1][0].id, totalCols: cols.length };
   };
 
   // Node "level" drives enemy strength and reward scale.

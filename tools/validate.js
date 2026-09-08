@@ -82,7 +82,10 @@ for (const [id, sk] of Object.entries(DJ.SKILLS)) {
   if (!sk.name) err(`skill ${id} has no name`);
   if (!sk.desc) warn(`skill ${id} has no description`);
   if (sk.status && !DJ.STATUS[sk.status.id]) err(`skill ${id} applies unknown status "${sk.status.id}"`);
-  if (sk.self && !DJ.STATUS[sk.self.id]) err(`skill ${id} applies unknown self-status "${sk.self.id}"`);
+  // A skill may put several statuses on its caster, so `self` is one or a list of them.
+  for (const st of (sk.self ? (Array.isArray(sk.self) ? sk.self : [sk.self]) : [])) {
+    if (!DJ.STATUS[st.id]) err(`skill ${id} applies unknown self-status "${st.id}"`);
+  }
 }
 for (const h of DJ.HEROES) {
   if (h.skills.length !== 4) err(`hero ${h.id} has ${h.skills.length} skills, expected 4`);

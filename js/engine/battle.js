@@ -26,8 +26,11 @@
 
   // ---- Global balance tuning (see tools/sim.js) ----
   DJ.TUNE = {
-    hpMult:  { normal: 1.85, elite: 1.7, boss: 1.15, final: 1.0 },
-    dmgMult: { normal: 0.83, elite: 0.84, boss: 0.74, final: 0.72 },
+    // Nudged up together with the adventurer balance pass, which lifted the whole roster
+    // and made the game about six points easier. A little more of both keeps fights the
+    // same length rather than only making them longer.
+    hpMult:  { normal: 1.90, elite: 1.75, boss: 1.19, final: 1.03 },
+    dmgMult: { normal: 0.85, elite: 0.86, boss: 0.76, final: 0.74 },
     levelScale: 0.10,   // stat growth per level above the monster's tier base
     // Damage from everything in a region, by region index. Hero HP climbs much faster
     // than a tier-1 monster's attack does, so the opening region needs a thumb on the
@@ -390,7 +393,9 @@
     } else if (sk.kind === 'summon') {
       ev.push(...this.summonMinions(u, 2));
     }
-    if (sk.self && u.alive) this.applyStatus(u, u, sk.self, ev);
+    if (sk.self && u.alive) {
+      for (const st of (Array.isArray(sk.self) ? sk.self : [sk.self])) this.applyStatus(u, u, st, ev);
+    }
     if (sk.gold && u.side === 'hero') { const g = Math.round(this.level * 3 + this.rng.int(4, 12)); this.stats.goldStolen = (this.stats.goldStolen || 0) + g; ev.push({ type: 'gold', amount: g }); }
     return ev;
   };
@@ -458,7 +463,12 @@
       return true;
     });
     const pickTarget = () => {
-      const w = heroes.map((h) => ({ v: h, w: 1 + (1 - h.hp / h.maxHp) * 1.2 }));
+      // Wounded heroes draw attention, but a taunting hero draws far more. This is what
+      // makes a tank a tank: without it, high DEF only ever saved the tank itself.
+      const w = heroes.map((h) => ({
+        v: h,
+        w: (1 + (1 - h.hp / h.maxHp) * 1.2) * (DJ.hasStatus(h, 'taunt') ? 6 : 1),
+      }));
       return rng.weighted(w);
     };
     const attackW = u.kind === 'boss' || u.kind === 'final' ? 0.2 : 0.4;

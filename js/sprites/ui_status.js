@@ -1028,4 +1028,33 @@
     ],
   };
 
+  // A ring of attention. Worn by whoever just told the room to come and try it.
+  S.status_taunt = {
+    w: 16, h: 16,
+    pal: {
+      k: '#2a0d08',
+      r: '#e04b2e',
+      d: '#8f2a16',
+      w: '#ffd2c0',
+    },
+    px: [
+      '................',
+      '................',
+      '...kkkkkkkkkk...',
+      '..kdrrrrrrrrdk..',
+      '.kdrrwwwwwwrrdk.',
+      '.krrwwkkkkwwrrk.',
+      '.krwwkkddkkwwrk.',
+      '.krwkkdrrdkkwrk.',
+      '.krwkkdrrdkkwrk.',
+      '.krwwkkddkkwwrk.',
+      '.krrwwkkkkwwrrk.',
+      '.kdrrwwwwwwrrdk.',
+      '..kdrrrrrrrrdk..',
+      '...kkkkkkkkkk...',
+      '................',
+      '................',
+    ],
+  };
+
 })();

@@ -14,18 +14,23 @@
   const ge = (k, n) => count((s) => s[k] || 0, n);
   const tag = (t, n) => count((s) => (s.killsByTag || {})[t] || 0, n);
   const boss = (id, n) => count((s) => (s.bossKills || {})[id] || 0, n || 1);
+  // Regions field one of several guardians per run, so an achievement about "the
+  // guardian of the Mire" counts whichever one the map put there. Tying these to a
+  // single monster would leave two adventurer unlocks waiting on a dice roll.
+  const guardian = (r, n) => count(
+    (s) => DJ.regionBosses(r).reduce((a, id) => a + ((s.bossKills || {})[id] || 0), 0), n || 1);
   const won = (h) => count((s) => Math.min(1, (s.wonWith || {})[h] || 0), 1);
 
   // ===== Adventurer-unlocking achievements (18 here; 7 more are marked further down) =====
   a('first_blood', 'First Blood', 'Win your first battle.', ge('battlesWon', 1));
-  a('thorn_crown', 'Thorn Crown', 'Defeat the Bramble King.', boss('bramble_king'));
+  a('thorn_crown', 'Thorn Crown', 'Defeat the guardian of the Undergrowth.', guardian(0));
   a('overkill', 'Overkill', 'Deal 260 or more damage in a single hit.', ge('maxHit', 260), 'lizard_berserker');
   a('lore_seeker', 'Lore Seeker', 'Discover 45 monsters in the compendium.', ge('discovered', 45), 'moth_oracle');
   a('tamer', 'Tamer', 'Defeat 220 monsters.', ge('kills', 220), 'pygmy_beastmaster');
   a('green_thumb', 'Green Thumb', 'Solve 12 jungle puzzles.', ge('puzzlesSolved', 12), 'orchid_witch');
   a('unbroken', 'Unbroken', 'Win 8 battles without taking any damage.', ge('perfectBattles', 8), 'golem_guardian');
   a('treasure_hunter', 'Treasure Hunter', 'Earn 3,000 gold in total.', ge('goldEarned', 3000), 'ratkin_corsair');
-  a('fang_breaker', 'Fang Breaker', 'Defeat the Mother of Fangs.', boss('mother_of_fangs'), 'firefly_ranger');
+  a('fang_breaker', 'Fang Breaker', 'Defeat the guardian of the Mire.', guardian(1), 'firefly_ranger');
   a('survivalist', 'Survivalist', 'Rest at 30 campfires.', ge('rests', 30), 'spore_druid');
   a('apex', 'Apex Predator', 'Raise a hero to level 16.', ge('heroMaxLevel', 16), 'tiger_shaman');
   a('elite_hunter', 'Elite Hunter', 'Defeat 30 elite monsters.', ge('elitesKilled', 30), 'harpy_skydancer');
@@ -42,7 +47,7 @@
   a('into_the_green', 'Into the Green', 'Begin your first expedition.', ge('runsStarted', 1));
   a('undergrowth', 'Beyond the Undergrowth', 'Reach the second region.', ge('highestColumn', 6));
   a('canopy', 'Under the Canopy', 'Reach the third region.', ge('highestColumn', 11));
-  a('warden_slayer', 'Warden Slayer', 'Defeat the Vine Warden.', boss('vine_warden'), 'toucan_bard');
+  a('warden_slayer', 'Warden Slayer', 'Defeat the guardian of the High Canopy.', guardian(2), 'toucan_bard');
   a('heart_x3', 'Jungle Veteran', 'Defeat the Heart of the Jungle 3 times.', boss('heart_of_jungle', 3), 'scarab_alchemist');
   a('heart_x10', 'Jungle Legend', 'Defeat the Heart of the Jungle 10 times.', boss('heart_of_jungle', 10));
   a('persistent', 'Persistent', 'Start 5 expeditions.', ge('runsStarted', 5));
