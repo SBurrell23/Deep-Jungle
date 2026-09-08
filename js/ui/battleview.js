@@ -323,20 +323,29 @@
     if (u.statuses.length) {
       // A quarter larger than they were: at the old size the difference between, say,
       // Poison and Regen was a couple of pixels of colour.
-      let ix = x;
+      // Centre the row of icons under the bars rather than left-aligning it, now that a
+      // full set of six is wider than the bars above it.
+      const n = Math.min(6, u.statuses.length);
+      let ix = x + bw / 2 - ((n - 1) * 20) / 2;
       const iy = barBottom + 3;
       for (const st of u.statuses.slice(0, 6)) {
         const def = DJ.STATUS[st.id];
         // Remember the hit box so hovering the icon can explain the effect.
-        statusHits.push({ x: ix - 1, y: iy - 1, w: 18, h: 18, id: st.id, turns: st.turns });
+        statusHits.push({ x: ix - 9, y: iy - 3, w: 19, h: 20, id: st.id, turns: st.turns });
         const drew = DJ.drawSprite(ctx, def ? def.icon : 'status_poison', ix, iy + 15, 1.06, { center: true });
-        if (!drew) { ctx.fillStyle = def ? def.color : '#fff'; ctx.fillRect(ix, iy, 9, 9); }
+        if (!drew) { ctx.fillStyle = def ? def.color : '#fff'; ctx.fillRect(ix - 5, iy + 5, 10, 10); }
+        // The count rides in the icon's own bottom-right corner on a dark badge. Beside
+        // the icon it ran underneath whichever buff came next.
+        const turns = String(st.turns);
         ctx.save();
-        ctx.font = 'bold 9px monospace'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-        ctx.strokeStyle = 'rgba(0,0,0,.9)'; ctx.lineWidth = 2;
-        ctx.strokeText(String(st.turns), ix + 8, iy + 16); ctx.fillText(String(st.turns), ix + 8, iy + 16);
+        ctx.font = 'bold 9px monospace';
+        const tw = ctx.measureText(turns).width;
+        ctx.fillStyle = 'rgba(6,14,9,.88)';
+        ctx.fillRect(ix + 8 - tw - 2, iy + 7, tw + 4, 10);
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText(turns, ix + 8, iy + 15);
         ctx.restore();
-        ix += 16;
+        ix += 20;
       }
     }
   }
