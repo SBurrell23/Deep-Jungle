@@ -239,8 +239,9 @@
         for (const k in acc) acc[k] += g.delta[k] || 0;
         return acc;
       }, { hp: 0, mp: 0, atk: 0, mag: 0, def: 0, spd: 0 });
-      const bits = Object.keys(d).filter((k) => d[k]).map((k) => `+${d[k]} ${k.toUpperCase()}`);
-      lines.push({ unit: h, text: `level ${before} \u2192 ${h.level}` + (bits.length ? '  ' + bits.join(', ') : ''), levelUp: true, gains });
+      // The card built from `gains` is what the player actually sees; this text is only
+      // the fallback for anywhere that cannot draw one.
+      lines.push({ unit: h, text: `reached level ${h.level}, up from ${before}`, levelUp: true, gains });
       this.inventory[pid]--;
       return { potion: pot, lines };
     }
@@ -349,13 +350,17 @@
     return gains;
   };
 
-  // Between-battle recovery so the run doesn't die from attrition: small heal after each battle
+  // A breather between fights, not a refill. At the old figures a run's two dozen
+  // battles handed back far more mana than any hero could spend, so the expensive sweep
+  // was free every encounter and nothing ever wore the party down. Campfires, potions and
+  // levelling are what restore a bar now; this only takes the edge off.
+  R.RECOVER = { hp: 0.20, mp: 0.19 };
   R.postBattleRecovery = function () {
     for (const h of this.party) {
       if (!h.alive) continue;
       h.statuses = [];
-      h.hp = Math.min(h.maxHp, h.hp + Math.round(h.maxHp * 0.22));
-      h.mp = Math.min(h.maxMp, h.mp + Math.round(h.maxMp * 0.28));
+      h.hp = Math.min(h.maxHp, h.hp + Math.round(h.maxHp * R.RECOVER.hp));
+      h.mp = Math.min(h.maxMp, h.mp + Math.round(h.maxMp * R.RECOVER.mp));
     }
   };
 

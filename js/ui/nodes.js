@@ -109,6 +109,11 @@
   const STAT_COLOR = { hp: '#4fbf5a', mp: '#4f9fe0', atk: '#e05252', mag: '#a97fe0', def: '#7fc8ff', spd: '#e8c65a' };
   const STAT_DIM = { hp: '#2c6b33', mp: '#2c5b7d', atk: '#7d2f2f', mag: '#5c447a', def: '#3f6e8c', spd: '#7d6a2c' };
 
+  // Shared with the bag, so a level bought with Heartbloom Nectar is presented exactly
+  // the way a level earned in a fight is.
+  UI.levelUpCard = levelUpCard;
+  UI.mergeGains = mergeGains;
+
   function levelUpCard(g) {
     const card = UI.el('div', 'lu-card');
     card.appendChild(UI.spriteEl(g.unit.sprite, 2, g.unit.name));

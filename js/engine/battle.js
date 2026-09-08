@@ -31,6 +31,15 @@
     dotBossMult: 0.4,
   };
 
+  // What each extra target costs a sweeping ability. Hitting everything used to be worth
+  // its full power against every one of them, which made one cast worth three turns of
+  // single-target work against a group of three.
+  DJ.AOE_FALLOFF = { perTarget: 0.18, floor: 0.45 };
+  DJ.aoeShare = function (n) {
+    if (!n || n < 2) return 1;
+    return Math.max(DJ.AOE_FALLOFF.floor, 1 - DJ.AOE_FALLOFF.perTarget * (n - 1));
+  };
+
   // ---- Stat helpers ----
   DJ.hasStatus = (u, id) => u.statuses.some((s) => s.id === id);
   DJ.getStatus = (u, id) => u.statuses.find((s) => s.id === id);
@@ -136,7 +145,9 @@
     const ev = [{ type: 'roundStart', round: this.round }];
     for (const u of this.alive('hero')) {
       if (DJ.hasPassive(u, 'regen') && u.hp < u.maxHp) { const h = Math.max(1, Math.round(u.maxHp * 0.05)); u.hp = Math.min(u.maxHp, u.hp + h); ev.push({ type: 'heal', target: u, amount: h, fx: null, quiet: true }); }
-      if (DJ.hasPassive(u, 'mpregen') && u.mp < u.maxMp) { const m = Math.max(1, Math.round(u.maxMp * 0.08)); u.mp = Math.min(u.maxMp, u.mp + m); ev.push({ type: 'mp', unit: u, amount: m, quiet: true }); }
+      // 8% a round returned most of a mana bar over a long fight, on top of everything
+      // else. It is a trickle now, which is what a passive should be.
+      if (DJ.hasPassive(u, 'mpregen') && u.mp < u.maxMp) { const m = Math.max(1, Math.round(u.maxMp * 0.045)); u.mp = Math.min(u.maxMp, u.mp + m); ev.push({ type: 'mp', unit: u, amount: m, quiet: true }); }
     }
     return ev;
   };
@@ -271,8 +282,8 @@
     if (DJ.hasPassive(src, 'crit')) c += 0.10;
     return Math.min(0.75, c);
   };
-  P.computeDamage = function (src, tgt, skill, kind) {
-    const power = skill ? (skill.power || 1) : 1;
+  P.computeDamage = function (src, tgt, skill, kind, share) {
+    const power = (skill ? (skill.power || 1) : 1) * (share == null ? 1 : share);
     let base;
     if (kind === 'mag' || kind === 'drain' && src.base.mag > src.base.atk) {
       base = DJ.effStat(src, 'mag') * power;
@@ -339,10 +350,10 @@
     ev.push({ type: 'status', target: tgt, status: st.id, applied: true, turns });
   };
 
-  P.dealDamage = function (src, tgt, skill, kind, ev) {
+  P.dealDamage = function (src, tgt, skill, kind, ev, share) {
     // miss check (blind)
     if (DJ.hasStatus(src, 'blind') && this.rng.chance(0.4)) { ev.push({ type: 'hit', source: src, target: tgt, miss: true, fx: skill ? skill.fx : 'hit' }); return 0; }
-    const r = this.computeDamage(src, tgt, skill, kind);
+    const r = this.computeDamage(src, tgt, skill, kind, share);
     if (r.absorbed > 0 && r.shield) {
       r.shield.pool = Math.max(0, Math.round(r.shield.pool - r.absorbed));
       if (r.shield.pool <= 0) {
@@ -358,10 +369,10 @@
     // Thorns send part of every blow straight back. Worn armour returns a fifth; the
     // status returns half, which is enough that swinging into it is a real decision.
     const th = DJ.getStatus(tgt, 'thorns');
-    const share = (DJ.hasPassive(tgt, 'thorns') ? DJ.STATUS_TUNE.thornsPassive : 0) +
+    const reflect = (DJ.hasPassive(tgt, 'thorns') ? DJ.STATUS_TUNE.thornsPassive : 0) +
       (th ? (th.val || DJ.STATUS_TUNE.thornsShare) : 0);
-    if (share > 0 && r.dmg > 0 && tgt.alive && src.alive) {
-      const back = Math.max(1, Math.round(r.dmg * share)); src.hp = Math.max(0, src.hp - back);
+    if (reflect > 0 && r.dmg > 0 && tgt.alive && src.alive) {
+      const back = Math.max(1, Math.round(r.dmg * reflect)); src.hp = Math.max(0, src.hp - back);
       if (src.side === 'hero') this.stats.damageTaken += back; else this.stats.damageDealt += back;
       ev.push({ type: 'hit', source: tgt, target: src, dmg: back, thorns: true, fx: 'thorns', sfx: 'hit' });
       if (src.hp <= 0) ev.push(...this.kill(src, 'thorns'));
@@ -446,11 +457,13 @@
   P.applySkill = function (u, sk, targets) {
     const ev = [];
     const hits = sk.hits || 1;
+    // A sweeping ability is worth less to each target the more of them there are.
+    const share = sk.target === 'enemies' ? DJ.aoeShare(targets.filter((t) => t.alive).length) : 1;
     if (sk.kind === 'phys' || sk.kind === 'mag') {
-      for (let h = 0; h < hits; h++) for (const t of targets) if (t.alive) this.dealDamage(u, t, sk, sk.kind, ev);
+      for (let h = 0; h < hits; h++) for (const t of targets) if (t.alive) this.dealDamage(u, t, sk, sk.kind, ev, share);
     } else if (sk.kind === 'drain') {
       let total = 0;
-      for (const t of targets) if (t.alive) total += this.dealDamage(u, t, sk, u.base.mag >= u.base.atk ? 'mag' : 'phys', ev);
+      for (const t of targets) if (t.alive) total += this.dealDamage(u, t, sk, u.base.mag >= u.base.atk ? 'mag' : 'phys', ev, share);
       const h = Math.round(total * (sk.drain || 0.5));
       if (h > 0 && u.alive) this.healUnit(u, u, h, ev, 'dark');
     } else if (sk.kind === 'heal') {
@@ -612,7 +625,12 @@
         if (inventory.orange > 0) return { type: 'item', potion: 'orange', target: lowest, inventory };
       }
     }
-    if (u.maxMp && u.mp < u.maxMp * 0.15 && inventory && inventory.blue > 0 && skills.length === 0) return { type: 'item', potion: 'blue', target: u, inventory };
+    // A caster sitting at the bottom of their bar is worth a turn and a blue potion,
+    // not just when every ability is out of reach but as soon as most of them are.
+    if (u.maxMp >= 24 && inventory && inventory.blue > 0 && u.mp < u.maxMp * 0.3 &&
+        (skills.length === 0 || rng.chance(0.5))) {
+      return { type: 'item', potion: 'blue', target: u, inventory };
+    }
     // A green potion clears every ailment at once, which is the answer to a stacked
     // poison or to somebody buried under three separate debuffs.
     if (inventory && inventory.green > 0) {
@@ -659,7 +677,13 @@
       .sort((a, b) => (b.power * (b.hits || 1)) - (a.power * (a.hits || 1)))[0];
     const debuff = skills.find((s) => s.kind === 'debuff' && s.target === 'enemies' && !foes.every((f) => DJ.hasStatus(f, s.status.id)));
     if (foes.length >= 3 && debuff && rng.chance(0.3)) return { type: 'skill', skillId: debuff.id };
-    if (foes.length >= 2 && aoe && (u.mp >= aoe.mp)) return { type: 'skill', skillId: aoe.id };
+    // Worth it only when the sweep, after its falloff, actually beats the best single
+    // blow. Against two healthy monsters that is often no longer true.
+    if (aoe && u.mp >= aoe.mp) {
+      const sweep = aoe.power * DJ.aoeShare(foes.length) * foes.length;
+      const best = single ? single.power * (single.hits || 1) : 0;
+      if (foes.length >= 2 && sweep > best * 1.15) return { type: 'skill', skillId: aoe.id };
+    }
     if (single && u.mp >= single.mp && (u.mp / u.maxMp > 0.25 || target.hp > DJ.effStat(u, 'atk') * 1.2)) return { type: 'skill', skillId: single.id, target };
     return { type: 'attack', target };
   };

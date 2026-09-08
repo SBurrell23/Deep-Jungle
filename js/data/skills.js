@@ -133,7 +133,7 @@
   // -- Tiger Shaman --
   def('totem_strike', { name: 'Totem Strike', kind: 'phys', target: 'enemy', power: 1.68, mp: 4, fx: 'hit', sfx: 'hit', desc: 'Smash with the totem staff.' });
   def('spirit_lightning', { name: 'Spirit Lightning', kind: 'mag', target: 'enemy', power: 2.35, mp: 7, status: { id: 'shock', turns: 2, chance: 0.6 }, fx: 'lightning', sfx: 'thunder', desc: 'Lightning from the ancestors. Often leaves a foe Shocked.' });
-  def('ancestor_ward', { name: 'Ancestor Ward', kind: 'buff', target: 'allies', mp: 10, status: { id: 'guard', turns: 3, chance: 1 }, fx: 'buff', sfx: 'buff', desc: 'Ancestors Guard the party.' });
+  def('ancestor_ward', { name: 'Ancestor Ward', kind: 'buff', target: 'allies', mp: 10, status: { id: 'guard', turns: 3, chance: 1 }, self: { id: 'regen', turns: 3, chance: 1 }, fx: 'buff', sfx: 'buff', desc: 'The ancestors Guard the party, and leave you with Regen.' });
   def('tiger_spirit', { name: 'Tiger Spirit', kind: 'phys', target: 'enemies', power: 2.2, mp: 16, fx: 'claw', sfx: 'roar', desc: 'The tiger spirit mauls all enemies.' });
   // -- Harpy Skydancer --
   def('dive',         { name: 'Sky Dive', kind: 'phys', target: 'enemy', power: 2.0, mp: 5, fx: 'pierce', sfx: 'wind', desc: 'Plunge from above.' });
@@ -184,13 +184,13 @@
   // -- Toucan Bard --
   def('beak_jab',     { name: 'Beak Jab', kind: 'phys', target: 'enemy', power: 1.55, mp: 4, status: { id: 'shock', turns: 2, chance: 0.5 }, fx: 'pierce', sfx: 'pierce', desc: 'A quick stab of that enormous beak. Can leave a foe Shocked.' });
   def('rally_song',   { name: 'Rally Song', kind: 'buff', target: 'allies', mp: 6, status: { id: 'haste', turns: 3, chance: 1 }, self: { id: 'rage', turns: 3, chance: 1 }, fx: 'song', sfx: 'buff', desc: 'The party gains Haste; you gain Rage.' });
-  def('deep_refrain', { name: 'Deep Refrain', kind: 'mana', target: 'ally', mp: 5, mpPct: 0.3, fx: 'song', sfx: 'buff', desc: 'An old song. One ally recovers 30% of their mana.' });
+  def('deep_refrain', { name: 'Deep Refrain', kind: 'mana', target: 'ally', mp: 10, mpPct: 0.3, fx: 'song', sfx: 'buff', desc: 'An old song. One ally recovers 30% of their mana.' });
   def('dawn_anthem',  { name: 'Anthem of Dawn', kind: 'heal', target: 'allies', power: 0.92, mp: 17, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
 
   // -- Scarab Alchemist --
   def('acid_flask',   { name: 'Acid Flask', kind: 'mag', target: 'enemy', power: 1.7, mp: 5, status: { id: 'weak', turns: 3, chance: 0.6 }, fx: 'poison', sfx: 'poison', desc: 'Corrosive glass. Eats armour, and leaves the target Weak.' });
   def('smoke_screen', { name: 'Smoke Screen', kind: 'buff', target: 'allies', mp: 7, status: { id: 'shield', turns: 3, chance: 1, val: 0.3 }, fx: 'debuff', sfx: 'debuff', desc: 'Cover the party in choking smoke: Shield for 3 turns.' });
-  def('volatile_mix', { name: 'Volatile Mix', kind: 'mag', target: 'enemies', power: 1.32, mp: 13, status: { id: 'burn', turns: 2, chance: 0.6 }, fx: 'fireball', sfx: 'explosion', desc: 'Whatever was in the flask, it is angry now. Everything Burns.' });
+  def('volatile_mix', { name: 'Volatile Mix', kind: 'mag', target: 'enemies', power: 1.15, mp: 12, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison_cloud', sfx: 'explosion', desc: 'Two reagents that should never have met. Everything nearby is Poisoned.' });
   def('philos_fire',  { name: "Philosopher's Fire", kind: 'mag', target: 'enemies', power: 1.7, mp: 24, status: { id: 'burn', turns: 2, chance: 0.7 }, fx: 'inferno', sfx: 'explosion', desc: 'The reaction he spent his life perfecting. The line Burns.' });
 
   // -- Sloth Sentinel --

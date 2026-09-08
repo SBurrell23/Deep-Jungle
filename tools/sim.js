@@ -37,10 +37,17 @@ function simRun(seed, partyIds, opt) {
     time += T.mapChoice;
     // AI player preference: rest when hurt, else prefer value nodes
     const hpPct = run.party.reduce((a, h) => a + (h.alive ? h.hp / h.maxHp : 0), 0) / run.party.length;
+    // Mana is a real resource now, so a party of empty casters wants a campfire as much
+    // as a bloodied one does.
+    const casters = run.party.filter((h) => h.alive && h.maxMp >= 24);
+    const mpPct = casters.length
+      ? casters.reduce((a, h) => a + h.mp / h.maxMp, 0) / casters.length
+      : 1;
+    const dead = run.party.some((h) => !h.alive);
     const scored = opts.map((id) => {
       const n = run.map.nodeById[id];
       let s = rng.range(0, 1);
-      if (n.type === 'rest') s += hpPct < 0.6 ? 4 : 0.4;
+      if (n.type === 'rest') s += (hpPct < 0.6 || mpPct < 0.4 || dead) ? 4 : (hpPct < 0.85 || mpPct < 0.7) ? 1.6 : 0.4;
       else if (n.type === 'treasure') s += 2.2;
       else if (n.type === 'shrine') s += 1.9;
       else if (n.type === 'training') s += 1.6;
@@ -144,9 +151,15 @@ function resolveNode(run, node, rng) {
     const stock = run.merchantStock();
     // Buy potions when affordable, at the shelf price for this node's level so the
     // simulated purse feels the same inflation a player does.
-    for (const p of ['red', 'red', 'green', 'yellow']) {
-      const price = DJ.potionPrice(p, node.level);
-      if (run.gold >= price + 40) { run.gold -= price; run.addPotion(p, 1); }
+    // Buy against what the party is actually short of, and keep buying while there is
+    // gold spare. Hoarding coins that never get spent was flattering nothing.
+    const want = ['red', 'green', 'yellow', 'blue', 'red', 'blue'];
+    for (let pass = 0; pass < 3; pass++) {
+      for (const p of want) {
+        const price = DJ.potionPrice(p, node.level);
+        const keep = pass === 0 ? 40 : 90;      // leave something for equipment
+        if (run.gold >= price + keep) { run.gold -= price; run.addPotion(p, 1); }
+      }
     }
     for (const item of stock.items) {
       const price = DJ.itemPrice(item);

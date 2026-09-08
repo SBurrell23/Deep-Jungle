@@ -479,6 +479,11 @@
     UI.openOverlay((panel, close) => {
       UI.overlayHeader(panel, res.potion.name, close);
       for (const line of res.lines) {
+        // A level is worth showing properly rather than as a list of deltas.
+        if (line.gains && line.gains.length && UI.levelUpCard) {
+          for (const g of UI.mergeGains(line.gains)) panel.appendChild(UI.levelUpCard(g));
+          continue;
+        }
         const row = UI.el('div', 'loot-row');
         row.appendChild(UI.spriteEl(line.unit.sprite, 1.8, line.unit.name));
         const info = UI.el('div');

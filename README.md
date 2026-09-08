@@ -62,6 +62,13 @@ Levelling restores rather than fully heals: the increase to max HP and MP is add
 to the current values, and then a further 25% of max HP and 30% of max MP is topped up on
 top. A hero who levels at low health comes out better off, but not full.
 
+**Attrition is the run.** A battle hands back only a small share of health and mana
+afterwards, so both drain across an expedition rather than resetting between fights. That
+makes campfires, potions and the merchant into real decisions, and it is what stops the
+most expensive ability in a kit being the correct answer to every encounter. An ability
+that sweeps the whole enemy line also loses power for each target beyond the first, so
+clearing a crowd is what sweeps are for rather than what they are always for.
+
 A full run takes roughly an hour depending on your party. Progress saves to `localStorage`
 automatically, and you can leave and resume mid-expedition, including partway through a
 fight: the run is saved the moment you step onto a node, and resuming replays that node
@@ -149,15 +156,21 @@ The balance simulator plays complete expeditions with an AI player and reports w
 estimated real playtime, and a difficulty curve broken down by map column. `sweep.js` runs
 many random party compositions to catch outliers.
 
-Current tuning, measured over 300 simulated runs across 60 random party compositions:
+Current tuning, measured over 400 simulated runs across 80 random party compositions:
 
 | Metric | Value |
 |---|---|
-| Win rate | 53.3% |
-| Average playtime | 51m24s |
-| Winning-run playtime | 59m40s |
-| Battles per run | 23.8 |
-| Nodes per run | 32.8 |
+| Win rate | 32.0% |
+| Average playtime | 51m51s |
+| Winning-run playtime | 64m20s |
+| Battles per run | 21.5 |
+| Nodes per run | 30.6 |
+
+Read that figure as a floor rather than a forecast. The simulated player fights competently
+but plans a route, shops and rests far worse than a person does, and since difficulty now
+comes mostly from attrition rather than from any single fight, that gap costs the simulator
+much more than it costs a player. Treat the number as a relative measure between two builds
+of the game, not as the odds a human faces.
 
 ### Balance harnesses
 

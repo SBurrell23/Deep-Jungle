@@ -178,6 +178,12 @@
     box.appendChild(sub('Damage'));
     box.appendChild(p('A physical hit is ATK multiplied by the ability’s power, then reduced by the target’s DEF. Magic works the same way from MAG, except that DEF only counts for six tenths of its value. Every hit is then rolled a further 10% either way.'));
     box.appendChild(note('That six tenths is the whole reason to carry a spellcaster: an armoured monster is meaningfully softer to magic than it is to steel. Check DEF on the compendium page before deciding who swings.'));
+    box.appendChild(sub('Hitting everything at once'));
+    box.appendChild(p('An ability that strikes every enemy loses ' +
+      Math.round(DJ.AOE_FALLOFF.perTarget * 100) + '% of its power for each target beyond the first, down to a floor of ' +
+      Math.round(DJ.AOE_FALLOFF.floor * 100) + '%. Against two it deals ' + Math.round(DJ.aoeShare(2) * 100) +
+      '% to each, against three ' + Math.round(DJ.aoeShare(3) * 100) + '%, against four ' + Math.round(DJ.aoeShare(4) * 100) +
+      '%. Sweeps are still the right answer to a crowd, but they are no longer the right answer to everything.'));
     box.appendChild(sub('Critical hits'));
     box.appendChild(p('Every attack starts at a 5% chance to crit and gains half a percent for each point of SPD it has over its target, up to a ceiling of 75%. Some abilities add their own chance on top. A crit deals 75% more damage.'));
     box.appendChild(sub('Resistance'));
