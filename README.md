@@ -102,7 +102,7 @@ node tools/validate.js
 ```
 
 Checks that every sprite, skill, effect, item, achievement and map reference resolves, that
-all 100 monsters have unique stats, that every locked hero is reachable through some
+all 106 monsters have unique stats, that every locked hero is reachable through some
 achievement, that every music track exists, that cache stamps are current, and that 40
 generated maps have no unreachable nodes or dead ends. CI runs this before deploying.
 
@@ -116,15 +116,61 @@ The balance simulator plays complete expeditions with an AI player and reports w
 estimated real playtime, and a difficulty curve broken down by map column. `sweep.js` runs
 many random party compositions to catch outliers.
 
-Current tuning, measured over 250 simulated runs across 50 random party compositions:
+Current tuning, measured over 300 simulated runs across 60 random party compositions:
 
 | Metric | Value |
 |---|---|
-| Win rate | 50.7% |
-| Average playtime | 56m30s |
-| Winning-run playtime | 61m25s |
-| Battles per run | 25.5 |
-| Nodes per run | 34.9 |
+| Win rate | 53.3% |
+| Average playtime | 51m24s |
+| Winning-run playtime | 59m40s |
+| Battles per run | 23.8 |
+| Nodes per run | 32.8 |
+
+### Balance harnesses
+
+Four narrower tools, for questions `sim.js` and `sweep.js` average away. All of them
+report a spread rather than a single number, because that is what you tune against.
+
+```bash
+node tools/heroes.js 5
+```
+
+Every adventurer run with the same fixed set of partner pairs, so what comes out is the
+hero's own contribution rather than the company they kept. This is the one that found
+the roster spanning 13% to 77%, and the two structural faults behind it: skills that
+scaled off a stat their owner did not have, and tanks with no way to protect anyone.
+At 50 runs a hero the noise is worth about 13 points, so act only on heroes that stay
+out of line across repeated measurements rather than chasing single results.
+
+```bash
+node tools/sustain.js 300 4
+```
+
+Classifies every adventurer by the sustain they actually bring, read off their kit
+rather than their job title, then splits win rates by how many healers a party brought
+and, among healerless parties, by whether a substitute made up the difference. **Run
+this after touching any heal power or cost.** As of now a healer is worth about four
+points and a second about five, healerless parties win 47.7%, and what actually matters
+is sustain of some kind rather than a healer specifically: a party carrying a drain, a
+self-heal or a revive beats the average party that brought a real healer.
+
+```bash
+node tools/bosses.js 300
+```
+
+Fights all three of a region's guardians with the same party at the same level. Win rate
+alone is misleading here, because a guardian can be beaten reliably and still gut a party
+on the way out, which shows up later as a lost run. Watch the rounds and the hero downs
+beside it.
+
+```bash
+node tools/region.js 11 50
+```
+
+Stops each run at a chosen column and reports the difficulty curve over just that
+stretch. Full expeditions hide what a single region feels like: this is what showed the
+opening region ending fights with the party at 92% health, running a level and a third
+below them the whole way.
 
 Each region is guaranteed one or two trading posts, so gold always has somewhere to go.
 
@@ -149,7 +195,7 @@ js/data/              monsters, heroes, skills, items, achievements, events
 js/engine/            battle, map generation, run state, save (all DOM-free)
 js/sprites/           text-grid pixel art
 js/ui/                screens: title, select, map, battle, nodes, puzzles, panels
-tools/                validation, balance simulator, art tooling
+tools/                validation, balance simulators and harnesses, art tooling
 assets/FX/            effect sprite sheets
 assets/audio/         music
 ```
