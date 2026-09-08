@@ -35,7 +35,9 @@ for (const s of scripts.filter((x) => /^js\/(ui|main)/.test(x))) {
 const expect = (label, actual, wanted) => {
   if (actual !== wanted) err(`${label}: expected ${wanted}, found ${actual}`);
 };
-expect('monsters', DJ.MONSTERS.length, 100);
+// 100 ordinary monsters and elites, plus the Heart and three guardians per region.
+expect('monsters', DJ.MONSTERS.length, 106);
+expect('region guardians', [0, 1, 2].reduce((a, r) => a + DJ.regionBosses(r).length, 0), 9);
 expect('heroes', DJ.HEROES.length, 30);
 expect('achievements', DJ.ACHIEVEMENTS.length, 100);
 expect('achievements that unlock a hero', DJ.ACHIEVEMENTS.filter((a) => a.unlocks).length, 25);

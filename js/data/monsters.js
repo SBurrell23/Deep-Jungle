@@ -115,6 +115,18 @@
   m('bramble_king', 'The Bramble King', 2, 260, 22, 16, 10, 6, ['b_bramble_crown', 'm_vine_whip', 'b_root_prison', 'm_regen'], 'plant boss', 'Crowned in thorns, seated on a throne of everything that tried to leave the undergrowth.', 'boss');
   m('mother_of_fangs', 'Mother of Fangs', 4, 620, 36, 28, 17, 11, ['b_fang_barrage', 'b_venom_flood', 'm_web', 'm_constrict'], 'insect reptile boss', 'Spider body, serpent legs, and a brood that never stops hatching.', 'boss');
   m('vine_warden', 'The Vine Warden', 5, 950, 46, 42, 28, 7, ['b_lantern_beam', 'b_warden_wall', 'm_vine_whip', 'm_earthquake'], 'construct plant boss', 'Built to keep the Heart safe. Built well.', 'boss');
+  // ---- Alternate guardians, region 0. One of a region's three is drawn per run. ----
+  m('thousand_mouth', 'The Thousand-Mouth', 2, 223, 20, 9, 8, 15, ['b_boiling_tide', 'b_scatter_reform', 'm_blind_dust', 'm_leech'], 'insect swarm boss', 'Not one creature but four million of them, in agreement. The skull it wears belonged to something that also thought it was fast.', 'boss');
+  m('old_gullet', 'Old Gullet', 2, 270, 21, 7, 14, 4, ['b_tongue_drag', 'b_swell', 'm_devour', 'm_stomp'], 'amphibian beast boss', 'Has held the same wallow for sixty years without once standing up. Everything that walked past it is still in there.', 'boss');
+
+  // ---- Alternate guardians, region 1. One of a region's three is drawn per run. ----
+  m('sunken_choir', 'The Sunken Choir', 4, 484, 20, 35, 14, 13, ['b_undertow', 'b_choir_swell', 'm_wail', 'm_drain'], 'undead aquatic spirit boss', 'Everyone the Mire has taken, still holding hands and still singing. They have had a great deal of time to practise.', 'boss');
+  m('kettlemaw', 'Old Kettlemaw', 4, 642, 39, 9, 20, 5, ['b_ground_gives', 'b_kettle_jaw', 'm_harden', 'm_stomp'], 'beast reptile aquatic boss', 'Two centuries of silt, shell and somebody else\'s temple wall, walking. It has never once needed to hurry.', 'boss');
+
+  // ---- Alternate guardians, region 2. One of a region's three is drawn per run. ----
+  m('skywrack', 'The Skywrack', 5, 790, 39, 28, 19, 20, ['b_stormfall', 'b_gale_eyes', 'm_storm', 'm_enrage'], 'beast bird flying boss', 'Six hundred years on the highest branch. Nothing has ever come up to challenge it, and it has grown very bored.', 'boss');
+  m('last_watchman', 'The Last Watchman', 5, 781, 26, 49, 22, 10, ['b_toll_of_years', 'b_grey_tithe', 'm_nightmare', 'm_bone_spear'], 'undead spirit humanoid boss', 'Nobody came to relieve him. Nobody has come for four hundred years. He has decided that you will do.', 'boss');
+
   m('heart_of_jungle', 'Heart of the Jungle', 5, 1150, 48, 50, 26, 8, ['h_heartbeat', 'h_root_lash', 'h_bloom_heal', 'h_summon', 'h_wrath', 'h_drain_all'], 'plant boss final', 'Every root, every vine, every hungry thing in the jungle grows from this. It is awake, and it has noticed you.', 'final');
 
   DJ.MONSTER_BY_ID = {};

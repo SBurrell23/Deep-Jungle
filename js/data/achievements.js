@@ -100,7 +100,7 @@
   a('discover_5', 'Curious', 'Discover 5 monsters.', ge('discovered', 5));
   a('discover_30', 'Naturalist', 'Discover 30 monsters.', ge('discovered', 30));
   a('discover_85', 'Encyclopedist', 'Discover 88 monsters.', ge('discovered', 88), 'termite_swarmlord');
-  a('discover_100', 'Complete Compendium', 'Discover all 100 monsters.', ge('discovered', 100));
+  a('discover_100', 'Complete Compendium', 'Discover every monster in the jungle.', ge('discovered', DJ.MONSTERS.length));
 
   // ===== Exploration & economy =====
   a('wanderer', 'Wanderer', 'Visit 30 map nodes.', ge('nodesVisited', 30));

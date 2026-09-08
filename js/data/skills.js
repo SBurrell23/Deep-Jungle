@@ -303,6 +303,25 @@
     return null;   // buffs, debuffs, revives and summons do not scale off a stat
   };
 
+
+  // ---- Alternate region bosses, region 0 ----
+  def('b_boiling_tide', { name: 'Boiling Tide', kind: 'phys', target: 'enemies', power: 0.65, hits: 2, mp: 0, status: { id: 'bleed', turns: 2, chance: 0.35 }, fx: 'swarm_fx', sfx: 'bite', desc: 'The column breaks and washes over everyone, twice.' });
+  def('b_scatter_reform', { name: 'Scatter and Reform', kind: 'buff', target: 'self', mp: 0, status: { id: 'haste', turns: 3, chance: 1 }, self: { id: 'shield', turns: 2, chance: 1, val: 0.25 }, fx: 'swarm_fx', sfx: 'summon', desc: 'The swarm comes apart, then pours back together faster and looser.' });
+  def('b_tongue_drag', { name: 'Tongue Drag', kind: 'phys', target: 'enemy', power: 2.15, mp: 0, status: { id: 'slow', turns: 2, chance: 0.7 }, fx: 'hit_big', sfx: 'whip', desc: 'A tongue like a wet rope takes one hero off their feet.' });
+  def('b_swell', { name: 'Swell', kind: 'buff', target: 'self', mp: 0, status: { id: 'rage', turns: 3, chance: 1 }, self: { id: 'guard', turns: 2, chance: 1 }, fx: 'shield', sfx: 'roar', desc: 'It inflates until the clearing gets noticeably darker.' });
+
+  // ---- Alternate region bosses, region 1 ----
+  def('b_undertow',     { name: 'Undertow', kind: 'drain', target: 'enemies', power: 1.05, mp: 0, drain: 0.45, fx: 'water', sfx: 'drain', desc: 'The water pulls at everyone, and the Choir grows on what it takes.' });
+  def('b_choir_swell',  { name: 'Swell', kind: 'heal', target: 'ally', power: 1.3, mp: 0, fx: 'water', sfx: 'heal', desc: 'It counts its drowned again and finds that there are more of them.' });
+  def('b_ground_gives', { name: 'The Ground Gives', kind: 'phys', target: 'enemies', power: 1.3, mp: 0, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'earth', sfx: 'explosion', desc: 'What everyone was standing on turns out to have been him.' });
+  def('b_kettle_jaw',   { name: 'Kettle Jaw', kind: 'phys', target: 'enemy', power: 2.2, mp: 0, status: { id: 'bleed', turns: 3, chance: 0.7 }, fx: 'hit_big', sfx: 'bite', desc: 'The jaw closes slowly. It does not open again.' });
+
+  // ---- Alternate region bosses, region 2 ----
+  def('b_stormfall', { name: 'Stormfall', kind: 'phys', target: 'enemy', power: 1.05, hits: 3, mp: 0, status: { id: 'bleed', turns: 3, chance: 0.5 }, fx: 'pierce', sfx: 'thunder', desc: 'Folds its wings and falls out of the cloud. Three times.' });
+  def('b_gale_eyes', { name: 'Eye of the Storm', kind: 'debuff', target: 'enemies', mp: 0, status: { id: 'blind', turns: 2, chance: 0.7 }, self: { id: 'haste', turns: 3, chance: 1 }, fx: 'wind', sfx: 'wind', desc: 'Grit and rain in every eye but its own. The wind carries it faster.' });
+  def('b_toll_of_years', { name: 'Toll of Years', kind: 'debuff', target: 'enemies', mp: 0, status: { id: 'weak', turns: 3, chance: 0.8 }, fx: 'curse', sfx: 'debuff', desc: 'He counts the years aloud. Everyone who hears them ages a little.' });
+  def('b_grey_tithe', { name: 'The Grey Tithe', kind: 'drain', target: 'enemies', power: 1.2, mp: 0, drain: 0.24, fx: 'dark', sfx: 'drain', desc: 'Collects what he is owed from the whole party, and keeps it.' });
+
   // ---- Status definitions ----
   DJ.STATUS = {
     poison: { name: 'Poison', icon: 'status_poison', color: '#7dd66a', bad: true, desc: 'Takes damage each turn.' },

@@ -10,11 +10,11 @@
   // bosses a run faces is part of what makes that run different. `boss` remains the
   // first of each list purely so anything reading a region outside a run still resolves.
   DJ.REGIONS = [
-    { id: 'undergrowth', name: 'The Undergrowth', bosses: ['bramble_king'], boss: 'bramble_king', tiers: [1, 2], color: '#3f7d3a', bg: '#0f2418',
+    { id: 'undergrowth', name: 'The Undergrowth', bosses: ['bramble_king', 'thousand_mouth', 'old_gullet'], boss: 'bramble_king', tiers: [1, 2], color: '#3f7d3a', bg: '#0f2418',
       blurb: 'Wet green dark. Everything here is small, hungry, and numerous.' },
-    { id: 'mireheart', name: 'The Mire', bosses: ['mother_of_fangs'], boss: 'mother_of_fangs', tiers: [2, 3, 4], color: '#7a6b2f', bg: '#1d2110',
+    { id: 'mireheart', name: 'The Mire', bosses: ['mother_of_fangs', 'sunken_choir', 'kettlemaw'], boss: 'mother_of_fangs', tiers: [2, 3, 4], color: '#7a6b2f', bg: '#1d2110',
       blurb: 'The ground stops being ground. Things move under the water.' },
-    { id: 'canopy', name: 'The High Canopy', bosses: ['vine_warden'], boss: 'vine_warden', tiers: [4, 5], color: '#2f6b7a', bg: '#0d1c24',
+    { id: 'canopy', name: 'The High Canopy', bosses: ['vine_warden', 'skywrack', 'last_watchman'], boss: 'vine_warden', tiers: [4, 5], color: '#2f6b7a', bg: '#0d1c24',
       blurb: 'Above the mist, where the old guardians still keep their posts.' },
   ];
 

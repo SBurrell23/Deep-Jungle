@@ -112,9 +112,9 @@
     cont.classList.toggle('hidden', !DJ.hasSavedRun());
     const s = p.stats;
     const bits = [
-      `${p.unlocked.length}/23 adventurers`,
+      `${p.unlocked.length}/${DJ.HEROES.length} adventurers`,
       `${p.achievements.length}/${DJ.ACHIEVEMENTS.length} achievements`,
-      `${s.discovered}/100 monsters`,
+      `${s.discovered}/${DJ.MONSTERS.length} monsters`,
     ];
     if (s.runsWon > 0) bits.push(`${s.runsWon} ${s.runsWon === 1 ? 'victory' : 'victories'}`);
     UI.$('#titleStats').textContent = bits.join('   ·   ');

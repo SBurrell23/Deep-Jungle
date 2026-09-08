@@ -136,7 +136,7 @@
       right.appendChild(heading('Save data'));
       const stat = UI.el('p', 'muted set-stats');
       const st = DJ.profile.stats;
-      stat.textContent = `${DJ.profile.achievements.length}/${DJ.ACHIEVEMENTS.length} achievements \u00b7 ${DJ.profile.unlocked.length}/23 adventurers \u00b7 ${st.discovered}/100 monsters \u00b7 ${st.runsWon} ${st.runsWon === 1 ? 'victory' : 'victories'}`;
+      stat.textContent = `${DJ.profile.achievements.length}/${DJ.ACHIEVEMENTS.length} achievements \u00b7 ${DJ.profile.unlocked.length}/${DJ.HEROES.length} adventurers \u00b7 ${st.discovered}/${DJ.MONSTERS.length} monsters \u00b7 ${st.runsWon} ${st.runsWon === 1 ? 'victory' : 'victories'}`;
       right.appendChild(stat);
 
       const inRun = !!(DJ.run && !DJ.run.finished);
