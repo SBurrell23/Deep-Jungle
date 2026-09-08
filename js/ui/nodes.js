@@ -173,6 +173,15 @@
 
   function showVictory(node, rew, gains, drops) {
     const run = DJ.run;
+    // Everything on this screen arrives in the order it is stacked, one shortly after
+    // the last, so the eye is led from the experience down to the final level up.
+    let landed = 0;
+    const pop = (el) => {
+      el.classList.add('spoil-row');
+      el.style.animationDelay = (0.1 + landed * 0.07).toFixed(2) + 's';
+      landed++;
+      return el;
+    };
     const isFinal = node.type === 'heart';
     UI.$('#resultTitle').textContent = isFinal ? 'THE JUNGLE IS STILL' : 'Victory!';
     UI.$('#resultTitle').className = 'win';
@@ -203,18 +212,10 @@
       const spoils = UI.el('div', 'spoils-list');
       body.appendChild(spoils);
 
-      let landed = 0;
       // Experience lands first, ahead of the gold.
       spoils.appendChild(xp);
-      xp.classList.add('spoil-row');
-      xp.style.animationDelay = '0.34s';
-      landed = 1;
-      const land = (row) => {
-        row.classList.add('spoil-row');
-        row.style.animationDelay = (0.34 + landed * 0.13).toFixed(2) + 's';   // experience is index 0
-        landed++;
-        spoils.appendChild(row);
-      };
+      pop(xp);
+      const land = (row) => { pop(row); spoils.appendChild(row); };
 
       if (rew.gold) {
         const g = UI.el('div', 'loot-row');
@@ -245,9 +246,10 @@
     if (!xp.parentNode) body.appendChild(xp);
 
     // Level ups come last, under the spoils, because they are the part you read rather
-    // than the part you act on.
+    // than the part you act on. They join the same top-down reveal, so the screen fills
+    // in one continuous run from the experience down to the final card.
     const merged = mergeGains(gains);
-    for (const g of merged) body.appendChild(levelUpCard(g));
+    for (const g of merged) body.appendChild(pop(levelUpCard(g)));
     if (merged.length) DJ.sfx('levelup', 0.35);
 
     const acts = UI.$('#resultActions');
