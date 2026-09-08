@@ -89,6 +89,7 @@
     UI.$('#btnCompendium').addEventListener('click', () => { DJ.sfx('page'); UI.Compendium.open(); });
     UI.$('#btnAchievements').addEventListener('click', () => { DJ.sfx('page'); UI.Achievements.open(); });
     UI.$('#btnHistory').addEventListener('click', () => { DJ.sfx('page'); UI.History.open(); });
+    UI.$('#btnHelp').addEventListener('click', () => { DJ.sfx('page'); UI.Help.open(); });
     // A balance aid rather than a feature: DJ.UI.ItemDebug.open() from the console,
     // or load the page with ?items on the end.
     // Waits for the boot screen to hand over, which takes as long as the effect

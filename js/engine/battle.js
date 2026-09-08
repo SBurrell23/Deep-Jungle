@@ -11,6 +11,24 @@
 
   const STATUS_MULT = {
     rage: { atk: 1.4 }, weak: { atk: 0.7, mag: 0.7 }, guard: { def: 1.5 }, haste: { spd: 1.5 }, slow: { spd: 0.65 },
+    chill: { spd: 0.75 },
+  };
+
+  // How the effects that are not simple stat multipliers are sized. Kept in one place so
+  // the Help page and the status tooltips quote the same numbers the engine uses.
+  DJ.STATUS_TUNE = {
+    poisonPct: 0.042,     // of max HP per stack, per turn
+    poisonTurns: 3,       // reset by every fresh dose
+    poisonMaxStacks: 5,
+    burnPct: 0.09,        // short and fierce
+    bleedPct: 0.038,      // long and slow
+    regenPct: 0.08,
+    shockAmp: 1.25,       // damage taken while shocked
+    chillHeal: 0.5,       // healing received while chilled
+    thornsShare: 0.5,     // fraction of a hit sent back by the status
+    thornsPassive: 0.2,   // and by the trinket passive
+    dotEnemyCap: 0.18,    // no single tick may take more than this much of a monster
+    dotBossMult: 0.4,
   };
 
   // ---- Stat helpers ----
@@ -30,7 +48,7 @@
     // and made the game about six points easier. A little more of both keeps fights the
     // same length rather than only making them longer.
     hpMult:  { normal: 1.90, elite: 1.75, boss: 1.19, final: 1.03 },
-    dmgMult: { normal: 0.85, elite: 0.86, boss: 0.76, final: 0.74 },
+    dmgMult: { normal: 0.93, elite: 0.94, boss: 0.82, final: 0.80 },
     levelScale: 0.10,   // stat growth per level above the monster's tier base
     // Damage from everything in a region, by region index. Hero HP climbs much faster
     // than a tier-1 monster's attack does, so the opening region needs a thumb on the
@@ -185,18 +203,23 @@
     const isBoss = u.kind === 'boss' || u.kind === 'final';
     for (const s of u.statuses.slice()) {
       let dmg = 0, heal = 0;
-      if (s.id === 'poison') dmg = Math.max(3, Math.round(u.maxHp * 0.07));
-      else if (s.id === 'burn') dmg = Math.max(3, Math.round(u.maxHp * 0.055) + 2);
-      else if (s.id === 'bleed') dmg = Math.max(3, Math.round(u.maxHp * 0.045) + 3);
-      else if (s.id === 'regen') heal = Math.max(2, Math.round(u.maxHp * 0.08));
+      const T = DJ.STATUS_TUNE;
+      // The three damage-over-time effects are deliberately different animals. Poison is a
+      // stack that grows for as long as somebody keeps applying it; fire is short and
+      // brutal; bleeding is slow and outlasts everything.
+      if (s.id === 'poison') dmg = Math.max(2, Math.round(u.maxHp * T.poisonPct)) * (s.stacks || 1);
+      else if (s.id === 'burn') dmg = Math.max(4, Math.round(u.maxHp * T.burnPct));
+      else if (s.id === 'bleed') dmg = Math.max(2, Math.round(u.maxHp * T.bleedPct));
+      else if (s.id === 'regen') heal = Math.max(2, Math.round(u.maxHp * T.regenPct));
       if (dmg) {
-        if (isBoss) dmg = Math.round(dmg * 0.4);
-        if (u.side === 'enemy') dmg = Math.min(dmg, Math.round(u.maxHp * 0.12));
+        if (isBoss) dmg = Math.round(dmg * T.dotBossMult);
+        if (u.side === 'enemy') dmg = Math.min(dmg, Math.round(u.maxHp * T.dotEnemyCap));
         u.hp = Math.max(0, u.hp - dmg);
         ev.push({ type: 'statusTick', unit: u, status: s.id, dmg });
         if (u.side === 'hero') this.stats.damageTaken += dmg; else this.stats.damageDealt += dmg;
         if (u.hp <= 0) { ev.push(...this.kill(u, s.id)); }
       } else if (heal && u.hp < u.maxHp) {
+        if (DJ.hasStatus(u, 'chill')) heal = Math.max(1, Math.round(heal * DJ.STATUS_TUNE.chillHeal));
         heal = Math.min(heal, u.maxHp - u.hp); u.hp += heal;
         ev.push({ type: 'statusTick', unit: u, status: s.id, heal });
         if (u.side === 'hero') this.stats.healing += heal;
@@ -240,6 +263,9 @@
 
   // ---- Damage ----
   P.critChance = function (src, tgt, skill) {
+    // The payload of a wind-up never crits. The party spent a turn preparing for a known
+    // quantity, and a coin flip on top of that would make the warning worthless.
+    if (skill && skill.noCrit) return 0;
     let c = 0.05 + Math.max(0, DJ.effStat(src, 'spd') - DJ.effStat(tgt, 'spd')) * 0.005;
     if (skill && skill.crit) c += skill.crit;
     if (DJ.hasPassive(src, 'crit')) c += 0.10;
@@ -261,6 +287,9 @@
     // level pressure: heroes vs. higher-level enemies take a bit more
     let crit = false;
     if (this.rng.chance(this.critChance(src, tgt, skill))) { crit = true; base *= 1.75; }
+    // A shocked target is wide open. Everything lands harder while the charge holds,
+    // which is what makes spending a turn shocking something worth doing.
+    if (DJ.hasStatus(tgt, 'shock')) base *= DJ.STATUS_TUNE.shockAmp;
     // The shield takes as much of the hit as it still can hold. A hit it swallows whole
     // deals nothing at all, which is the only way armour and wards can win a fight
     // untouched; a percentage reduction never could, however large.
@@ -294,9 +323,16 @@
       ex.turns = Math.max(ex.turns, turns);
       if (st.val) ex.val = Math.max(ex.val || 0, st.val);
       if (pool) ex.pool = Math.max(ex.pool || 0, pool);
+      // Poison is the one thing that piles up. A fresh dose adds a stack and resets the
+      // clock, so a poisoner who keeps at it gets worse and worse, and one who stops
+      // loses the whole stack at once when the timer runs out.
+      if (st.id === 'poison') ex.stacks = Math.min(DJ.STATUS_TUNE.poisonMaxStacks, (ex.stacks || 1) + 1);
+      if (st.sk) ex.sk = st.sk;
     } else {
       const add = { id: st.id, turns, val: st.val };
       if (pool) add.pool = pool;
+      if (st.id === 'poison') add.stacks = 1;
+      if (st.sk) add.sk = st.sk;
       tgt.statuses.push(add);
     }
     if (def && def.bad && src.side === 'hero') this.stats.statuses++;
@@ -319,9 +355,14 @@
     if (src.side === 'hero') { this.stats.damageDealt += r.dmg; if (r.crit) this.stats.crits++; if (r.dmg > this.stats.maxHit) this.stats.maxHit = r.dmg; }
     else this.stats.damageTaken += r.dmg;   // zero when the shield swallowed the hit whole
     ev.push({ type: 'hit', source: src, target: tgt, dmg: r.dmg, crit: r.crit, absorbed: r.absorbed, kind, fx: skill ? skill.fx : (kind === 'mag' ? 'arcane' : 'hit'), sfx: skill ? skill.sfx : 'hit' });
-    // thorns reflect
-    if (DJ.hasPassive(tgt, 'thorns') && tgt.alive && src.alive) {
-      const back = Math.max(1, Math.round(r.dmg * 0.2)); src.hp = Math.max(0, src.hp - back);
+    // Thorns send part of every blow straight back. Worn armour returns a fifth; the
+    // status returns half, which is enough that swinging into it is a real decision.
+    const th = DJ.getStatus(tgt, 'thorns');
+    const share = (DJ.hasPassive(tgt, 'thorns') ? DJ.STATUS_TUNE.thornsPassive : 0) +
+      (th ? (th.val || DJ.STATUS_TUNE.thornsShare) : 0);
+    if (share > 0 && r.dmg > 0 && tgt.alive && src.alive) {
+      const back = Math.max(1, Math.round(r.dmg * share)); src.hp = Math.max(0, src.hp - back);
+      if (src.side === 'hero') this.stats.damageTaken += back; else this.stats.damageDealt += back;
       ev.push({ type: 'hit', source: tgt, target: src, dmg: back, thorns: true, fx: 'thorns', sfx: 'hit' });
       if (src.hp <= 0) ev.push(...this.kill(src, 'thorns'));
     }
@@ -336,6 +377,9 @@
 
   P.healUnit = function (src, tgt, amount, ev, fx) {
     if (!tgt.alive) return 0;
+    // Chill closes wounds badly. Anything mending a chilled unit works at half strength,
+    // which is the answer to a party that plans to simply out-heal the jungle.
+    if (DJ.hasStatus(tgt, 'chill')) amount = Math.max(1, Math.round(amount * DJ.STATUS_TUNE.chillHeal));
     const h = Math.min(amount, tgt.maxHp - tgt.hp);
     tgt.hp += h;
     if (src && src.side === 'hero') this.stats.healing += h;
@@ -428,6 +472,18 @@
       }
     } else if (sk.kind === 'summon') {
       ev.push(...this.summonMinions(u, 2));
+    } else if (sk.kind === 'charge') {
+      // A wind-up. The turn is spent visibly gathering and the stored ability lands on
+      // the next one, so the party is told in advance to brace, scatter, or stun it.
+      this.applyStatus(u, u, { id: 'charge', turns: 2, chance: 1, sk: sk.charge }, ev);
+    }
+    // Any ability may hand mana back as well as doing its own job.
+    if (sk.mpPct) {
+      for (const t of targets) {
+        if (!t.alive || !t.maxMp) continue;
+        const m = Math.min(t.maxMp - t.mp, Math.max(1, Math.round(t.maxMp * sk.mpPct)));
+        if (m > 0) { t.mp += m; ev.push({ type: 'mp', unit: t, amount: m }); }
+      }
     }
     if (sk.self && u.alive) {
       for (const st of (Array.isArray(sk.self) ? sk.self : [sk.self])) this.applyStatus(u, u, st, ev);
@@ -478,6 +534,14 @@
     const rng = this.rng;
     const heroes = this.foes(u);
     if (!heroes.length) return { type: 'defend' };
+    // Whatever it was gathering itself for, it lands now. Stunning something mid-wind-up
+    // throws the charge away with it, which is the party's answer to these.
+    const ch = DJ.getStatus(u, 'charge');
+    if (ch && ch.sk && DJ.SKILLS[ch.sk]) {
+      u.statuses = u.statuses.filter((s) => s !== ch);
+      const rel = DJ.SKILLS[ch.sk];
+      return { type: 'skill', skillId: ch.sk, target: rel.target === 'enemy' ? rng.pick(heroes) : null };
+    }
     // Boss phases: Heart summons at 70% / 35%
     if (u.kind === 'final') {
       const pct = u.hp / u.maxHp;
@@ -495,7 +559,11 @@
       if (s.kind === 'heal') return false;
       if (s.kind === 'summon') return false;
       if (s.kind === 'buff' && s.status && DJ.hasStatus(u, s.status.id) && (s.target === 'self' || s.target === 'allies')) return false;
-      if (s.kind === 'debuff' && s.target === 'enemy') return heroes.some((h) => !DJ.hasStatus(h, s.status.id));
+      // Poison is worth reapplying to somebody who already has it: that is how it
+      // stacks. Everything else only wants a target that is still clean.
+      if (s.kind === 'debuff' && s.target === 'enemy' && s.status.id !== 'poison') {
+        return heroes.some((h) => !DJ.hasStatus(h, s.status.id));
+      }
       return true;
     });
     const pickTarget = () => {
@@ -508,8 +576,12 @@
       return rng.weighted(w);
     };
     const attackW = u.kind === 'boss' || u.kind === 'final' ? 0.2 : 0.4;
-    if (!usable.length || rng.chance(attackW)) return { type: 'attack', target: pickTarget() };
-    const sk = rng.pick(usable);
+    // A wind-up costs the monster a whole turn, so it is only worth starting while there
+    // is still enough of a fight left to land it in.
+    const cutWindup = this.round <= 1 || u.hp / u.maxHp < 0.12;
+    const pool = cutWindup ? usable.filter((s) => s.kind !== 'charge') : usable;
+    if (!pool.length || rng.chance(attackW)) return { type: 'attack', target: pickTarget() };
+    const sk = rng.pick(pool);
     let target = null;
     if (sk.target === 'enemy') {
       if (sk.kind === 'debuff') { const c = heroes.filter((h) => !DJ.hasStatus(h, sk.status.id)); target = c.length ? rng.pick(c) : pickTarget(); }
@@ -541,8 +613,36 @@
       }
     }
     if (u.maxMp && u.mp < u.maxMp * 0.15 && inventory && inventory.blue > 0 && skills.length === 0) return { type: 'item', potion: 'blue', target: u, inventory };
+    // A green potion clears every ailment at once, which is the answer to a stacked
+    // poison or to somebody buried under three separate debuffs.
+    if (inventory && inventory.green > 0) {
+      const worst = friends
+        .map((f) => {
+          const po = DJ.getStatus(f, 'poison');
+          const bad = f.statuses.filter((x) => DJ.STATUS[x.id] && DJ.STATUS[x.id].bad).length;
+          return { f, weight: (po ? (po.stacks || 1) : 0) + bad };
+        })
+        .sort((a, b) => b.weight - a.weight)[0];
+      if (worst && worst.weight >= 4) return { type: 'item', potion: 'green', target: worst.f, inventory };
+    }
     const selfHeal = skills.find((s) => s.kind === 'heal' && s.target === 'self');
     if (selfHeal && u.hp / u.maxHp < 0.45) return { type: 'skill', skillId: selfHeal.id, target: u };
+    // Two reasons to spend a turn not attacking: something is visibly winding up, or the
+    // only thing in front of you returns half of every blow. Guarding answers both.
+    const charging = foes.some((f) => DJ.hasStatus(f, 'charge'));
+    const bristling = foes.length && foes.every((f) => DJ.hasStatus(f, 'thorns'));
+    if ((charging || bristling) && !DJ.hasStatus(u, 'guard') &&
+        u.hp / u.maxHp < (charging ? 0.8 : 0.55) && rng.chance(charging ? 0.55 : 0.45)) {
+      return { type: 'defend' };
+    }
+    // Mana abilities are worth a turn once the casters start running dry.
+    const mana = skills.find((s) => s.kind === 'mana');
+    if (mana) {
+      const dry = friends.filter((f) => f.maxMp > 0 && f.mp / f.maxMp < 0.4);
+      if (dry.length >= (mana.target === 'allies' ? 2 : 1) && rng.chance(0.6)) {
+        return { type: 'skill', skillId: mana.id, target: dry.sort((a, b) => a.mp / a.maxMp - b.mp / b.maxMp)[0] };
+      }
+    }
     // buffs early in fight
     const buffs = skills.filter((s) => s.kind === 'buff' && s.status && !DJ.hasStatus(s.target === 'self' ? u : friends[0], s.status.id));
     if (buffs.length && this.round <= 2 && foes.length >= 2 && rng.chance(0.5)) return { type: 'skill', skillId: buffs[0].id, target: u };
@@ -550,7 +650,13 @@
     const dmg = skills.filter((s) => ['phys', 'mag', 'drain'].includes(s.kind));
     const target = foes.slice().sort((a, b) => a.hp - b.hp)[0];
     const aoe = dmg.filter((s) => s.target === 'enemies').sort((a, b) => b.power - a.power)[0];
-    const single = dmg.filter((s) => s.target === 'enemy').sort((a, b) => (b.power * (b.hits || 1)) - (a.power * (a.hits || 1)))[0];
+    // Thorns reflects each hit separately, so a flurry into something bristling comes back
+    // several times over. When that is what is in front of us, one heavy blow beats six
+    // light ones even though the six add up to more.
+    const bristly = target && DJ.hasStatus(target, 'thorns');
+    const singles = dmg.filter((s) => s.target === 'enemy' && (!bristly || (s.hits || 1) <= 2));
+    const single = (singles.length ? singles : dmg.filter((s) => s.target === 'enemy'))
+      .sort((a, b) => (b.power * (b.hits || 1)) - (a.power * (a.hits || 1)))[0];
     const debuff = skills.find((s) => s.kind === 'debuff' && s.target === 'enemies' && !foes.every((f) => DJ.hasStatus(f, s.status.id)));
     if (foes.length >= 3 && debuff && rng.chance(0.3)) return { type: 'skill', skillId: debuff.id };
     if (foes.length >= 2 && aoe && (u.mp >= aoe.mp)) return { type: 'skill', skillId: aoe.id };

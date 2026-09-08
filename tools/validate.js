@@ -89,6 +89,68 @@ for (const [id, sk] of Object.entries(DJ.SKILLS)) {
     if (!DJ.STATUS[st.id]) err(`skill ${id} applies unknown self-status "${st.id}"`);
   }
 }
+// Ability text names its statuses, and the UI tints and explains each one it finds, so
+// the two have to agree. Claiming an effect the ability does not apply is an error;
+// applying one without mentioning it is only a missed opportunity.
+{
+  const forms = {
+    poison: ['poison', 'poisons', 'poisoned'],
+    burn: ['burn', 'burns', 'burned', 'burning'],
+    bleed: ['bleed', 'bleeds', 'bleeding'],
+    stun: ['stun', 'stuns', 'stunned'],
+    weak: ['weak', 'weaken', 'weakens', 'weakened'],
+    slow: ['slow', 'slows', 'slowed'],
+    blind: ['blind', 'blinds', 'blinded'],
+    guard: ['guard', 'guards'],
+    haste: ['haste'],
+    regen: ['regen'],
+    shield: ['shield', 'shields', 'shielded'],
+    rage: ['rage'],
+    taunt: ['taunt', 'taunts'],
+    shock: ['shock', 'shocks', 'shocked'],
+    chill: ['chill', 'chills', 'chilled'],
+    thorns: ['thorns'],
+    charge: ['charging'],
+  };
+  // This mirrors STATUS_WORDS in js/ui/common.js; keep the two lists in step.
+  for (const id of Object.keys(forms)) {
+    if (!DJ.STATUS[id]) err(`the ability-text scanner knows a status "${id}" that DJ.STATUS does not define`);
+  }
+  for (const id of Object.keys(DJ.STATUS)) {
+    if (!forms[id]) err(`status "${id}" has no word forms in the ability-text scanner, so it will never be tinted in a description`);
+  }
+  const map = {};
+  const all = [];
+  for (const id in forms) for (const w of forms[id]) { map[w] = id; all.push(w); }
+  all.sort((a, b) => b.length - a.length);
+  const re = new RegExp('(^|[^A-Za-z])(' + all.join('|') + ')(?![A-Za-z])', 'gi');
+  for (const [id, sk] of Object.entries(DJ.SKILLS)) {
+    const applied = new Set();
+    if (sk.status) applied.add(sk.status.id);
+    for (const st of (sk.self ? (Array.isArray(sk.self) ? sk.self : [sk.self]) : [])) applied.add(st.id);
+    if (sk.kind === 'charge') applied.add('charge');
+    const named = new Set();
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(sk.desc || ''))) named.add(map[m[2].toLowerCase()]);
+    for (const n of named) {
+      if (!applied.has(n)) err(`skill ${id} says "${DJ.STATUS[n].name}" in its description but does not apply it`);
+    }
+    for (const a of applied) {
+      if (!named.has(a) && a !== 'charge') warn(`skill ${id} applies ${a} without naming it in its description`);
+    }
+  }
+  // The released half of a wind-up must never sit in a monster's own ability list, or it
+  // could be cast directly with no warning at all.
+  const held = new Set(Object.values(DJ.SKILLS).filter((s) => s.kind === 'charge').map((s) => s.charge));
+  for (const s of Object.values(DJ.SKILLS)) {
+    if (s.kind === 'charge' && !DJ.SKILLS[s.charge]) err(`wind-up ${s.id} releases unknown skill "${s.charge}"`);
+  }
+  for (const m of DJ.MONSTERS) {
+    for (const s of m.skills) if (held.has(s)) err(`monster ${m.id} can cast "${s}" directly, but it is meant to be reachable only through a wind-up`);
+  }
+}
+
 for (const h of DJ.HEROES) {
   if (h.skills.length !== 4) err(`hero ${h.id} has ${h.skills.length} skills, expected 4`);
   for (const s of h.skills) if (!DJ.SKILLS[s]) err(`hero ${h.id} references unknown skill "${s}"`);

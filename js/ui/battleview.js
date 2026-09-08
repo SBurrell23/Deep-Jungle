@@ -343,19 +343,23 @@
       for (const st of u.statuses.slice(0, 6)) {
         const def = DJ.STATUS[st.id];
         // Remember the hit box so hovering the icon can explain the effect.
-        statusHits.push({ x: ix - 9, y: iy - 3, w: 19, h: 20, id: st.id, turns: st.turns });
+        statusHits.push({ x: ix - 9, y: iy - 3, w: 19, h: 20, id: st.id, turns: st.turns, st });
         const drew = DJ.drawSprite(ctx, def ? def.icon : 'status_poison', ix, iy + 15, 1.06, { center: true });
         if (!drew) { ctx.fillStyle = def ? def.color : '#fff'; ctx.fillRect(ix - 5, iy + 5, 10, 10); }
         // The count rides in the icon's own bottom-right corner on a dark badge. Beside
         // the icon it ran underneath whichever buff came next.
-        const turns = String(st.turns);
+        // For poison the interesting number is how many doses are stacked up, not how
+        // long they have left, so that is what the badge shows once there is more than one.
+        const stacked = st.id === 'poison' && (st.stacks || 1) > 1;
+        const badge = stacked ? st.stacks + '\u00d7' : String(st.turns);
         ctx.save();
         ctx.font = 'bold 9px monospace';
-        const tw = ctx.measureText(turns).width;
+        const tw = ctx.measureText(badge).width;
         ctx.fillStyle = 'rgba(6,14,9,.88)';
         ctx.fillRect(ix + 8 - tw - 2, iy + 7, tw + 4, 10);
-        ctx.fillStyle = '#fff'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
-        ctx.fillText(turns, ix + 8, iy + 15);
+        ctx.fillStyle = stacked ? (def ? def.color : '#fff') : '#fff';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText(badge, ix + 8, iy + 15);
         ctx.restore();
         ix += 20;
       }
@@ -403,7 +407,7 @@
           const d = DJ.STATUS[x.id];
           const dot = UI.el('span', 'bp-dot', (d ? d.name[0] : '?'));
           dot.style.background = d ? d.color : '#888';
-          UI.statusTip(dot, x.id, x.turns);
+          UI.statusTip(dot, x.id, x.turns, x);
           st.appendChild(dot);
         }
         info.appendChild(st);
@@ -475,6 +479,8 @@
           // like a bug, so it is named for what happened.
           if (!e.dmg && e.absorbed) {
             fx.spawnText('ABSORBED', c.x, c.y - 6, { color: '#7fe0ff', size: 15 });
+          } else if (e.thorns) {
+            fx.spawnText(e.dmg + ' THORNS', c.x, c.y - 6, { color: DJ.STATUS.thorns.color, size: 15 });
           } else {
             fx.spawnText((e.crit ? 'CRIT ' : '') + e.dmg, c.x, c.y - 6, {
               color: e.crit ? '#ffd75e' : (e.target.side === 'hero' ? '#ff8b8b' : '#ffffff'),
@@ -509,6 +515,15 @@
         const c = unitCenter(e.target);
         const def = DJ.STATUS[e.status];
         if (!e.applied) { fx.spawnText('resisted', c.x, c.y - 14, { color: '#b8c8b8', size: 12 }); return 140; }
+        // A monster gathering itself for something big is the one moment the fight asks
+        // the player to stop and think, so it is announced rather than mentioned.
+        if (e.status === 'charge') {
+          fx.spawnText('WINDING UP!', c.x, c.y - 18, { color: def.color, size: 20, shake: true });
+          log(`${e.target.name} is winding up something heavy!`);
+          DJ.sfx('roar');
+          if (DJ.profile.settings.screenShake) shake = Math.max(shake, 7);
+          return 620;
+        }
         fx.spawnText(def ? def.name : e.status, c.x, c.y - 16, { color: def ? def.color : '#fff', size: 13 });
         DJ.sfx(def && def.bad ? 'debuff' : 'buff');
         return 200;
@@ -589,7 +604,8 @@
       const hit = statusHits.find((h) => px >= h.x && px <= h.x + h.w && py >= h.y && py <= h.y + h.h);
       if (hit) {
         const d = DJ.STATUS[hit.id];
-        if (d) UI.showTip(`<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span><i>${hit.turns} turn${hit.turns === 1 ? '' : 's'} remaining</i>`, e.clientX, e.clientY);
+        if (d) UI.showTip(`<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span>` +
+          UI.statusFoot(hit.id, hit.turns, hit.st), e.clientX, e.clientY);
       } else UI.hideTip();
 
       if (!pendingAction || !pendingAction.targets) {
@@ -786,7 +802,7 @@
       }
       n.appendChild(meta);
       b.appendChild(n);
-      b.appendChild(UI.el('div', 'a-desc', sk.desc));
+      b.appendChild(UI.skillDesc(sk, 'a-desc'));
       b.disabled = !usable;
       b.title = usable ? sk.desc : ((sk.mp || 0) > u.mp ? 'Not enough MP' : 'No valid target');
       b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'skill', skillId: sid }, sk.target); });

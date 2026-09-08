@@ -1057,4 +1057,116 @@
     ],
   };
 
+  // A bolt. Worn by anything whose guard has just been rattled loose.
+  S.status_shock = {
+    w: 16, h: 16,
+    pal: {
+      k: '#3a2a05',
+      y: '#ffd233',
+      w: '#fffbd0',
+    },
+    px: [
+      '................',
+      '..........kkk...',
+      '.........kyyk...',
+      '........kyywk...',
+      '.......kyywk....',
+      '......kyywk.....',
+      '.....kyyyyyyk...',
+      '.....kkyyywwk...',
+      '.......kyywk....',
+      '......kyywk.....',
+      '.....kyywk......',
+      '....kyywk.......',
+      '...kyywk........',
+      '...kkkk.........',
+      '................',
+      '................',
+    ],
+  };
+
+  // A flake, for the cold that gets into wounds.
+  S.status_chill = {
+    w: 16, h: 16,
+    pal: {
+      k: '#08303f',
+      c: '#4fc4e8',
+      w: '#e8fbff',
+    },
+    px: [
+      '................',
+      '.......kk.......',
+      '......kcck......',
+      '...k..kcck..k...',
+      '....kk.cc.kk....',
+      '.....kckkck.....',
+      '..kkkccwwcckkk..',
+      '..kccwwwwwwcck..',
+      '..kccwwwwwwcck..',
+      '..kkkccwwcckkk..',
+      '.....kckkck.....',
+      '....kk.cc.kk....',
+      '...k..kcck..k...',
+      '......kcck......',
+      '.......kk.......',
+      '................',
+    ],
+  };
+
+  // A burr, all spines out. Hitting this is a decision.
+  S.status_thorns = {
+    w: 16, h: 16,
+    pal: {
+      g: '#8a5a2b',
+      l: '#c9944e',
+      w: '#f2d8a4',
+    },
+    px: [
+      '................',
+      '.......gg.......',
+      '.......gg.......',
+      '......lggl......',
+      '..g...lggl...g..',
+      '...gg.lwwl.gg...',
+      '....ggwwwwgg....',
+      '.ggllwwwwwwllgg.',
+      '.ggllwwwwwwllgg.',
+      '....ggwwwwgg....',
+      '...gg.lwwl.gg...',
+      '..g...lggl...g..',
+      '......lggl......',
+      '.......gg.......',
+      '.......gg.......',
+      '................',
+    ],
+  };
+
+  // An arrow gathering upward: something big is one turn away.
+  S.status_charge = {
+    w: 16, h: 16,
+    pal: {
+      k: '#3d2405',
+      a: '#ff9f2e',
+      w: '#ffe9b0',
+    },
+    px: [
+      '................',
+      '.......kk.......',
+      '......kaak......',
+      '.....kawwak.....',
+      '....kawwwwak....',
+      '...kawwaawwak...',
+      '..kawwakkawwak..',
+      '..kkkkawwakkkk..',
+      '.....kawwak.....',
+      '.....kawwak.....',
+      '.....kawwak.....',
+      '.....kawwak.....',
+      '.....kaaaak.....',
+      '.....kkkkkk.....',
+      '................',
+      '................',
+    ],
+  };
+
 })();

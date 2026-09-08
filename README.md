@@ -32,6 +32,32 @@ Battles are JRPG-style: initiative order by speed, four skills per hero unlockin
 lot of potions. Actions are bound to Q, W, E and 1-4, and hovering any stat or status icon
 explains it immediately.
 
+Seventeen status effects drive most of what a fight asks of you, and both sides use all of
+them. The three damage-over-time effects are deliberately different animals: **Poison**
+stacks, adding a dose and resetting its clock every time it lands, so a poisoner who keeps
+working gets steadily worse and one who is killed loses the whole stack at once; **Burn** is
+short and heavy; **Bleed** is small and outlasts everything. **Shock** opens a target up to
+25% more damage from every source, **Chill** slows a unit and halves the healing it
+receives, and **Thorns** sends half of every blow straight back at whoever landed it.
+
+Two of those exist to make attacking the wrong answer sometimes. A monster that spends a
+turn **Charging** is announcing a much larger attack on its next one, which can be guarded
+against, healed through, or thrown away entirely by stunning it; a monster with Thorns
+punishes every separate hit, so a four-strike flurry into one reflects four times. Between
+them, the fights that used to be attack-attack-attack now have turns where the right move is
+to brace.
+
+Each monster is built around a single idea rather than a generic kit. Some bleed, some
+burn, some bristle, some wind up, and a couple — the Spore Colossus and the Plague Shaman
+among them — never deal direct damage at all and simply keep stacking Poison until the
+party runs out of time.
+
+Any status an ability applies is named in the ability's own text, tinted its own colour and
+explaining itself on hover, so nothing has to be memorised. The **Help** screen on the title
+menu is a full field guide: the map, damage and turn order, every status with the exact
+numbers the engine uses, the XP curve, gear, potions, and a section on when attacking is the
+wrong move. Everything it quotes is read from live data, so it cannot drift.
+
 Levelling restores rather than fully heals: the increase to max HP and MP is added straight
 to the current values, and then a further 25% of max HP and 30% of max MP is topped up on
 top. A hero who levels at low health comes out better off, but not full.
@@ -65,7 +91,7 @@ from its saved RNG state, so you drop back into the same encounter.
   entry. Tier 1 species haunt the undergrowth; tier 5 only appear deep in the canopy.
 - **30 adventurers** across fighter, mage, healer, tank, rogue, and hybrid roles.
 - **100 achievements**, 25 of which unlock a new adventurer.
-- **187 skills** shared between heroes and monsters, with 12 status effects.
+- **227 skills** shared between heroes and monsters, with 17 status effects.
 - **39 items** and 9 potions, including a rare one that grants an instant level.
 - **12 story events**, 16 riddles, and 4 puzzle types.
 
@@ -105,6 +131,13 @@ Checks that every sprite, skill, effect, item, achievement and map reference res
 all 106 monsters have unique stats, that every locked hero is reachable through some
 achievement, that every music track exists, that cache stamps are current, and that 40
 generated maps have no unreachable nodes or dead ends. CI runs this before deploying.
+
+It also reads every ability description against the statuses that ability actually applies.
+Since a status named in the text is tinted and made hoverable, a description that claims an
+effect it does not apply is a lie to the player rather than a typo, and fails the build;
+applying one without mentioning it is only a warning. The same check confirms that the
+payload of a wind-up never appears in a monster's own ability list, where it could be cast
+with no warning at all.
 
 ```bash
 node tools/sim.js 40

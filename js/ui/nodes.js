@@ -153,7 +153,12 @@
 
     for (const sid of g.newSkills) {
       const sk = DJ.SKILLS[sid];
-      if (sk) body.appendChild(UI.el('div', 'lu-skill', `New skill: ${sk.name} — ${sk.desc}`));
+      if (sk) {
+        const line = UI.el('div', 'lu-skill');
+        line.appendChild(UI.el('b', null, 'New skill: ' + sk.name + ' — '));
+        UI.statusText(sk.desc, line);
+        body.appendChild(line);
+      }
     }
     card.appendChild(body);
     return card;

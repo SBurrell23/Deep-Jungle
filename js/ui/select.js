@@ -108,7 +108,7 @@
       if (sc) meta.appendChild(UI.el('span', 'a-scale ' + (sc === 'MAG' ? 'sc-mag' : 'sc-phys'), sc));
       hd.appendChild(meta);
       item.appendChild(hd);
-      item.appendChild(UI.el('div', 'sk-desc', sk.desc));
+      item.appendChild(UI.skillDesc(sk));
       const lv = DJ.SKILL_UNLOCK_LEVELS[i];
       if (lv > 1) item.appendChild(UI.el('div', 'sk-lvl', 'Unlocks at level ' + lv));
       box.appendChild(item);

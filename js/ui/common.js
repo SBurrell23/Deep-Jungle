@@ -196,11 +196,79 @@
     if (!h) return el;
     return UI.tip(el, `<b>${h.name}</b><span>${h.text}</span>`);
   };
-  UI.statusTip = function (el, id, turns) {
+  // The footnote under a status tooltip: how long it has left, how many doses have
+  // piled up, how much a shield can still swallow.
+  UI.statusFoot = function (id, turns, st) {
+    const bits = [];
+    if (st && id === 'poison' && (st.stacks || 1) > 1) bits.push(st.stacks + ' stacks');
+    if (st && id === 'shield' && st.pool > 0) bits.push(st.pool + ' damage left to soak');
+    if (turns) bits.push(turns + ' turn' + (turns === 1 ? '' : 's') + ' remaining');
+    return bits.length ? '<i>' + bits.join('  \u00b7  ') + '</i>' : '';
+  };
+  UI.statusTip = function (el, id, turns, st) {
     const d = DJ.STATUS[id];
     if (!d) return el;
     return UI.tip(el, () => `<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span>` +
-      (turns ? `<i>${turns} turn${turns === 1 ? '' : 's'} remaining</i>` : ''));
+      UI.statusFoot(id, turns, st));
+  };
+
+  // ---- Status names inside ability text ----
+  // An ability that says it inflicts Poison should say so in the colour of Poison, and
+  // the word itself should explain the effect on hover. Descriptions stay plain strings;
+  // the markup is built here, once, for every screen that shows them.
+  const STATUS_WORDS = (function () {
+    const forms = {
+      poison: ['poison', 'poisons', 'poisoned'],
+      burn:   ['burn', 'burns', 'burned', 'burning'],
+      bleed:  ['bleed', 'bleeds', 'bleeding'],
+      stun:   ['stun', 'stuns', 'stunned'],
+      weak:   ['weak', 'weaken', 'weakens', 'weakened'],
+      slow:   ['slow', 'slows', 'slowed'],
+      blind:  ['blind', 'blinds', 'blinded'],
+      guard:  ['guard', 'guards'],
+      haste:  ['haste'],
+      regen:  ['regen'],
+      shield: ['shield', 'shields', 'shielded'],
+      rage:   ['rage'],
+      taunt:  ['taunt', 'taunts'],
+      shock:  ['shock', 'shocks', 'shocked'],
+      chill:  ['chill', 'chills', 'chilled'],
+      thorns: ['thorns'],
+      charge: ['charging'],
+    };
+    const map = {};
+    const all = [];
+    for (const id in forms) for (const w of forms[id]) { map[w] = id; all.push(w); }
+    // Longest first, so "poisoned" is never matched as "poison" with a stray tail.
+    all.sort((a, b) => b.length - a.length);
+    // No word-boundary escapes here on purpose: a literal class plus a lookahead does the
+    // same job and survives every editor and shell this file has been through.
+    return { map, re: new RegExp('(^|[^A-Za-z])(' + all.join('|') + ')(?![A-Za-z])', 'gi') };
+  })();
+
+  // Fill an element with text, tinting any status name it contains.
+  UI.statusText = function (text, el) {
+    const box = el || UI.el('span');
+    const re = STATUS_WORDS.re;
+    re.lastIndex = 0;
+    let last = 0, m;
+    while ((m = re.exec(text))) {
+      const at = m.index + m[1].length;
+      if (at > last) box.appendChild(document.createTextNode(text.slice(last, at)));
+      const id = STATUS_WORDS.map[m[2].toLowerCase()];
+      const d = DJ.STATUS[id];
+      const tag = UI.el('span', 'st-word', m[2]);
+      if (d) { tag.style.color = d.color; UI.statusTip(tag, id); }
+      box.appendChild(tag);
+      last = at + m[2].length;
+    }
+    if (last < text.length) box.appendChild(document.createTextNode(text.slice(last)));
+    return box;
+  };
+
+  // The one-line description under an ability name, wherever it is shown.
+  UI.skillDesc = function (sk, cls) {
+    return UI.statusText(sk.desc || '', UI.el('div', cls || 'sk-desc'));
   };
 
   UI.flash = function () {

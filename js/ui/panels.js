@@ -297,7 +297,7 @@
       if (sc) meta.appendChild(UI.el('span', 'a-scale ' + (sc === 'MAG' ? 'sc-mag' : 'sc-phys'), sc));
       hd.appendChild(meta);
       item.appendChild(hd);
-      item.appendChild(UI.el('div', 'sk-desc', sk.desc));
+      item.appendChild(UI.skillDesc(sk));
       wrap.appendChild(item);
     });
     return wrap;
