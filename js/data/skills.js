@@ -393,7 +393,7 @@
     weak:   { name: 'Weak',   icon: 'status_weak',   color: '#b48cff', bad: true, desc: 'ATK and MAG reduced 30%.' },
     slow:   { name: 'Slow',   icon: 'status_slow',   color: '#8fb4ff', bad: true, desc: 'SPD reduced 35%.' },
     blind:  { name: 'Blind',  icon: 'status_blind',  color: '#aaaaaa', bad: true, desc: '40% chance to miss.' },
-    guard:  { name: 'Guard',  icon: 'status_guard',  color: '#7fc8ff', bad: false, desc: 'Incoming damage reduced 60%.' },
+    guard:  { name: 'Guard',  icon: 'status_guard',  color: '#7fc8ff', bad: false, desc: 'Incoming damage reduced 50%.' },
     haste:  { name: 'Haste',  icon: 'status_haste',  color: '#ffd27f', bad: false, desc: 'SPD increased 50%.' },
     regen:  { name: 'Regen',  icon: 'status_regen',  color: '#8cff9c', bad: false, desc: 'Heals each turn.' },
     shield: { name: 'Shield', icon: 'status_shield', color: '#7fe0ff', bad: false, desc: 'Absorbs incoming damage until the pool runs out.' },

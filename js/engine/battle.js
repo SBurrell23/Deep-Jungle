@@ -17,7 +17,7 @@
   // Guard is a flat reduction rather than a DEF multiplier. As a multiplier it was worth
   // about 14% off a hit, because DEF is already divided into the damage and more of it
   // buys less and less; a whole turn has to buy more than that or bracing is never right.
-  DJ.GUARD_CUT = 0.6;
+  DJ.GUARD_CUT = 0.5;
 
   // How the effects that are not simple stat multipliers are sized. Kept in one place so
   // the Help page and the status tooltips quote the same numbers the engine uses.

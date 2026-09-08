@@ -177,7 +177,7 @@
     box.appendChild(defs([
       ['Attack', 'A basic strike at 100% power. Costs nothing.'],
       ['Ability', 'One of up to four abilities, each costing mana. The tag on the card says whether its numbers come from ATK or MAG.'],
-      ['Guard', 'Cuts everything landing on this hero by 60% for two turns. It restores no mana.'],
+      ['Guard', 'Cuts everything landing on this hero by 50% for two turns. It restores no mana.'],
       ['Item', 'Drink a potion. Uses the whole turn, whoever it is aimed at.'],
     ]));
     box.appendChild(sub('Damage'));

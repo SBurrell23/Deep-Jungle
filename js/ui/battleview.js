@@ -763,7 +763,7 @@
     const potCount = Object.values(DJ.run.inventory).reduce((a, n) => a + (n > 0 ? 1 : 0), 0);
     rail.appendChild(bindKey('w', utilBtn('act-defend', 'status_guard', 'Guard', 'Take cover', false,
       () => submit({ type: 'defend' }),
-      '<b>Guard</b><span>Cuts everything landing on this hero by 60% for two turns.</span>')));
+      '<b>Guard</b><span>Cuts everything landing on this hero by 50% for two turns.</span>')));
     rail.appendChild(bindKey('e', utilBtn('act-item', 'potion_red', 'Items',
       potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
       '<b>Items</b><span>Open your potions and use one on the party. It costs the whole turn.</span>')));

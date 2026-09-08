@@ -83,7 +83,7 @@ and the other turns have to be filled with something else.
 divided into the damage — took about 14% off a hit in exchange for a whole turn. Nobody
 ever guarded, and teaching the simulated player to brace against wind-ups made it lose
 *more* runs, which is the measurement saying the trade was bad rather than the players
-being wrong. Guard now cuts everything landing on that hero by 60%. A monster releasing a
+being wrong. Guard now cuts everything landing on that hero by 50%. A monster releasing a
 wind-up hits the whole party for full power and never crits, so bracing against one is
 usually the best turn on the board.
 
