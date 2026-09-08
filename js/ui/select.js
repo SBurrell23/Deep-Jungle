@@ -25,7 +25,10 @@
     // Only what you have earned. The locked roster lives on the Adventurers screen, where
     // it can show the achievement each one is waiting on; here it was just dead cards.
     for (const h of DJ.HEROES.filter((x) => DJ.isUnlocked(x.id))) {
-      const card = UI.el('div', 'hero-card' + (picked.includes(h.id) ? ' selected' : ''));
+      // The same gold wash the Adventurers page uses for a finished campaign, going
+      // with the tick in the corner.
+      const card = UI.el('div', 'hero-card' + (picked.includes(h.id) ? ' selected' : '') +
+        (DJ.heartWinsWith(h.id) > 0 ? ' won' : ''));
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
       card.setAttribute('aria-label', h.name + ', ' + h.role);

@@ -12,7 +12,7 @@
       settings: { music: 0.5, sfx: 0.7, musicOn: true, sfxOn: true, speed: 1, autoSave: true, screenShake: true, damageNumbers: true, loopOne: false },
       stats: {
         runsStarted: 0, runsWon: 0, runsLost: 0, battlesWon: 0, kills: 0, elitesKilled: 0,
-        crits: 0, maxHit: 0, damageDealt: 0, damageTaken: 0, healingDone: 0, statusesInflicted: 0,
+        crits: 0, maxHit: 0, damageDealt: 0, damageTaken: 0, damageAbsorbed: 0, healingDone: 0, statusesInflicted: 0,
         potionsUsed: 0, potionsByType: {}, revives: 0, heroKOs: 0, defends: 0, skillsUsed: 0,
         nodesVisited: 0, rests: 0, merchants: 0, shrines: 0, events: 0, puzzlesSolved: 0,
         riddlesSolved: 0, totemsSolved: 0, vinesSolved: 0, traps: 0, trainings: 0,
@@ -113,6 +113,7 @@
     const st = battle.stats;
     DJ.bump('damageDealt', st.damageDealt);
     DJ.bump('damageTaken', st.damageTaken);
+    DJ.bump('damageAbsorbed', st.damageAbsorbed);
     DJ.bump('crits', st.crits);
     DJ.setMax('maxHit', st.maxHit);
     DJ.bump('healingDone', st.healing);
@@ -190,7 +191,8 @@
       longestBattle: run.stats.longestBattle || 0,
       tally: {
         battlesWon: grew('battlesWon'), kills: grew('kills'), elitesKilled: grew('elitesKilled'),
-        damageDealt: grew('damageDealt'), damageTaken: grew('damageTaken'), healingDone: grew('healingDone'),
+        damageDealt: grew('damageDealt'), damageTaken: grew('damageTaken'),
+        damageAbsorbed: grew('damageAbsorbed'), healingDone: grew('healingDone'),
         crits: grew('crits'), statusesInflicted: grew('statusesInflicted'), skillsUsed: grew('skillsUsed'),
         defends: grew('defends'), revives: grew('revives'), heroKOs: grew('heroKOs'),
         potionsUsed: grew('potionsUsed'), perfectBattles: grew('perfectBattles'), oneRoundWins: grew('oneRoundWins'),

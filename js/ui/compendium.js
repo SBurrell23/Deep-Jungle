@@ -282,8 +282,11 @@
       (a, b) => (DJ.isUnlocked(b.id) ? 1 : 0) - (DJ.isUnlocked(a.id) ? 1 : 0));
     for (const h of ordered) {
       const unlocked = DJ.isUnlocked(h.id);
+      // A gold wash behind the ones you have carried to the Heart, going with the tick
+      // in their corner, so a finished adventurer reads at a glance across the whole grid.
+      const won = unlocked && DJ.heartWinsWith(h.id) > 0;
       const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked') +
-        (rosterPinned === h.id ? ' pinned' : ''));
+        (won ? ' won' : '') + (rosterPinned === h.id ? ' pinned' : ''));
       card.tabIndex = 0;
       card.appendChild(unlocked ? UI.spriteEl(h.id, 3.0, h.name) : UI.silhouetteEl(h.id, 3.0));
       card.appendChild(UI.el('div', 'rc-name', unlocked ? h.name : '???'));

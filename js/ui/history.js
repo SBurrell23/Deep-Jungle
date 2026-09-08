@@ -189,6 +189,7 @@
       ['Minions felled', num(t.summonKills)],
       ['Damage dealt', num(t.damageDealt), '#ff9b8a'],
       ['Damage taken', num(t.damageTaken), '#ffb0b0'],
+      ['Damage absorbed', num(t.damageAbsorbed), '#7fe0ff'],
       ['Healing done', num(t.healingDone), '#8fe08a'],
       ['Biggest hit', num(e.bestHit), '#ffd27a'],
       ['Critical hits', num(t.crits)],

@@ -121,7 +121,7 @@
     this.current = null;
     this.over = false;
     this.result = null;
-    this.stats = { damageTaken: 0, damageDealt: 0, crits: 0, maxHit: 0, kills: [], heroKOs: 0, statuses: 0, healing: 0, killsBy: {}, summonKills: 0, skillsUsed: 0, defends: 0, revives: 0, potions: 0 };
+    this.stats = { damageTaken: 0, damageDealt: 0, damageAbsorbed: 0, crits: 0, maxHit: 0, kills: [], heroKOs: 0, statuses: 0, healing: 0, killsBy: {}, summonKills: 0, skillsUsed: 0, defends: 0, revives: 0, potions: 0 };
     this.log = [];
   }
   DJ.Battle = Battle;
@@ -365,6 +365,9 @@
     if (DJ.hasStatus(src, 'blind') && this.rng.chance(0.4)) { ev.push({ type: 'hit', source: src, target: tgt, miss: true, fx: skill ? skill.fx : 'hit' }); return 0; }
     const r = this.computeDamage(src, tgt, skill, kind, share);
     if (r.absorbed > 0 && r.shield) {
+      // Damage that arrived and was eaten. Worth counting: it is the whole case for
+      // spending a turn on a Shield, and nothing else on the record shows it.
+      if (tgt.side === 'hero') this.stats.damageAbsorbed += Math.round(r.absorbed);
       r.shield.pool = Math.max(0, Math.round(r.shield.pool - r.absorbed));
       if (r.shield.pool <= 0) {
         const i = tgt.statuses.indexOf(r.shield);

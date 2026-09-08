@@ -177,6 +177,13 @@ button { font-family: inherit; }
   position: relative;
 }
 .hero-card:hover { transform: translateY(-2px); border-color: var(--green); }
+/* Carried the Heart of the Jungle. Background only, and declared before .selected so
+   picking a card still overrides it. */
+.hero-card.won {
+  background:
+    radial-gradient(115% 88% at 50% 0%, rgba(232,198,90,.15), rgba(232,198,90,0) 64%),
+    linear-gradient(#1b3020, #12231a);
+}
 .hero-card.selected { border-color: var(--gold); background: linear-gradient(#243d1f, #1a2c17); box-shadow: 0 0 0 2px rgba(232,198,90,.28); }
 .hero-card.locked { opacity: .55; cursor: pointer; }
 .hero-card.locked .hero-name { color: var(--ink-mute); }
@@ -630,6 +637,13 @@ button { font-family: inherit; }
 }
 .roster-card:hover { transform: translateY(-2px); border-color: var(--green); }
 .roster-card.locked { opacity: .62; }
+/* Carried the Heart of the Jungle. A wash of the same gold as the tick in the corner,
+   kept to the background so it never fights the hover or the pinned outline. */
+.roster-card.won {
+  background:
+    radial-gradient(115% 88% at 50% 0%, rgba(232,198,90,.15), rgba(232,198,90,0) 64%),
+    linear-gradient(#1b3020, #12231a);
+}
 /* The one being held open while you read its panel. */
 .roster-card.pinned {
   border-color: var(--green-2);
