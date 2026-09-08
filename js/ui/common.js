@@ -282,10 +282,10 @@
       const n = turns && turns[id];
       if (d) { tag.style.color = d.color; UI.statusTip(tag, id, null, null, n); }
       box.appendChild(tag);
-      // Four characters rather than a clause, so an ability that grants three of these
-      // still fits on its button.
+      // Just the number, so an ability that grants three of these still fits on its
+      // button. The tooltip on the word says what it counts.
       if (n) {
-        const t = UI.el('span', 'st-turns', n + 't');
+        const t = UI.el('span', 'st-turns', String(n));
         if (d) t.style.color = d.color;
         box.appendChild(t);
       }

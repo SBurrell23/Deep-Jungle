@@ -89,7 +89,7 @@ usually the best turn on the board.
 
 **How long an effect lasts is a property of the ability, not the status.** War Cry grants
 three turns of Rage; Call of the Wild grants two. So every ability that hands out a boon or
-an ailment stamps the duration onto the tinted word itself — "Chilled 3t", "Haste 2t" — read
+an ailment stamps the duration onto the tinted word itself — Chilled 3, Haste 2 — read
 straight off the ability so it cannot drift, and short enough that a card granting three of
 them still fits on its button. Bleed, Poison, Burn and Stun are left bare, because those
 four last the same from every source in the game and the field guide says so once.
