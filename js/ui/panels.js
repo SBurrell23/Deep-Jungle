@@ -497,21 +497,23 @@
     DJ.checkAndAnnounce();
     DJ.sfx(res.potion.effect.revive != null ? 'revive' : 'potion');
     UI.closeOverlay(true);
+
+    // A heal, a cure or a revive is its own receipt: the bars move and the bottle is gone
+    // from the bag. Straight back to the bag rather than a panel reporting a number you
+    // can already see and then asking to be dismissed.
+    const levels = res.lines.filter((l) => l.gains && l.gains.length);
+    if (!levels.length || !UI.levelUpCard) {
+      if (UI.current === 'map') UI.Map.refresh();
+      P.bag();
+      return;
+    }
+
+    // A level is the exception. It is stat gains and sometimes a new ability, and there is
+    // nowhere else to read it.
     UI.openOverlay((panel, close) => {
       UI.overlayHeader(panel, res.potion.name, close);
-      for (const line of res.lines) {
-        // A level is worth showing properly rather than as a list of deltas.
-        if (line.gains && line.gains.length && UI.levelUpCard) {
-          for (const g of UI.mergeGains(line.gains)) panel.appendChild(UI.levelUpCard(g));
-          continue;
-        }
-        const row = UI.el('div', 'loot-row');
-        row.appendChild(UI.spriteEl(line.unit.sprite, 1.8, line.unit.name));
-        const info = UI.el('div');
-        info.appendChild(UI.el('div', 'loot-name', line.unit.name));
-        info.appendChild(UI.el('div', 'loot-stats', line.text));
-        row.appendChild(info);
-        panel.appendChild(row);
+      for (const line of levels) {
+        for (const g of UI.mergeGains(line.gains)) panel.appendChild(UI.levelUpCard(g));
       }
       const back = UI.el('button', 'btn wide');
       back.textContent = 'Back to bag';
