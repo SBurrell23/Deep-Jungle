@@ -64,7 +64,11 @@ at low health comes out better off, but nowhere near full.
 
 **Attrition is the run.** A battle hands back only a small share of health and mana
 afterwards, so both drain across an expedition rather than resetting between fights. That
-makes campfires, potions and the merchant into real decisions. An ability that sweeps the
+makes campfires, potions and the merchant into real decisions. A trader carries a few of
+each potion rather than an unlimited supply — two to five of the basics, one to three on
+the mid shelf, one of anything rare — because it does not matter how little a battle gives
+back if a full purse can always buy the difference. What a shop has left is remembered on
+the run, so leaving and coming back does not restock it. An ability that sweeps the
 whole enemy line loses power for each target beyond the first, so clearing a crowd is what
 sweeps are for rather than what they are always for.
 
@@ -181,11 +185,11 @@ Current tuning, measured over 400 simulated runs across 80 random party composit
 
 | Metric | Value |
 |---|---|
-| Win rate | 12.3% |
-| Average playtime | 47m45s |
-| Winning-run playtime | 81m56s |
-| Battles per run | 18.0 |
-| Nodes per run | 26.2 |
+| Win rate | 10.0% |
+| Average playtime | 46m01s |
+| Winning-run playtime | 72m29s |
+| Battles per run | 17.9 |
+| Nodes per run | 26.0 |
 
 Read that figure as a floor rather than a forecast, and only as a relative measure between
 two builds. The gap between it and a person is large and has been measured directly: four

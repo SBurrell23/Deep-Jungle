@@ -148,17 +148,18 @@ function resolveNode(run, node, rng) {
     return out;
   }
   if (t === 'merchant') {
-    const stock = run.merchantStock();
-    // Buy potions when affordable, at the shelf price for this node's level so the
-    // simulated purse feels the same inflation a player does.
-    // Buy against what the party is actually short of, and keep buying while there is
-    // gold spare. Hoarding coins that never get spent was flattering nothing.
+    const stock = run.merchantStock(node.id);
+    // Buy at the shelf price for this node's level, so the simulated purse feels the same
+    // inflation a player does - and only as far as the shelf goes, since a trader now
+    // carries a few of a thing rather than all of it.
     const want = ['red', 'green', 'yellow', 'blue', 'red', 'blue'];
     for (let pass = 0; pass < 3; pass++) {
       for (const p of want) {
+        const slot = stock.potions.find((x) => x.id === p && x.n > 0);
+        if (!slot) continue;
         const price = DJ.potionPrice(p, node.level);
         const keep = pass === 0 ? 40 : 90;      // leave something for equipment
-        if (run.gold >= price + keep) { run.gold -= price; run.addPotion(p, 1); }
+        if (run.gold >= price + keep) { run.gold -= price; run.addPotion(p, 1); slot.n--; }
       }
     }
     for (const item of stock.items) {

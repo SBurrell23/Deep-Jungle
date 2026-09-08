@@ -603,8 +603,7 @@
   // ---------------- merchant ----------------
   function merchant(node) {
     const run = DJ.run;
-    if (!node._stock) node._stock = run.merchantStock();
-    const stock = node._stock;
+    const stock = run.merchantStock(node.id);
     run.stats.merchants++;
     if (!node._counted) { node._counted = true; DJ.bump('merchants'); }
 
@@ -649,12 +648,17 @@
       });
 
       body.appendChild(UI.el('h4', null, 'Potions')).style.cssText = 'margin:14px 0 8px;font-size:14px';
-      stock.potions.forEach((pid) => {
+      const onShelf = stock.potions.filter((p) => p.n > 0);
+      if (!onShelf.length) body.appendChild(UI.el('p', 'empty-note', 'Cleaned out.'));
+      onShelf.forEach((slot) => {
         // Priced against this node's level, so the shelf keeps pace with the party's purse.
-        const price = DJ.potionPrice(pid, node.level);
-        body.appendChild(UI.potionLine(pid, null, mkBuy(DJ.POTIONS[pid].name, price, run.gold >= price, () => {
+        const price = DJ.potionPrice(slot.id, node.level);
+        // The count is what he has left, not what you are carrying.
+        body.appendChild(UI.potionLine(slot.id, slot.n, mkBuy(DJ.POTIONS[slot.id].name, price, run.gold >= price, () => {
           run.gold -= price; DJ.bump('goldSpent', price);
-          run.addPotion(pid, 1);
+          run.addPotion(slot.id, 1);
+          slot.n--;
+          DJ.saveRun(run);
           merchant(node);
         })));
       });

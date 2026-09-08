@@ -81,6 +81,7 @@
     // end except the one the jungle picks, and nobody gains another level.
     this.beyond = false;
     this.stash = [];                  // unequipped items
+    this.shops = {};                  // what each trader has left, by node id
     this.currentId = this.map.startId;
     this.visited = { [this.map.startId]: true };
     this.path = [this.map.startId];
@@ -370,7 +371,16 @@
     }
   };
 
-  R.merchantStock = function () {
+  // How many of each a trader is carrying. Unlimited stock meant a full purse could
+  // always be turned into as much healing as it would buy, which undoes attrition
+  // whatever a battle hands back.
+  R.SHOP_STOCK = { basic: [2, 5], mid: [1, 3], premium: [1, 1], rare: [1, 1] };
+
+  R.merchantStock = function (nodeId) {
+    const key = nodeId || this.currentId;
+    // Kept on the run rather than on the map node, so what you bought stays bought
+    // across a save and a reload instead of the shelf quietly refilling.
+    if (this.shops[key]) return this.shops[key];
     const rng = this.rng;
     const level = this.node().level;
     const items = [];
@@ -379,11 +389,16 @@
     // Everything above that is the mid shelf. A premium tonic appears only now and then,
     // and mostly deep in the run, where a party might actually have the gold for one.
     const mid = rng.shuffle(['blue', 'green', 'purple']).slice(0, 2);
-    const potions = ['red', 'yellow'].concat(mid);
+    const ids = ['red', 'yellow'].concat(mid);
     if (rng.chance(level >= 10 ? 0.3 : 0.1)) {
-      potions.push(rng.weighted([{ v: 'orange', w: 5 }, { v: 'phoenix', w: 2 }, { v: 'elixir', w: 1 }]));
+      ids.push(rng.weighted([{ v: 'orange', w: 5 }, { v: 'phoenix', w: 2 }, { v: 'elixir', w: 1 }]));
     }
-    return { items, potions: rng.shuffle(potions) };
+    const potions = rng.shuffle(ids).map((id) => {
+      const range = R.SHOP_STOCK[DJ.POTIONS[id].grade] || R.SHOP_STOCK.mid;
+      return { id, n: rng.int(range[0], range[1]) };
+    });
+    this.shops[key] = { items, potions };
+    return this.shops[key];
   };
 
   R.serialize = function () {
@@ -401,6 +416,15 @@
       pending: !!this.pending, pendingRng: this.pendingRng == null ? null : this.pendingRng,
       elapsed: this.elapsed + (Date.now() - this.startedAt), stats: this.stats, discovered: this.discovered,
       startStats: this.startStats, startedWall: this.startedWall,
+      // Items are stored by id plus whether they went; potions by id and how many are left.
+      shops: Object.keys(this.shops).reduce((acc, k) => {
+        const s = this.shops[k];
+        acc[k] = {
+          items: s.items.map((it) => ({ id: it.id, sold: !!it._sold })),
+          potions: s.potions.map((p) => ({ id: p.id, n: p.n })),
+        };
+        return acc;
+      }, {}),
       doneNodes: Object.keys(this.map.nodeById).filter((k) => this.map.nodeById[k].done),
     };
   };
@@ -427,6 +451,20 @@
     r.stats = Object.assign(r.stats, d.stats || {}); r.discovered = d.discovered || {};
     r.startStats = d.startStats || r.startStats;
     r.startedWall = d.startedWall || r.startedWall;
+    for (const k of Object.keys(d.shops || {})) {
+      const s = d.shops[k];
+      r.shops[k] = {
+        items: (s.items || []).map((e) => {
+          const it = DJ.ITEM_BY_ID[e.id];
+          if (!it) return null;
+          // A shop's copy is its own, so marking it sold cannot touch the catalogue entry.
+          const copy = Object.assign({}, it);
+          copy._sold = !!e.sold;
+          return copy;
+        }).filter(Boolean),
+        potions: (s.potions || []).map((e) => ({ id: e.id, n: e.n })),
+      };
+    }
     for (const id of d.doneNodes || []) if (r.map.nodeById[id]) r.map.nodeById[id].done = true;
     return r;
   };
