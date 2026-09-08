@@ -380,7 +380,7 @@ button { font-family: inherit; }
 
 .act-btn {
   background: linear-gradient(#1d3a26, #162c1d); border: 1px solid var(--line-2);
-  border-radius: 9px; padding: 7px 12px; cursor: pointer; text-align: left; color: var(--ink);
+  border-radius: 9px; padding: 6px 12px; cursor: pointer; text-align: left; color: var(--ink);
   transition: transform .07s, border-color .15s, background .15s, box-shadow .15s;
   position: relative; min-height: 0; overflow: hidden;
   display: flex; flex-direction: column; justify-content: center;
@@ -416,7 +416,9 @@ button { font-family: inherit; }
 .a-scale.sc-phys { color: #ffb0a0; background: rgba(216,115,94,.16); border-color: rgba(216,115,94,.4); }
 .a-scale.sc-mag  { color: #d0b0ff; background: rgba(169,127,224,.16); border-color: rgba(169,127,224,.42); }
 .sk-meta { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
-.act-btn .a-desc { font-size: 12.5px; color: var(--ink-dim); margin-top: 3px; line-height: 1.32; }
+/* Two lines have to fit: at 1.32 a wrapped description lost its last two pixels on
+   every button wide enough to wrap in the first place. */
+.act-btn .a-desc { font-size: 12.5px; color: var(--ink-dim); margin-top: 2px; line-height: 1.22; }
 
 /* Attack: always available, so it reads as the anchor of the menu. */
 .act-attack {

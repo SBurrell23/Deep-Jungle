@@ -763,10 +763,10 @@
     const potCount = Object.values(DJ.run.inventory).reduce((a, n) => a + (n > 0 ? 1 : 0), 0);
     rail.appendChild(bindKey('w', utilBtn('act-defend', 'status_guard', 'Guard', 'Raise DEF', false,
       () => submit({ type: 'defend' }),
-      'Guard: raises this hero\u2019s DEF by 50% for 2 turns.')));
+      '<b>Guard</b><span>Raises this hero\u2019s DEF by 50% for two turns.</span>')));
     rail.appendChild(bindKey('e', utilBtn('act-item', 'potion_red', 'Items',
       potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
-      'Open your potions and use one on the party.')));
+      '<b>Items</b><span>Open your potions and use one on the party. It costs the whole turn.</span>')));
     menu.appendChild(rail);
 
     // Right: four fixed skill slots. Locked ones stay as empty placeholders so the
@@ -804,7 +804,6 @@
       b.appendChild(n);
       b.appendChild(UI.skillDesc(sk, 'a-desc'));
       b.disabled = !usable;
-      b.title = usable ? sk.desc : ((sk.mp || 0) > u.mp ? 'Not enough MP' : 'No valid target');
       b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'skill', skillId: sid }, sk.target); });
       skills.appendChild(bindKey(String(i + 1), b));
     }
@@ -827,7 +826,6 @@
     if (DJ.SPRITES[weapon]) b.appendChild(UI.spriteEl(weapon, 2, 'attack'));
     const label = UI.el('div', 'a-name', 'Attack');
     b.appendChild(label);
-    b.title = 'A basic weapon strike. Always available and costs no MP.';
     b.addEventListener('click', () => { DJ.sfx('click'); beginAction({ type: 'attack' }, 'enemy'); });
     return b;
   }
@@ -835,7 +833,7 @@
   function utilBtn(cls, icon, name, desc, disabled, fn, tip) {
     const b = UI.el('button', 'act-btn act-util ' + cls);
     b.type = 'button';
-    if (tip) b.title = tip;
+    if (tip) UI.tip(b, tip);
     if (DJ.SPRITES[icon]) b.appendChild(UI.spriteEl(icon, 1.4, name));
     const t = UI.el('div');
     t.style.minWidth = '0';
@@ -945,7 +943,9 @@
     for (const entry of order) {
       const u = entry.unit;
       const slot = UI.el('div', 'to-slot' + (u.side === 'enemy' ? ' enemy' : '') + (entry.current ? ' now' : '') + (u.alive ? '' : ' dead'));
-      slot.title = u.name + '  ' + u.hp + '/' + u.maxHp + ' HP';
+      // The turn strip is the last thing on this screen using a browser tooltip; it
+      // uses the same instant one as everything else.
+      UI.tip(slot, '<b>' + u.name + '</b><span>' + u.hp + ' / ' + u.maxHp + ' HP</span>');
       const sc = u.size >= 64 ? 0.5 : u.size >= 48 ? 0.66 : u.size >= 40 ? 0.8 : 1;
       slot.appendChild(UI.spriteEl(u.sprite, sc, u.name));
       const hp = UI.el('div', 'to-hp');
