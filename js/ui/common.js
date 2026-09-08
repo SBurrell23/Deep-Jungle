@@ -285,7 +285,7 @@
       // Just the number, so an ability that grants three of these still fits on its
       // button. The tooltip on the word says what it counts.
       if (n) {
-        const t = UI.el('span', 'st-turns', String(n));
+        const t = UI.el('span', 'st-turns', '(' + n + ')');
         if (d) t.style.color = d.color;
         box.appendChild(t);
       }

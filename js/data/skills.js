@@ -78,7 +78,7 @@
   // -- Kua Ta Lancer --
   def('lunge',        { name: 'Lunge', kind: 'phys', target: 'enemy', power: 1.95, mp: 5, fx: 'pierce', sfx: 'pierce', desc: 'A piercing thrust.' });
   def('sweep',        { name: 'Spear Sweep', kind: 'phys', target: 'enemies', power: 1.35, mp: 9, fx: 'slash', sfx: 'slash', desc: 'Sweep the spear across all enemies.' });
-  def('war_cry',      { name: 'War Cry', kind: 'buff', target: 'allies', mp: 10, status: { id: 'rage', turns: 3, chance: 1 }, fx: 'roar', sfx: 'roar', desc: 'Party gains Rage (+ATK) for 3 turns.' });
+  def('war_cry',      { name: 'War Cry', kind: 'buff', target: 'allies', mp: 10, status: { id: 'rage', turns: 3, chance: 1 }, fx: 'roar', sfx: 'roar', desc: 'The whole party gains Rage.' });
   def('impale',       { name: 'Impale', kind: 'phys', target: 'enemy', power: 2.8, mp: 23, status: { id: 'bleed', turns: 4, chance: 0.8 }, fx: 'pierce', sfx: 'pierce', desc: 'Massive damage, causes Bleed.' });
   // -- Frog Monk --
   def('tongue_lash',  { name: 'Tongue Lash', kind: 'phys', target: 'enemy', power: 1.5, mp: 4, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'hit', sfx: 'hit', desc: 'Whip strike that may Stun.' });
@@ -189,7 +189,7 @@
 
   // -- Scarab Alchemist --
   def('acid_flask',   { name: 'Acid Flask', kind: 'mag', target: 'enemy', power: 1.7, mp: 5, status: { id: 'weak', turns: 3, chance: 0.6 }, fx: 'poison', sfx: 'poison', desc: 'Corrosive glass. Eats armour, and leaves the target Weak.' });
-  def('smoke_screen', { name: 'Smoke Screen', kind: 'buff', target: 'allies', mp: 7, status: { id: 'shield', turns: 3, chance: 1, val: 0.3 }, fx: 'debuff', sfx: 'debuff', desc: 'Cover the party in choking smoke: Shield for 3 turns.' });
+  def('smoke_screen', { name: 'Smoke Screen', kind: 'buff', target: 'allies', mp: 7, status: { id: 'shield', turns: 3, chance: 1, val: 0.3 }, fx: 'debuff', sfx: 'debuff', desc: 'Choking smoke covers the party: a Shield for everyone.' });
   def('volatile_mix', { name: 'Volatile Mix', kind: 'mag', target: 'enemies', power: 1.15, mp: 16, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison_cloud', sfx: 'explosion', desc: 'Two reagents that should never have met. Everything nearby is Poisoned.' });
   def('philos_fire',  { name: "Philosopher's Fire", kind: 'mag', target: 'enemies', power: 1.7, mp: 37, status: { id: 'burn', turns: 2, chance: 0.7 }, fx: 'inferno', sfx: 'explosion', desc: 'The reaction he spent his life perfecting. The line Burns.' });
 

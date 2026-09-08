@@ -259,9 +259,15 @@
   const STAT_COLOR = { hp: '#4fbf5a', mp: '#4f9fe0', atk: '#e05252', mag: '#a97fe0', def: '#7fc8ff', spd: '#e8c65a' };
 
   let rosterHover = null;
+  // Clicking a card pins it. Hovering still previews freely, so browsing the grid is
+  // unchanged, but the panel falls back to the pinned adventurer once the cursor leaves
+  // rather than emptying itself - which it used to do the instant you set off toward it.
+  let rosterPinned = null;
+  const rosterShown = () => rosterHover || rosterPinned;
 
   R.open = function () {
     rosterHover = null;
+    rosterPinned = null;
     R.render();
     UI.show('roster');
   };
@@ -276,7 +282,8 @@
       (a, b) => (DJ.isUnlocked(b.id) ? 1 : 0) - (DJ.isUnlocked(a.id) ? 1 : 0));
     for (const h of ordered) {
       const unlocked = DJ.isUnlocked(h.id);
-      const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked'));
+      const card = UI.el('div', 'roster-card' + (unlocked ? '' : ' locked') +
+        (rosterPinned === h.id ? ' pinned' : ''));
       card.tabIndex = 0;
       card.appendChild(unlocked ? UI.spriteEl(h.id, 3.0, h.name) : UI.silhouetteEl(h.id, 3.0));
       card.appendChild(UI.el('div', 'rc-name', unlocked ? h.name : '???'));
@@ -293,7 +300,15 @@
       const show = () => { rosterHover = h.id; renderPanel(); };
       card.addEventListener('mouseenter', show);
       card.addEventListener('focus', show);
-      card.addEventListener('click', () => { DJ.sfx('page'); rosterHover = h.id; renderPanel(); });
+      card.addEventListener('click', () => {
+        DJ.sfx('page');
+        // A second click on the same card lets it go again.
+        rosterPinned = rosterPinned === h.id ? null : h.id;
+        rosterHover = h.id;
+        UI.$$('.roster-card', grid).forEach((c) => c.classList.remove('pinned'));
+        if (rosterPinned) card.classList.add('pinned');
+        renderPanel();
+      });
       grid.appendChild(card);
     }
     UI.$('#rosterCount').textContent = `${DJ.profile.unlocked.length} / ${DJ.HEROES.length}`;
@@ -305,11 +320,12 @@
     const box = UI.$('#rosterDetail');
     if (!box) return;
     box.innerHTML = '';
-    if (!rosterHover) {
-      box.appendChild(UI.el('p', 'muted center', 'Hover an adventurer to see their stats and skills.'));
+    if (!rosterShown()) {
+      box.appendChild(UI.el('p', 'muted center',
+        'Hover an adventurer to see their stats and skills. Click one to keep it here.'));
       return;
     }
-    const h = DJ.HERO_BY_ID[rosterHover];
+    const h = DJ.HERO_BY_ID[rosterShown()];
     const unlocked = DJ.isUnlocked(h.id);
 
     const head = UI.el('div');

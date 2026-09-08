@@ -630,6 +630,11 @@ button { font-family: inherit; }
 }
 .roster-card:hover { transform: translateY(-2px); border-color: var(--green); }
 .roster-card.locked { opacity: .62; }
+/* The one being held open while you read its panel. */
+.roster-card.pinned {
+  border-color: var(--green-2);
+  box-shadow: 0 0 0 1px var(--green-2), 0 0 14px rgba(143,224,138,.22);
+}
 .roster-card canvas { display: block; margin: 0 auto 7px; }
 .rc-name { font-size: 15.5px; font-weight: 700; line-height: 1.2; }
 .rc-role { font-size: 14px; color: var(--ink-mute); margin-top: 3px; }
