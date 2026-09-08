@@ -257,7 +257,11 @@
       if (at > last) box.appendChild(document.createTextNode(text.slice(last, at)));
       const id = STATUS_WORDS.map[m[2].toLowerCase()];
       const d = DJ.STATUS[id];
-      const tag = UI.el('span', 'st-word', m[2]);
+      // Statuses are proper nouns here, so the word is capitalised whatever case the
+      // description happened to use. The suffix is left alone: "slows" becomes "Slows",
+      // not "Slow".
+      const word = m[2].charAt(0).toUpperCase() + m[2].slice(1);
+      const tag = UI.el('span', 'st-word', word);
       if (d) { tag.style.color = d.color; UI.statusTip(tag, id); }
       box.appendChild(tag);
       last = at + m[2].length;

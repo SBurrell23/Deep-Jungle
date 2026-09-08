@@ -54,19 +54,16 @@
     const T = DJ.STATUS_TUNE || {};
     switch (id) {
       case 'poison': return Math.round(T.poisonPct * 1000) / 10 + '% of max HP per stack, each turn  ·  up to ' +
-        T.poisonMaxStacks + ' stacks  ·  ' + T.poisonTurns + ' turns, reset by every fresh dose';
+        T.poisonMaxStacks + ' stacks  ·  ' + T.poisonTurns + ' turns';
       case 'burn':   return Math.round(T.burnPct * 100) + '% of max HP each turn  ·  2 turns';
       case 'bleed':  return Math.round(T.bleedPct * 1000) / 10 + '% of max HP each turn  ·  4 turns';
       case 'regen':  return Math.round(T.regenPct * 100) + '% of max HP healed each turn';
-      case 'shock':  return 'Takes ' + Math.round((T.shockAmp - 1) * 100) + '% more damage from every source';
-      case 'chill':  return 'SPD ' + Math.round((1 - 0.75) * 100) + '% lower  ·  healing received cut to ' + pct(T.chillHeal);
-      case 'thorns': return 'Reflects ' + pct(T.thornsShare) + ' of every blow that lands (a thorns trinket reflects ' + pct(T.thornsPassive) + ')';
-      case 'shield': return 'Soaks a pool of damage sized from the wearer’s max HP; ends when the pool or the turns run out';
-      case 'stun':   return 'Loses its turn entirely. A wind-up interrupted this way is wasted';
-      case 'taunt':  return 'Enemies are six times more likely to pick this hero';
-      // Weak, Slow, Haste, Rage, Guard and Blind already carry their own numbers in the
-      // one-line description, so a second line under them would only repeat it.
-      case 'charge': return 'Releases on the next turn. Stun it and the whole thing is lost';
+      case 'thorns': return 'A thorns trinket reflects ' + pct(T.thornsPassive) + ' instead';
+      case 'shield': return 'The pool is sized from the wearer’s max HP';
+      case 'taunt':  return 'Six times more likely to be targeted';
+      case 'charge': return 'Lost entirely if the unit is stunned before it releases';
+      // Everything else states its own numbers in the one-line description, so a second
+      // line under it would only say the same thing again.
       default: return '';
     }
   }
@@ -209,23 +206,14 @@
 
   function buildAilments(box) {
     box.appendChild(h('Ailments'));
-    box.appendChild(p('Harmful effects. Every one of these can land on your party as well as on a monster, and both sides have abilities that inflict them.'));
+    box.appendChild(p('Harmful effects. Both sides can inflict all of them, and a green potion clears every one at once.'));
     box.appendChild(statusTable(true));
-    box.appendChild(sub('The three damage-over-time effects'));
-    box.appendChild(p('Poison, Burn and Bleed are deliberately different shapes, and reading which one is stuck to you tells you how long you have.'));
-    box.appendChild(defs([
-      ['Poison', 'Stacks without limit up to eight doses. Each fresh dose adds a stack and resets a short clock, so a poisoner who keeps working gets steadily worse. Stop the poisoner and the entire stack falls off at once.', DJ.STATUS.poison.color, DJ.STATUS.poison.icon],
-      ['Burn', 'Short and vicious. The heaviest damage of the three, over only two turns.', DJ.STATUS.burn.color, DJ.STATUS.burn.icon],
-      ['Bleed', 'Slow and stubborn. The least damage per turn, for twice as long as anything else.', DJ.STATUS.bleed.color, DJ.STATUS.bleed.icon],
-    ]));
-    box.appendChild(note('A green potion clears every ailment at once. Against a monster that stacks Poison this is worth far more than the small heal attached to it.'));
   }
 
   function buildBoons(box) {
     box.appendChild(h('Boons'));
-    box.appendChild(p('Helpful effects. Monsters use most of these too, which is why a support monster left alive can be worse news than the thing hitting you.'));
+    box.appendChild(p('Helpful effects. Monsters use most of these too.'));
     box.appendChild(statusTable(false));
-    box.appendChild(note('Shield carries a pool of damage rather than a percentage. A hit the pool swallows whole deals nothing at all, which is the only way to come through a fight completely untouched.'));
   }
 
   function buildTactics(box) {
@@ -346,7 +334,10 @@
       nav.appendChild(b);
     }
 
+    // Sections build into a centred column rather than straight into the scroller.
+    const inner = UI.el('div', 'help-inner');
+    body.appendChild(inner);
     const found = SECTIONS.find((s) => s[0] === section) || SECTIONS[0];
-    found[2](body);
+    found[2](inner);
   };
 })(typeof window !== 'undefined' ? window : globalThis);
