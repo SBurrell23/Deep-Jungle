@@ -185,10 +185,10 @@
   // What each stat actually does, for the tooltips on stat boxes and bars.
   DJ.STAT_HELP = {
     hp:  { name: 'Health', text: 'How much damage this adventurer can take before falling. Reaching 0 knocks them out until they are revived.' },
-    mp:  { name: 'Mana', text: 'Spent to cast abilities. Restored by Guarding, by resting at a campfire, and by blue potions.' },
+    mp:  { name: 'Mana', text: 'Spent to cast abilities. Restored by resting at a campfire, by levelling up, and by blue potions.' },
     atk: { name: 'Attack', text: 'Drives damage from physical abilities and basic attacks. Reduced by the target\u2019s DEF.' },
     mag: { name: 'Magic', text: 'Drives damage from spells, and the strength of healing. Partly reduced by the target\u2019s DEF.' },
-    def: { name: 'Defence', text: 'Reduces incoming damage. Higher DEF means every hit lands for less; Guard raises it 50% for two turns.' },
+    def: { name: 'Defence', text: 'Reduces incoming damage. It counts in full against physical attacks but only partly against magic, so a heavily armoured monster is softer to spells than to swords.' },
     spd: { name: 'Speed', text: 'Sets turn order, and adds a small bonus to critical hit chance against slower foes.' },
   };
   UI.statTip = function (el, key) {

@@ -321,20 +321,22 @@
 
     // statuses
     if (u.statuses.length) {
+      // A quarter larger than they were: at the old size the difference between, say,
+      // Poison and Regen was a couple of pixels of colour.
       let ix = x;
       const iy = barBottom + 3;
       for (const st of u.statuses.slice(0, 6)) {
         const def = DJ.STATUS[st.id];
         // Remember the hit box so hovering the icon can explain the effect.
-        statusHits.push({ x: ix - 1, y: iy - 1, w: 14, h: 14, id: st.id, turns: st.turns });
-        const drew = DJ.drawSprite(ctx, def ? def.icon : 'status_poison', ix, iy + 12, 0.85, { center: true });
-        if (!drew) { ctx.fillStyle = def ? def.color : '#fff'; ctx.fillRect(ix, iy, 7, 7); }
+        statusHits.push({ x: ix - 1, y: iy - 1, w: 18, h: 18, id: st.id, turns: st.turns });
+        const drew = DJ.drawSprite(ctx, def ? def.icon : 'status_poison', ix, iy + 15, 1.06, { center: true });
+        if (!drew) { ctx.fillStyle = def ? def.color : '#fff'; ctx.fillRect(ix, iy, 9, 9); }
         ctx.save();
-        ctx.font = 'bold 8px monospace'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+        ctx.font = 'bold 9px monospace'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
         ctx.strokeStyle = 'rgba(0,0,0,.9)'; ctx.lineWidth = 2;
-        ctx.strokeText(String(st.turns), ix + 6, iy + 13); ctx.fillText(String(st.turns), ix + 6, iy + 13);
+        ctx.strokeText(String(st.turns), ix + 8, iy + 16); ctx.fillText(String(st.turns), ix + 8, iy + 16);
         ctx.restore();
-        ix += 13;
+        ix += 16;
       }
     }
   }
