@@ -34,6 +34,7 @@
     buff_atk:     { pack: '5', row: 6,  frames: 6, variant: 'a' },
     debuff:       { pack: '5', row: 7,  frames: 6, variant: 'b' },
     arcane:       { pack: '5', row: 15, frames: 7, variant: 'b' },
+    arcane_green: { pack: '5', row: 15, frames: 7, variant: 'd' },   // goblin sorcery
     arcane_burst: { pack: '5', row: 28, frames: 9, variant: 'b' },
     dark:         { pack: '5', row: 17, frames: 8, variant: 'b' },
     curse:        { pack: '5', row: 7,  frames: 6, variant: 'b' },
@@ -67,7 +68,7 @@
   def('leaf_cyclone', { name: 'Leaf Cyclone', kind: 'phys', target: 'enemies', power: 1.55, mp: 10, fx: 'wind', sfx: 'slash', desc: 'Spinning slash hitting all enemies.' });
   def('elven_fury',   { name: 'Elven Fury', kind: 'phys', target: 'enemy', power: 1.55, hits: 3, mp: 14, fx: 'slash_big', sfx: 'slash', desc: 'Three rapid strikes.' });
   // -- Goblin Mage --
-  def('spark',        { name: 'Spark', kind: 'mag', target: 'enemy', power: 1.6, mp: 4, fx: 'arcane', sfx: 'magic', desc: 'A crackle of green sorcery.' });
+  def('spark',        { name: 'Spark', kind: 'mag', target: 'enemy', power: 1.6, mp: 4, fx: 'arcane_green', sfx: 'magic', desc: 'A crackle of green sorcery.' });
   def('fire_gout',    { name: 'Fire Gout', kind: 'mag', target: 'enemy', power: 1.9, mp: 7, status: { id: 'burn', turns: 3, chance: 0.6 }, fx: 'fire', sfx: 'fire', desc: 'Burns the target, may inflict Burn.' });
   def('mana_storm',   { name: 'Mana Storm', kind: 'mag', target: 'enemies', power: 1.22, mp: 13, fx: 'arcane_burst', sfx: 'magic', desc: 'Arcane blast hitting all enemies.' });
   def('meteor',       { name: 'Goblin Meteor', kind: 'mag', target: 'enemies', power: 2.0, mp: 23, status: { id: 'burn', turns: 2, chance: 0.5 }, fx: 'inferno', sfx: 'explosion', desc: 'Devastating fire on all foes.' });
