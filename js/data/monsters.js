@@ -120,7 +120,7 @@
   m('old_gullet', 'Old Gullet', 2, 270, 21, 7, 14, 4, ['b_tongue_drag', 'b_swell', 'm_devour', 'm_stomp'], 'amphibian beast boss', 'Has held the same wallow for sixty years without once standing up. Everything that walked past it is still in there.', 'boss');
 
   // ---- Alternate guardians, region 1. One of a region's three is drawn per run. ----
-  m('sunken_choir', 'The Sunken Choir', 4, 484, 20, 35, 14, 13, ['b_undertow', 'b_choir_swell', 'm_wail', 'm_drain'], 'undead aquatic spirit boss', 'Everyone the Mire has taken, still holding hands and still singing. They have had a great deal of time to practise.', 'boss');
+  m('sunken_choir', 'The Sunken Choir', 4, 505, 22, 43, 14, 13, ['b_undertow', 'b_choir_swell', 'm_wail', 'm_drain'], 'undead aquatic spirit boss', 'Everyone the Mire has taken, still holding hands and still singing. They have had a great deal of time to practise.', 'boss');
   m('kettlemaw', 'Old Kettlemaw', 4, 642, 39, 9, 20, 5, ['b_ground_gives', 'b_kettle_jaw', 'm_harden', 'm_stomp'], 'beast reptile aquatic boss', 'Two centuries of silt, shell and somebody else\'s temple wall, walking. It has never once needed to hurry.', 'boss');
 
   // ---- Alternate guardians, region 2. One of a region's three is drawn per run. ----

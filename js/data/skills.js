@@ -312,7 +312,7 @@
 
   // ---- Alternate region bosses, region 1 ----
   def('b_undertow',     { name: 'Undertow', kind: 'drain', target: 'enemies', power: 1.05, mp: 0, drain: 0.45, fx: 'water', sfx: 'drain', desc: 'The water pulls at everyone, and the Choir grows on what it takes.' });
-  def('b_choir_swell',  { name: 'Swell', kind: 'heal', target: 'ally', power: 1.3, mp: 0, fx: 'water', sfx: 'heal', desc: 'It counts its drowned again and finds that there are more of them.' });
+  def('b_choir_swell',  { name: 'Another Voice', kind: 'heal', target: 'ally', power: 1.35, mp: 0, fx: 'water', sfx: 'heal', desc: 'It counts its drowned again and finds that there are more of them.' });
   def('b_ground_gives', { name: 'The Ground Gives', kind: 'phys', target: 'enemies', power: 1.3, mp: 0, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'earth', sfx: 'explosion', desc: 'What everyone was standing on turns out to have been him.' });
   def('b_kettle_jaw',   { name: 'Kettle Jaw', kind: 'phys', target: 'enemy', power: 2.2, mp: 0, status: { id: 'bleed', turns: 3, chance: 0.7 }, fx: 'hit_big', sfx: 'bite', desc: 'The jaw closes slowly. It does not open again.' });
 
