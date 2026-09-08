@@ -247,7 +247,7 @@
     // status bars so it is never hidden behind them
     if (waitingFor === u) {
       ctx.save();
-      const barTop = s.y - sh - 20 - ((s.labelRow || 0) % 3) * 15;
+      const barTop = barTopFor(s, sh, s.labelRow || 0);
       const ay = barTop - 26 + Math.sin(lastT * 0.005) * 4;
       ctx.shadowColor = 'rgba(255,220,90,.95)';
       ctx.shadowBlur = 16 + Math.sin(lastT * 0.006) * 6;
@@ -273,6 +273,16 @@
     if (!dead) drawUnitBars(s, u, sw, sh, s.labelRow || 0);
   }
 
+  // How high above a unit its bars sit. The first slot gets a little extra lift, because
+  // it is the lowest of the three and its bars were crowding the sprite underneath.
+  function barTopFor(s, sh, idx) {
+    const row = (idx || 0) % 3;
+    const floor = barFloor();
+    let top = s.y - sh - 21 - (row === 0 ? 7 : 0) - row * 18;
+    if (top < floor) top = floor + row * 18;
+    return top;
+  }
+
   // Lowest y a health bar may occupy, just under the turn order strip. Measured once a
   // frame, since the strip's height changes with the number of combatants.
   let floorCache = { at: 0, v: 0 };
@@ -292,12 +302,7 @@
   function drawUnitBars(s, u, sw, sh, idx) {
     // There is room above the battlefield, so the bars take it: wide enough that the
     // segment ticks are countable and tall enough to read at a glance.
-    // The turn order strip sits over the top of the canvas. On a short window a tall
-    // sprite's bars would slide underneath it, so they are pushed back down below it
-    // instead, keeping the row stagger so neighbouring bars still read apart.
-    const floor = barFloor();
-    let top = s.y - sh - 21 - (idx % 3) * 18;
-    if (top < floor) top = floor + (idx % 3) * 18;
+    const top = barTopFor(s, sh, idx);
     const bw = u.side === 'hero' ? Math.min(Math.max(56, sw * 1.05), 84) : Math.max(66, sw * 1.15);
     const x = s.x - bw / 2;
     if (u.side === 'enemy') {
@@ -323,10 +328,10 @@
     if (u.statuses.length) {
       // A quarter larger than they were: at the old size the difference between, say,
       // Poison and Regen was a couple of pixels of colour.
-      // Centre the row of icons under the bars rather than left-aligning it, now that a
-      // full set of six is wider than the bars above it.
-      const n = Math.min(6, u.statuses.length);
-      let ix = x + bw / 2 - ((n - 1) * 20) / 2;
+      // Icons are anchored at their centres and 17px wide, so the row starts half an icon
+      // in from the left edge of the bars. That puts the first icon's left edge flush
+      // with where the health bar begins.
+      let ix = x + 9;
       const iy = barBottom + 3;
       for (const st of u.statuses.slice(0, 6)) {
         const def = DJ.STATUS[st.id];
