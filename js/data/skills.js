@@ -64,7 +64,7 @@
   // ================= HERO SKILLS =================
   // -- Elf Warrior --
   def('sword_dance',  { name: 'Sword Dance', kind: 'phys', target: 'enemy', power: 2.0, mp: 5, fx: 'slash', sfx: 'slash', desc: 'A graceful strike dealing 170% damage.' });
-  def('shield_wall',  { name: 'Shield Wall', kind: 'buff', target: 'allies', mp: 6, status: { id: 'guard', turns: 2, chance: 1 }, self: { id: 'taunt', turns: 2, chance: 1 }, fx: 'shield', sfx: 'buff', desc: 'The party guards behind you, and the enemy comes for you.' });
+  def('shield_wall',  { name: 'Shield Wall', kind: 'buff', target: 'allies', mp: 6, status: { id: 'guard', turns: 2, chance: 1 }, self: { id: 'taunt', turns: 2, chance: 1 }, fx: 'shield', sfx: 'buff', desc: 'The party guards behind you, and taunts the enemy.' });
   def('leaf_cyclone', { name: 'Leaf Cyclone', kind: 'phys', target: 'enemies', power: 1.55, mp: 10, fx: 'wind', sfx: 'slash', desc: 'Spinning slash hitting all enemies.' });
   def('elven_fury',   { name: 'Elven Fury', kind: 'phys', target: 'enemy', power: 1.55, hits: 3, mp: 14, fx: 'slash_big', sfx: 'slash', desc: 'Three rapid strikes.' });
   // -- Goblin Mage --
@@ -109,7 +109,7 @@
   def('wither',       { name: 'Wither', kind: 'drain', target: 'enemy', power: 1.95, mp: 16, drain: 0.38, fx: 'dark', sfx: 'drain', desc: 'Drain life; heals you for half.' });
   // -- Golem Guardian --
   def('boulder_fist', { name: 'Boulder Fist', kind: 'phys', target: 'enemy', power: 2.1, mp: 5, fx: 'earth', sfx: 'hit', desc: 'Crushing stone punch.' });
-  def('bulwark',      { name: 'Bulwark', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'regen', turns: 2, chance: 1 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Harden: Guard, Regen, and every enemy comes for you.' });
+  def('bulwark',      { name: 'Bulwark', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'regen', turns: 2, chance: 1 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Harden: Guard, Regen, and taunts the enemy.' });
   def('quake',        { name: 'Quake', kind: 'phys', target: 'enemies', power: 1.62, mp: 11, status: { id: 'slow', turns: 2, chance: 0.6 }, fx: 'earth', sfx: 'explosion', desc: 'Shake the ground; slows enemies.' });
   def('mountain',     { name: 'Living Mountain', kind: 'buff', target: 'allies', mp: 13, status: { id: 'shield', turns: 3, chance: 1, val: 0.46 }, fx: 'shield', sfx: 'buff', desc: 'Big shield for the whole party.' });
   // -- Ratkin Corsair --
@@ -144,7 +144,7 @@
   def('death_pact',   { name: 'Death Pact', kind: 'drain', target: 'enemies', power: 1.6, mp: 16, drain: 0.4, fx: 'dark', sfx: 'drain', desc: 'Drain all enemies.' });
   // -- Beetle Knight --
   def('lance_charge', { name: 'Lance Charge', kind: 'phys', target: 'enemy', power: 2.0, mp: 5, fx: 'pierce', sfx: 'pierce', desc: 'Charge with the lance.' });
-  def('carapace',     { name: 'Carapace', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'shield', turns: 3, chance: 1, val: 0.3 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Guard, Shield, and every enemy comes for you.' });
+  def('carapace',     { name: 'Carapace', kind: 'buff', target: 'self', mp: 4, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'shield', turns: 3, chance: 1, val: 0.3 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Guard, Shield, and taunts the enemy.' });
   def('shield_bash',  { name: 'Shield Bash', kind: 'phys', target: 'enemy', power: 1.68, mp: 7, status: { id: 'stun', turns: 1, chance: 0.7 }, fx: 'hit_big', sfx: 'hit', desc: 'Bash that often stuns.' });
   def('horn_toss',    { name: 'Horn Toss', kind: 'phys', target: 'enemies', power: 1.92, mp: 14, fx: 'slash_big', sfx: 'slash', desc: 'Toss all enemies with your horns.' });
   // -- Naga Assassin --
@@ -192,8 +192,8 @@
 
   // -- Sloth Sentinel --
   def('slow_swipe',   { name: 'Slow Swipe', kind: 'phys', target: 'enemy', power: 2.55, mp: 5, fx: 'claw', sfx: 'slash', desc: 'It takes a while. It lands like a falling tree.' });
-  def('immovable',    { name: 'Immovable', kind: 'buff', target: 'self', mp: 5, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'shield', turns: 3, chance: 1, val: 0.32 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Guard, a solid Shield, and nothing gets past you.' });
-  def('canopy_hold',  { name: 'Canopy Hold', kind: 'buff', target: 'allies', mp: 13, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'regen', turns: 3, chance: 1 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'nature', sfx: 'buff', desc: 'The party braces behind you and Guards.' });
+  def('immovable',    { name: 'Immovable', kind: 'buff', target: 'self', mp: 5, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'shield', turns: 3, chance: 1, val: 0.32 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'shield', sfx: 'buff', desc: 'Guard, a solid Shield, and taunts the enemy.' });
+  def('canopy_hold',  { name: 'Canopy Hold', kind: 'buff', target: 'allies', mp: 13, status: { id: 'guard', turns: 3, chance: 1 }, self: [{ id: 'regen', turns: 3, chance: 1 }, { id: 'taunt', turns: 3, chance: 1 }], fx: 'nature', sfx: 'buff', desc: 'The party braces behind you and Guards, and taunts the enemy.' });
   def('avalanche',    { name: 'Avalanche', kind: 'phys', target: 'enemies', power: 1.92, mp: 17, status: { id: 'stun', turns: 1, chance: 0.35 }, fx: 'earth', sfx: 'explosion', desc: 'You finally let go. Everything below you regrets it.' });
 
   // -- Peacock Duelist --
