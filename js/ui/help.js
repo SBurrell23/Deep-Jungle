@@ -172,7 +172,7 @@
     box.appendChild(defs([
       ['Attack', 'A basic strike at 100% power. Costs nothing.'],
       ['Ability', 'One of up to four abilities, each costing mana. The tag on the card says whether its numbers come from ATK or MAG.'],
-      ['Guard', 'Cuts everything landing on this hero by 45% for two turns. It restores no mana. Against a telegraphed attack it is usually the best turn available.'],
+      ['Guard', 'Cuts everything landing on this hero by 60% for two turns. It restores no mana.'],
       ['Item', 'Drink a potion. Uses the whole turn, whoever it is aimed at.'],
     ]));
     box.appendChild(sub('Damage'));
@@ -270,7 +270,7 @@
     box.appendChild(sub('What a level gives'));
     box.appendChild(bullets([
       'Every stat rises by that adventurer’s own per-level growth, shown on their card.',
-      'A quarter of maximum health and just under a third of maximum mana are restored on the spot.',
+      'A little over a tenth of maximum health and mana are restored on the spot. Levelling is relief, not a refill.',
       'Mana pools grow slowly on purpose. An ability that cost half a bar at level 1 still costs a real share of one at level 20, so the expensive option stays a decision rather than becoming the default.',
       'Two abilities are known from the start. The third arrives at level ' +
         DJ.SKILL_UNLOCK_LEVELS[2] + ' and the fourth at level ' + DJ.SKILL_UNLOCK_LEVELS[3] + '.',

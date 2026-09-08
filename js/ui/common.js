@@ -205,11 +205,13 @@
     if (turns) bits.push(turns + ' turn' + (turns === 1 ? '' : 's') + ' remaining');
     return bits.length ? '<i>' + bits.join('  \u00b7  ') + '</i>' : '';
   };
-  UI.statusTip = function (el, id, turns, st) {
+  // `grants` is how long the ability being read hands this status out for, as opposed to
+  // `turns`, which is how long an effect already on a unit has left.
+  UI.statusTip = function (el, id, turns, st, grants) {
     const d = DJ.STATUS[id];
     if (!d) return el;
     return UI.tip(el, () => `<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span>` +
-      UI.statusFoot(id, turns, st));
+      (grants ? `<i>Lasts ${grants} turn${grants === 1 ? '' : 's'}</i>` : UI.statusFoot(id, turns, st)));
   };
 
   // ---- Status names inside ability text ----
@@ -246,8 +248,23 @@
     return { map, re: new RegExp('(^|[^A-Za-z])(' + all.join('|') + ')(?![A-Za-z])', 'gi') };
   })();
 
-  // Fill an element with text, tinting any status name it contains.
-  UI.statusText = function (text, el) {
+  // These four last the same number of turns from every source in the game, so the field
+  // guide states it once and an ability card does not repeat it.
+  const FIXED_LENGTH = { bleed: true, poison: true, burn: true, stun: true };
+
+  // How long each status an ability grants will actually last, keyed by status id.
+  UI.skillTurns = function (sk) {
+    const out = {};
+    if (!sk) return out;
+    const take = (st) => { if (st && st.id && !FIXED_LENGTH[st.id]) out[st.id] = st.turns || 2; };
+    take(sk.status);
+    for (const st of (sk.self ? (Array.isArray(sk.self) ? sk.self : [sk.self]) : [])) take(st);
+    return out;
+  };
+
+  // Fill an element with text, tinting any status name it contains. `turns` maps a status
+  // id to how long this particular ability grants it, which is stamped after the word.
+  UI.statusText = function (text, el, turns) {
     const box = el || UI.el('span');
     const re = STATUS_WORDS.re;
     re.lastIndex = 0;
@@ -262,8 +279,16 @@
       // not "Slow".
       const word = m[2].charAt(0).toUpperCase() + m[2].slice(1);
       const tag = UI.el('span', 'st-word', word);
-      if (d) { tag.style.color = d.color; UI.statusTip(tag, id); }
+      const n = turns && turns[id];
+      if (d) { tag.style.color = d.color; UI.statusTip(tag, id, null, null, n); }
       box.appendChild(tag);
+      // Four characters rather than a clause, so an ability that grants three of these
+      // still fits on its button.
+      if (n) {
+        const t = UI.el('span', 'st-turns', n + 't');
+        if (d) t.style.color = d.color;
+        box.appendChild(t);
+      }
       last = at + m[2].length;
     }
     if (last < text.length) box.appendChild(document.createTextNode(text.slice(last)));
@@ -272,7 +297,7 @@
 
   // The one-line description under an ability name, wherever it is shown.
   UI.skillDesc = function (sk, cls) {
-    return UI.statusText(sk.desc || '', UI.el('div', cls || 'sk-desc'));
+    return UI.statusText(sk.desc || '', UI.el('div', cls || 'sk-desc'), UI.skillTurns(sk));
   };
 
   UI.flash = function () {

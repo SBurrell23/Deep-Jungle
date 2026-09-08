@@ -161,7 +161,7 @@
       if (sk) {
         const line = UI.el('div', 'lu-skill');
         line.appendChild(UI.el('b', null, 'New skill: ' + sk.name + ' — '));
-        UI.statusText(sk.desc, line);
+        UI.statusText(sk.desc, line, UI.skillTurns(sk));
         body.appendChild(line);
       }
     }

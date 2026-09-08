@@ -54,9 +54,11 @@
       u.level++;
       const before = { hp: u.maxHp, mp: u.maxMp, atk: u.base.atk, mag: u.base.mag, def: u.base.def, spd: u.base.spd };
       DJ.recalcHero(u);
-      // level-ups also restore some HP/MP
-      u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.25));
-      u.mp = Math.min(u.maxMp, u.mp + Math.round(u.maxMp * 0.3));
+      // A level-up is a moment of relief, not a refill. At a quarter of health and near a
+      // third of mana it was undoing most of a hard fight on its own, which is a strange
+      // thing for the reward of winning that fight to do.
+      u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.12));
+      u.mp = Math.min(u.maxMp, u.mp + Math.round(u.maxMp * 0.2));
       u.xpNext = DJ.xpForLevel(u.level);
       const newSkill = DJ.SKILL_UNLOCK_LEVELS.map((l, i) => (l === u.level ? DJ.HERO_BY_ID[u.id].skills[i] : null)).filter(Boolean);
       gains.push({ unit: u, level: u.level, delta: { hp: u.maxHp - before.hp, mp: u.maxMp - before.mp, atk: u.base.atk - before.atk, mag: u.base.mag - before.mag, def: u.base.def - before.def, spd: u.base.spd - before.spd }, newSkills: newSkill });
@@ -354,7 +356,11 @@
   // battles handed back far more mana than any hero could spend, so the expensive sweep
   // was free every encounter and nothing ever wore the party down. Campfires, potions and
   // levelling are what restore a bar now; this only takes the edge off.
-  R.RECOVER = { hp: 0.20, mp: 0.19 };
+  // Health and mana are deliberately not the same dial. Health barely comes back, which
+  // is what makes the next fight worth fearing and a campfire worth routing for. Mana
+  // comes back enough to keep casting the cheap half of a kit, because starving it just
+  // turns every turn into a basic attack - which is the problem this was meant to fix.
+  R.RECOVER = { hp: 0.10, mp: 0.18 };
   R.postBattleRecovery = function () {
     for (const h of this.party) {
       if (!h.alive) continue;

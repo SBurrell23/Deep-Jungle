@@ -1168,6 +1168,13 @@ body.targeting #battleCanvas.can-target { cursor: var(--cur-hand); }
 }
 .a-desc .st-word { border-bottom: none; }
 
+/* How long the ability grants it for, stamped straight onto the word so nobody has to
+   hover, or guess, before spending the turn. */
+.st-turns {
+  font-size: .82em; font-weight: 700; opacity: .72;
+  margin-left: 2.5px; vertical-align: baseline;
+}
+
 /* ---------------- field guide ---------------- */
 .help-body { flex: 1; display: grid; grid-template-columns: minmax(178px, 210px) minmax(0, 1fr); min-height: 0; }
 .help-nav {

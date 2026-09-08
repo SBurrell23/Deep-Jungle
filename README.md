@@ -59,8 +59,8 @@ numbers the engine uses, the XP curve, gear, potions, and a section on when atta
 wrong move. Everything it quotes is read from live data, so it cannot drift.
 
 Levelling restores rather than fully heals: the increase to max HP and MP is added straight
-to the current values, and then a further 25% of max HP and 30% of max MP is topped up on
-top. A hero who levels at low health comes out better off, but not full.
+to the current values, and then a further 12% of each is topped up on top. A hero who levels
+at low health comes out better off, but nowhere near full.
 
 **Attrition is the run.** A battle hands back only a small share of health and mana
 afterwards, so both drain across an expedition rather than resetting between fights. That
@@ -79,9 +79,16 @@ and the other turns have to be filled with something else.
 divided into the damage — took about 14% off a hit in exchange for a whole turn. Nobody
 ever guarded, and teaching the simulated player to brace against wind-ups made it lose
 *more* runs, which is the measurement saying the trade was bad rather than the players
-being wrong. Guard now cuts everything landing on that hero by 45%. A monster releasing a
+being wrong. Guard now cuts everything landing on that hero by 60%. A monster releasing a
 wind-up hits the whole party for full power and never crits, so bracing against one is
 usually the best turn on the board.
+
+**How long an effect lasts is a property of the ability, not the status.** War Cry grants
+three turns of Rage; Call of the Wild grants two. So every ability that hands out a boon or
+an ailment stamps the duration onto the tinted word itself — "Chilled 3t", "Haste 2t" — read
+straight off the ability so it cannot drift, and short enough that a card granting three of
+them still fits on its button. Bleed, Poison, Burn and Stun are left bare, because those
+four last the same from every source in the game and the field guide says so once.
 
 A full run takes roughly an hour depending on your party. Progress saves to `localStorage`
 automatically, and you can leave and resume mid-expedition, including partway through a
@@ -174,11 +181,11 @@ Current tuning, measured over 400 simulated runs across 80 random party composit
 
 | Metric | Value |
 |---|---|
-| Win rate | 13.0% |
-| Average playtime | 49m33s |
-| Winning-run playtime | 74m40s |
-| Battles per run | 19.2 |
-| Nodes per run | 27.5 |
+| Win rate | 12.3% |
+| Average playtime | 47m45s |
+| Winning-run playtime | 81m56s |
+| Battles per run | 18.0 |
+| Nodes per run | 26.2 |
 
 Read that figure as a floor rather than a forecast, and only as a relative measure between
 two builds. The gap between it and a person is large and has been measured directly: four
