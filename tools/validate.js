@@ -162,8 +162,14 @@ for (let i = 0; i < 40; i++) {
   const all = Object.keys(map.nodeById);
   const unreachable = all.filter((id) => !seen.has(id));
   if (unreachable.length) { err(`map seed ${1000 + i * 977}: ${unreachable.length} unreachable node(s)`); break; }
-  const deadEnds = all.filter((id) => map.nodeById[id].next.length === 0 && id !== map.heartId);
-  if (deadEnds.length) { err(`map seed ${1000 + i * 977}: dead-end node(s) that are not the Heart: ${deadEnds.join(', ')}`); break; }
+  // The Heart is a legitimate terminus, and so is the far edge of The Beyond, which
+  // has no end by design: a run there stops when the party does.
+  const lastCol = map.cols.length - 1;
+  const deadEnds = all.filter((id) => {
+    const n = map.nodeById[id];
+    return n.next.length === 0 && id !== map.heartId && n.col !== lastCol;
+  });
+  if (deadEnds.length) { err(`map seed ${1000 + i * 977}: dead-end node(s) that are not the Heart or the edge of The Beyond: ${deadEnds.join(', ')}`); break; }
   if (!seen.has(map.heartId)) { err(`map seed ${1000 + i * 977}: the Heart is unreachable`); break; }
   // each region boss column must be a single node everything funnels through
   for (const col of map.cols) {

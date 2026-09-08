@@ -164,6 +164,16 @@ on the way out, which shows up later as a lost run. Watch the rounds and the her
 beside it.
 
 ```bash
+node tools/beyond.js 60 4
+```
+
+Every party that beats the Heart carries straight on into The Beyond, and the tool
+reports the distribution of depths reached. That distribution is the whole design of the
+endless region: the party is frozen at level 20, so what happens next is a curve of
+monster levels against a party that cannot answer it. The targets are that most deep
+runs end before depth 13 and almost none see depth 20.
+
+```bash
 node tools/region.js 11 50
 ```
 

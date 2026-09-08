@@ -75,6 +75,9 @@
     this.inventory = { red: 2, blue: 1, green: 1, yellow: 0, purple: 0, orange: 0, elixir: 0, phoenix: 0 };
     // How many of each capped potion this run has already dropped, so the caps hold.
     this.potionDrops = {};
+    // Set when the player refuses to leave after the Heart. From then on the run has no
+    // end except the one the jungle picks, and nobody gains another level.
+    this.beyond = false;
     this.stash = [];                  // unequipped items
     this.currentId = this.map.startId;
     this.visited = { [this.map.startId]: true };
@@ -119,9 +122,32 @@
     n.done = true;
     this.pending = false;
     this.pendingRng = null;
-    if (n.type === 'heart') { this.finished = true; this.won = true; this.available = []; return; }
+    if (n.type === 'heart') {
+      // The Heart is beaten. Whether that is the end is the player's call, so the run is
+      // parked here with no onward path until they answer.
+      this.won = true;
+      this.heartBeaten = true;
+      this.available = [];
+      return;
+    }
     this.available = n.next.slice();
   };
+  // Refuse to leave. Opens the columns past the Heart and freezes the party where they
+  // stand: no more experience, only what the jungle drops.
+  R.enterBeyond = function () {
+    const n = this.node();
+    if (!n || n.type !== 'heart' || this.finished) return false;
+    this.beyond = true;
+    this.available = n.next.slice();
+    return this.available.length > 0;
+  };
+
+  // How far past the Heart the party has come. Zero anywhere in the expedition proper.
+  R.depth = function () {
+    const n = this.node();
+    return n ? Math.max(0, n.col - DJ.HEART_COL) : 0;
+  };
+
   // True when the save was taken inside an unresolved node.
   R.isMidNode = function () {
     if (this.finished) return false;
@@ -292,11 +318,14 @@
     // The Undergrowth now hits hard enough to cost real sustain, so it hands a little
     // more back. Without this the opening drains potions the party never recovers, and
     // the whole run gets harder rather than just its first stretch.
-    const early = (node.region == null ? DJ.regionOfCol(node.col) : node.region) === 0;
-    const pChance = boss ? 1 : elite ? 0.9 : (early ? 0.8 : 0.62);
+    const reg = node.region == null ? DJ.regionOfCol(node.col) : node.region;
+    const early = reg === 0;
+    // Supplies are the only currency left in The Beyond, so it is generous with them.
+    // It has to be: without experience, potions and gear are the whole of the ramp.
+    const pChance = boss ? 1 : elite ? 0.9 : (reg === 3 ? 0.92 : early ? 0.8 : 0.62);
     if (rng.chance(pChance)) drops.potions.push(DJ.rollPotion(rng, this));
     if (rng.chance(boss ? 0.9 : elite ? 0.45 : 0.14)) drops.potions.push(DJ.rollPotion(rng, this));
-    const iChance = boss ? 1 : elite ? 0.7 : 0.16;
+    const iChance = boss ? 1 : elite ? 0.7 : (reg === 3 ? 0.42 : 0.16);
     if (rng.chance(iChance)) drops.items.push(DJ.rollItem(rng, node.level, boss ? 3 : elite ? 2 : 0));
     // Heartbloom Nectar is the run's rare prize: a guaranteed reward for a region boss,
     // and an occasional one from an elite. Ordinary monsters never carry it.
@@ -309,7 +338,8 @@
   R.applyBattleRewards = function (rew) {
     this.gold += rew.gold;
     const alive = this.partyAlive();
-    const share = alive.length ? rew.xp : 0;
+    // Nothing past the Heart teaches you anything. Gold, gear and potions still drop.
+    const share = (alive.length && !this.beyond) ? rew.xp : 0;
     const gains = [];
     for (const h of this.party) {
       // fallen heroes get half XP
@@ -353,6 +383,7 @@
     return {
       seed: this.seed, rngState: this.rng.s, gold: this.gold, inventory: this.inventory,
       potionDrops: this.potionDrops || {},
+      beyond: !!this.beyond, heartBeaten: !!this.heartBeaten,
       stash: this.stash.map((i) => i.id), party: this.party.map(ser),
       currentId: this.currentId, visited: this.visited, path: this.path, available: this.available,
       nodesVisited: this.nodesVisited, flawless: this.flawless, finished: this.finished, won: this.won,
@@ -367,6 +398,7 @@
     r.rng.s = d.rngState;
     r.gold = d.gold; r.inventory = d.inventory;
     r.potionDrops = d.potionDrops || {};   // per-run caps survive a reload
+    r.beyond = !!d.beyond; r.heartBeaten = !!d.heartBeaten;
     r.stash = (d.stash || []).map((id) => DJ.ITEM_BY_ID[id]).filter(Boolean);
     d.party.forEach((p, i) => {
       const u = r.party[i];

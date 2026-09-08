@@ -16,6 +16,10 @@
       blurb: 'The ground stops being ground. Things move under the water.' },
     { id: 'canopy', name: 'The High Canopy', bosses: ['vine_warden', 'skywrack', 'last_watchman'], boss: 'vine_warden', tiers: [4, 5], color: '#2f6b7a', bg: '#0d1c24',
       blurb: 'Above the mist, where the old guardians still keep their posts.' },
+    // Region 3 has no boss and no end. It is generated with every map but stays hidden
+    // until the Heart is dead, and the party stops gaining levels the moment they enter.
+    { id: 'beyond', name: 'The Beyond', bosses: [], boss: null, tiers: [3, 4, 5], color: '#7a3f6b', bg: '#180d1c',
+      blurb: 'Past where the Heart was. Nothing here was ever meant to be counted.' },
   ];
 
   // Every guardian a region can field, whether or not this run drew them. Used by the
@@ -55,6 +59,8 @@
 
   // Column plan per region: [normal columns..., boss column]
   const REGION_COLS = [11, 12, 11]; // + 1 boss column each => 1 start + 12 + 13 + 12 + 1 camp + 1 heart = 40 columns
+  DJ.HEART_COL = 39;          // the last column of the expedition proper
+  DJ.BEYOND_COLS = 30;        // how far past it the endless run can go
 
   // Guarantee trading posts. Left to the type weights alone a whole region could pass
   // without one, which strands the player with gold and nothing to spend it on.
@@ -149,6 +155,36 @@
     // Final column: Heart
     push([{ type: 'heart', region: 2 }]);
 
+    // ---- The Beyond ----
+    // Built now so it is part of the same seeded map, but nothing reveals it until the
+    // Heart is beaten. Combat heavy, with enough campfires and traders that a strong
+    // party can keep going for a while on supplies alone.
+    let deepCombat = true;   // the Heart was a fight
+    for (let d = 0; d < DJ.BEYOND_COLS; d++) {
+      const forced = !deepCombat;
+      const width = rng.weighted([{ v: 2, w: 5 }, { v: 3, w: 6 }, { v: 4, w: 3 }]);
+      const nodes = [];
+      for (let i = 0; i < width; i++) {
+        if (forced) {
+          nodes.push({ type: rng.chance(0.32) ? 'elite' : 'battle', region: 3 });
+        } else {
+          nodes.push({
+            type: rng.weighted([
+              { v: 'battle', w: 40 }, { v: 'elite', w: 16 }, { v: 'rest', w: 13 },
+              { v: 'treasure', w: 10 }, { v: 'merchant', w: 8 }, { v: 'shrine', w: 6 },
+              { v: 'event', w: 5 }, { v: 'mystery', w: 4 },
+            ]),
+            region: 3,
+          });
+        }
+      }
+      if (!forced && nodes.every((x) => x.type === 'battle' || x.type === 'elite')) {
+        nodes[rng.int(0, nodes.length - 1)].type = rng.pick(['rest', 'treasure', 'merchant', 'shrine']);
+      }
+      push(nodes);
+      deepCombat = forced;
+    }
+
     // Assign ids, levels, and per-node data
     const nodeById = {};
     cols.forEach((col, ci) => {
@@ -188,11 +224,17 @@
       b.forEach((t) => (t.prev = Array.from(new Set(t.prev))));
     }
 
-    return { seed, cols, nodeById, bosses: bossFor, startId: cols[0][0].id, heartId: cols[cols.length - 1][0].id, totalCols: cols.length };
+    // heartId is the Heart's own column, not the last one: the map now runs on past it
+    // into The Beyond, and everything that asks "where is the end" means the Heart.
+    return { seed, cols, nodeById, bosses: bossFor, startId: cols[0][0].id,
+      heartId: cols[DJ.HEART_COL][0].id, totalCols: cols.length };
   };
 
   // Node "level" drives enemy strength and reward scale.
   DJ.nodeLevel = function (col, type) {
+    // Past the Heart the level is the depth: one more for every column you survive.
+    // The party is frozen at twenty by then, so this is the whole of the difficulty curve.
+    if (col > DJ.HEART_COL) return DJ.MAX_LEVEL + (col - DJ.HEART_COL);
     let lvl = 1 + Math.floor(col * 0.43);
     // The Undergrowth used to sit more than a level under the party the whole way, so the
     // opening was a formality. This closes the gap without moving the later curve at all.
@@ -204,6 +246,7 @@
   };
 
   DJ.regionOfCol = function (col) {
+    if (col > DJ.HEART_COL) return 3;
     if (col === 0) return 0;
     let c = 1;
     for (let r = 0; r < 3; r++) { const n = REGION_COLS[r] + 1; if (col < c + n) return r; c += n; }
@@ -212,7 +255,18 @@
 
   // Build the enemy group for a node.
   DJ.buildEncounter = function (rng, node) {
-    return DJ.scaleEncounter(buildEncounterUnits(rng, node), node.region == null ? DJ.regionOfCol(node.col) : node.region);
+    const units = DJ.scaleEncounter(buildEncounterUnits(rng, node), node.region == null ? DJ.regionOfCol(node.col) : node.region);
+    // In The Beyond the monsters are the ones you already know, wound past anything the
+    // expedition proper ever throws. No new bestiary, just worse odds.
+    const deep = DJ.deepScale(node.level);
+    if (deep) {
+      for (const u of units) {
+        u.maxHp = Math.round(u.maxHp * deep.hp); u.hp = u.maxHp;
+        u.base.atk = Math.round(u.base.atk * deep.dmg);
+        u.base.mag = Math.round(u.base.mag * deep.dmg);
+      }
+    }
+    return units;
   };
   function buildEncounterUnits(rng, node) {
     const level = node.level;
@@ -254,7 +308,10 @@
   };
 
   DJ.buildNormalGroup = function (rng, level, region, tagFilter) {
-    const tiers = DJ.REGIONS[region] ? DJ.REGIONS[region].tiers : [1, 2];
+    // The Beyond draws mostly from the deep end but lets something from higher up the
+    // river turn up now and then, grown to fit. It is the same jungle, further in.
+    let tiers = DJ.REGIONS[region] ? DJ.REGIONS[region].tiers : [1, 2];
+    if (region === 3) tiers = rng.chance(0.18) ? [1, 2, 3, 4, 5] : [3, 4, 5];
     let pool = DJ.MONSTERS.filter((m) => m.kind === 'normal' && tiers.includes(m.tier));
     if (tagFilter) {
       const filtered = pool.filter((m) => m.tags.includes(tagFilter));

@@ -80,7 +80,7 @@
       row.tabIndex = 0;
 
       const top = UI.el('div', 'hr-top');
-      top.appendChild(UI.el('span', 'hr-verdict', e.won ? 'Survived' : 'Lost'));
+      top.appendChild(UI.el('span', 'hr-verdict', e.beyond ? 'Depth ' + e.depth : e.won ? 'Survived' : 'Lost'));
       top.appendChild(UI.el('span', 'hr-when', when(e.at)));
       row.appendChild(top);
 
@@ -97,7 +97,7 @@
       const foot = UI.el('div', 'hr-foot');
       foot.appendChild(UI.el('span', null, clock(e.ms)));
       foot.appendChild(UI.el('span', null, e.nodes + ' nodes'));
-      foot.appendChild(UI.el('span', null, e.region));
+      foot.appendChild(UI.el('span', null, e.beyond ? 'The Beyond' : e.region));
       row.appendChild(foot);
 
       const pick = () => { selected = i; DJ.sfx('click'); H.render(); };
@@ -140,7 +140,8 @@
 
     const head = UI.el('div', 'hd-title');
     const verdict = UI.el('div', 'hd-verdict ' + (e.won ? 'won' : 'lost'),
-      e.won ? 'The jungle is quiet' : 'The jungle keeps you');
+      e.beyond ? 'The Beyond, depth ' + e.depth
+        : e.won ? 'The jungle is quiet' : 'The jungle keeps you');
     head.appendChild(verdict);
     head.appendChild(UI.el('div', 'hd-sub', when(e.at) + '  ·  ' + clock(e.ms) + '  ·  seed ' + e.seed));
     if (e.flawless) head.appendChild(UI.el('span', 'hd-badge', 'Flawless'));
@@ -160,7 +161,8 @@
     block(box, 'Journey', [
       ['Nodes visited', num(e.nodes)],
       ['Furthest region', e.region],
-      ['Column reached', e.col + ' / ' + (e.totalCols ? e.totalCols - 1 : e.col)],
+      // A deep run is measured by how far past the Heart it got, not by a column number.
+      e.beyond ? ['Jungle Depth', num(e.depth)] : ['Column reached', e.col + ' / 39'],
       ['Gold carried out', num(e.goldLeft)],
     ]);
 

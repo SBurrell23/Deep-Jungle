@@ -205,7 +205,10 @@
 
     // Spoils come out of a chest: it sits shut for a beat, pops open, and the rows land
     // one after another rather than all appearing at once.
-    if (drops && (drops.items.length || drops.potions.length || rew.gold)) {
+    // The Heart drops nothing and shows no spoils. Its gold is still credited to the
+    // run, quietly, because it counts toward achievements and buys supplies for
+    // anyone who carries on into The Beyond.
+    if (!isFinal && drops && (drops.items.length || drops.potions.length || rew.gold)) {
       const head = UI.el('h4', null, 'Spoils');
       head.style.cssText = 'margin:14px 0 8px;font-size:14px';
       body.appendChild(head);
@@ -270,8 +273,22 @@
     if (isFinal) {
       const b = UI.el('button', 'choice-btn');
       b.appendChild(UI.el('div', 'c-label', 'Leave the jungle'));
+      b.appendChild(UI.el('div', 'c-desc', 'Walk out while you still can. The expedition is a victory.'));
       b.addEventListener('click', () => { DJ.sfx('confirm'); DJ.runWon(); });
       acts.appendChild(b);
+
+      // The other option. Nothing is forced on anyone: the win is already banked either
+      // way, and the deep run only ever ends one way.
+      const d = UI.el('button', 'choice-btn deep-choice');
+      d.appendChild(UI.el('div', 'c-label', 'Go deeper'));
+      d.appendChild(UI.el('div', 'c-desc',
+        'Past where the Heart was. No more levels, no way back, and it only gets worse. How far can you get?'));
+      d.addEventListener('click', () => {
+        DJ.sfx('confirm');
+        if (DJ.enterBeyond()) return;
+        DJ.runWon();
+      });
+      acts.appendChild(d);
     } else {
       const b = UI.el('button', 'choice-btn');
       b.appendChild(UI.el('div', 'c-label', 'Onward'));

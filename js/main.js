@@ -151,6 +151,21 @@
     UI.Map.refresh();
   };
 
+  // The player refused to leave. The victory is recorded now, so it counts however the
+  // deep run ends, and then the map opens up past the Heart.
+  DJ.enterBeyond = function () {
+    const run = DJ.run;
+    if (!run || !run.enterBeyond()) return false;
+    DJ.recordHeartVictory(run);
+    DJ.checkAndAnnounce();
+    UI.show('map');
+    UI.Map.open(false);
+    UI.Map.refresh();
+    DJ.saveRun(run);
+    UI.toast('The Beyond opens. No more levels from here.');
+    return true;
+  };
+
   DJ.runWon = function () {
     const run = DJ.run;
     run.finished = true; run.won = true;
@@ -163,7 +178,10 @@
   DJ.runLost = function () {
     const run = DJ.run;
     if (!run) return;
-    run.finished = true; run.won = false;
+    run.finished = true;
+    // A party that fell in The Beyond had already beaten the Heart to get there. The
+    // expedition was a win; only the deep run ended badly.
+    run.won = !!run.heartBeaten;
     DJ.recordRunEnd(run);
     const earned = DJ.checkAchievements();
     showRunEnd(false, run, earned);
@@ -171,16 +189,29 @@
   };
 
   function showRunEnd(won, run, earned) {
-    UI.$('#resultTitle').textContent = won ? 'THE JUNGLE IS QUIET' : 'THE JUNGLE KEEPS YOU';
-    UI.$('#resultTitle').className = won ? 'win' : 'lose';
+    // A deep run always ends the same way, but it is not a defeat: the Heart was already
+    // beaten to get there, so the screen says how far they got rather than that they lost.
+    const deep = !!run.beyond;
+    UI.$('#resultTitle').textContent = deep ? 'THE BEYOND TAKES YOU'
+      : won ? 'THE JUNGLE IS QUIET' : 'THE JUNGLE KEEPS YOU';
+    UI.$('#resultTitle').className = deep ? 'win' : won ? 'win' : 'lose';
     const body = UI.$('#resultBody');
     body.innerHTML = '';
     const p = UI.el('p', 'muted');
     p.style.cssText = 'font-style:italic;line-height:1.6;margin-bottom:16px';
-    p.textContent = won
+    p.textContent = deep
+      ? 'You went past the end of the map and kept walking. Nothing out here was keeping score, but you were.'
+      : won
       ? 'Your three walk out of the treeline into ordinary daylight, carrying a piece of something that used to be the centre of the world.'
       : 'The green closes over the place where you fell. Within a season there will be no sign that anyone came this way at all.';
     body.appendChild(p);
+
+    if (deep) {
+      const d = UI.el('div', 'xp-burst');
+      d.appendChild(UI.el('b', null, String(run.depth())));
+      d.appendChild(UI.el('span', null, 'Jungle Depth'));
+      body.appendChild(d);
+    }
 
     const rows = [
       ['Nodes travelled', run.nodesVisited],

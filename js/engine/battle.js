@@ -38,6 +38,16 @@
     regionDmg: [1.14, 1.0, 1.0],
   };
 
+  // How much harder than its own level a monster in The Beyond fights. The level itself
+  // already does most of the work through levelScale; this is the extra squeeze that
+  // stops a level-20 party from simply out-gearing an endless run. Tuned so a strong
+  // party stalls somewhere past depth ten and almost nothing survives depth twenty.
+  DJ.deepScale = function (level) {
+    const past = Math.max(0, level - DJ.MAX_LEVEL);
+    if (!past) return null;
+    return { hp: 1 + past * 0.068, dmg: 1 + past * 0.044 };
+  };
+
   // Applies the region's damage factor to a freshly built encounter.
   DJ.scaleEncounter = function (units, region) {
     const k = (DJ.TUNE.regionDmg || [])[region];

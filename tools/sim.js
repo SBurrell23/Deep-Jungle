@@ -66,6 +66,12 @@ function simRun(seed, partyIds, opt) {
     if (res.battleInfo) battleLog.push(res.battleInfo);
     if (res.wiped) { run.finished = true; run.won = false; break; }
     run.completeNode();
+    // opt.endless keeps a winning party walking past the Heart into The Beyond, which is
+    // the only way to measure how far the endless region actually carries.
+    if (run.heartBeaten && !run.beyond) {
+      if (opt.endless && run.enterBeyond()) { /* onward */ }
+      else { run.finished = true; break; }
+    }
     if (run.finished) break;
     // opt.maxCol stops a run early, for measuring one stretch of the map in isolation
     // without paying for a whole expedition each time.
@@ -74,6 +80,7 @@ function simRun(seed, partyIds, opt) {
   const maxLevel = Math.max(...run.party.map((h) => h.level));
   return {
     won: run.won, seed, nodes: run.nodesVisited, time, battleCount, totalRounds, deaths, potionsUsed,
+    heartBeaten: !!run.heartBeaten, depth: run.depth ? run.depth() : 0, beyond: !!run.beyond,
     maxLevel, gold: run.gold, party: partyIds, battleLog, col: run.node() ? run.node().col : 0,
     finalHp: run.party.map((h) => Math.round((h.hp / h.maxHp) * 100)),
   };

@@ -21,6 +21,7 @@
         soloWins: 0, lowHpWins: 0, longestBattle: 0, poisonKills: 0, burnKills: 0, bleedKills: 0,
         summonKills: 0, killsByTag: {}, bossKills: {}, wonWith: {}, flawlessRuns: 0,
         fastestWinNodes: 999, starterWins: 0, casterWins: 0, playTime: 0,
+        deepestDepth: 0, beyondRuns: 0,
       },
       run: null,
       history: [],               // finished expeditions, newest first
@@ -171,6 +172,8 @@
       flawless: !!run.flawless && run.party.every((h) => h.alive),
       nodes: run.nodesVisited,
       col: col,
+      beyond: !!run.beyond,
+      depth: run.depth ? run.depth() : 0,
       totalCols: run.map ? run.map.totalCols : 0,
       region: region.name,
       goldLeft: run.gold,
@@ -199,17 +202,31 @@
     };
   };
 
+  // Everything a Heart kill earns. Called the moment the Heart dies, so a player who
+  // carries on into The Beyond keeps the win even though the run ends in a wipe.
+  DJ.recordHeartVictory = function (run) {
+    if (run._heartRecorded) return;
+    run._heartRecorded = true;
+    DJ.bump('runsWon');
+    for (const h of run.party) DJ.bumpMap('wonWith', h.id);
+    if (run.flawless) DJ.bump('flawlessRuns');
+    DJ.setMin('fastestWinNodes', run.nodesVisited);
+    const ids = run.party.map((h) => h.id).sort().join(',');
+    if (ids === ['elf_warrior', 'goblin_mage', 'kuata_lancer'].sort().join(',')) DJ.bump('starterWins');
+    const casters = run.party.filter((h) => { const b = DJ.HERO_BY_ID[h.id].base; return b.mag >= b.atk; });
+    if (casters.length === 3) DJ.bump('casterWins');
+    DJ.save();
+  };
+
   DJ.recordRunEnd = function (run) {
-    if (run.won) {
-      DJ.bump('runsWon');
-      for (const h of run.party) DJ.bumpMap('wonWith', h.id);
-      if (run.flawless) DJ.bump('flawlessRuns');
-      DJ.setMin('fastestWinNodes', run.nodesVisited);
-      const ids = run.party.map((h) => h.id).sort().join(',');
-      if (ids === ['elf_warrior', 'goblin_mage', 'kuata_lancer'].sort().join(',')) DJ.bump('starterWins');
-      const casters = run.party.filter((h) => { const b = DJ.HERO_BY_ID[h.id].base; return b.mag >= b.atk; });
-      if (casters.length === 3) DJ.bump('casterWins');
-    } else DJ.bump('runsLost');
+    if (run.won) DJ.recordHeartVictory(run);
+    else DJ.bump('runsLost');
+    // recordHeartVictory is idempotent, so a deep run that banked its win when the Heart
+    // died does not bank it twice here.
+    if (run.beyond) {
+      DJ.setMax('deepestDepth', run.depth ? run.depth() : 0);
+      DJ.bump('beyondRuns');
+    }
     // Written after the profile totals are updated, so the entry sees the finished run.
     try {
       DJ.profile.history = DJ.profile.history || [];

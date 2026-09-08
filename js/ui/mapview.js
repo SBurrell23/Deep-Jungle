@@ -20,7 +20,11 @@
     const cols = run.map.cols;
     const nodes = [];
     const rng = new DJ.RNG(DJ.seedFromString('layout' + run.seed));
+    // The Beyond exists in every map from the moment it is generated, but nothing about
+    // it is drawn, linked or clickable until the Heart is dead and the player says yes.
+    const lastCol = run.beyond ? cols.length - 1 : DJ.HEART_COL;
     cols.forEach((col, ci) => {
+      if (ci > lastCol) return;
       col.forEach((nd, ri) => {
         const spread = (col.length - 1) / 2;
         const jitter = col.length > 1 ? rng.range(-9, 9) : 0;
@@ -111,8 +115,10 @@
 
     // region banners
     let colAcc = 1;
-    for (let ri = 0; ri < 3; ri++) {
-      const n = (ri === 0 ? 12 : ri === 1 ? 13 : 12);
+    // The fourth banner only exists once the run has gone past the Heart.
+    const banners = (DJ.run && DJ.run.beyond) ? 4 : 3;
+    for (let ri = 0; ri < banners; ri++) {
+      const n = (ri === 0 ? 12 : ri === 1 ? 13 : ri === 2 ? 14 : DJ.BEYOND_COLS);
       const x0 = PAD_X + (colAcc - 0.5) * COL_W;
       ctx.save();
       ctx.globalAlpha = 0.5;
@@ -360,8 +366,13 @@
     const regionIdx = DJ.regionOfCol(run.node().col);
     UI.$('#mapRegion').textContent = DJ.REGIONS[regionIdx].name;
     UI.$('#mapGold').textContent = run.gold;
-    const pct = Math.round((run.node().col / (run.map.totalCols - 1)) * 100);
-    UI.$('#mapProgress').textContent = pct + '%';
+    if (run.beyond) {
+      const d = run.depth();
+      UI.$('#mapProgress').textContent = d ? 'Depth ' + d : 'The threshold';
+    } else {
+      const pct = Math.round((run.node().col / DJ.HEART_COL) * 100);
+      UI.$('#mapProgress').textContent = pct + '%';
+    }
     UI.$('#mapHint').textContent = run.available.length
       ? (run.available.length === 1 ? 'One way forward' : 'Choose your path')
       : 'The path ends here';
