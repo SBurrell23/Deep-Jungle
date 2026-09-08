@@ -187,21 +187,64 @@
 
     body.appendChild(partyRow(run.party));
 
-    const rl = UI.el('div', 'reward-line');
-    rl.innerHTML = `<b>+${rew.xp}</b> XP    <b>+${rew.gold}</b> gold`;
-    body.appendChild(rl);
+    // Experience gets the loud treatment; gold has moved down into the spoils, where it
+    // sits beside the things it is actually competing with.
+    const xp = UI.el('div', 'xp-burst');
+    xp.appendChild(UI.el('b', null, '+' + rew.xp));
+    xp.appendChild(UI.el('span', null, 'XP'));
+    for (let i = 0; i < 6; i++) {
+      const sp = UI.el('i', 'xp-spark');
+      sp.style.cssText = 'left:' + (6 + i * 16) + '%;animation-delay:' + (i * 0.16).toFixed(2) + 's';
+      xp.appendChild(sp);
+    }
+    body.appendChild(xp);
 
     const merged = mergeGains(gains);
     for (const g of merged) body.appendChild(levelUpCard(g));
     if (merged.length) DJ.sfx('levelup', 0.35);
 
-    // Spoils, with each item removable once it has been dealt with.
-    if (drops && (drops.items.length || drops.potions.length)) {
+    // Spoils come out of a chest: it sits shut for a beat, pops open, and the rows land
+    // one after another rather than all appearing at once.
+    if (drops && (drops.items.length || drops.potions.length || rew.gold)) {
       const head = UI.el('h4', null, 'Spoils');
       head.style.cssText = 'margin:14px 0 8px;font-size:14px';
       body.appendChild(head);
-      const spoils = UI.el('div');
+
+      const chestWrap = UI.el('div', 'chest-wrap');
+      const chest = UI.spriteEl('chest_shut', 2.4, 'chest');
+      chest.className = 'chest-img';
+      chestWrap.appendChild(chest);
+      body.appendChild(chestWrap);
+
+      const spoils = UI.el('div', 'spoils-list');
       body.appendChild(spoils);
+
+      let landed = 0;
+      const land = (row) => {
+        row.classList.add('spoil-row');
+        row.style.animationDelay = (0.34 + landed * 0.13).toFixed(2) + 's';
+        landed++;
+        spoils.appendChild(row);
+      };
+
+      // The chest opens once, shortly after the screen does.
+      setTimeout(() => {
+        chestWrap.classList.add('open');
+        const img = UI.spriteEl('chest_open', 2.4, 'chest');
+        img.className = 'chest-img';
+        chest.replaceWith(img);
+        DJ.sfx('open');
+      }, 280);
+
+      if (rew.gold) {
+        const g = UI.el('div', 'loot-row');
+        if (DJ.SPRITES.icon_gold) g.appendChild(UI.spriteEl('icon_gold', 2, 'gold'));
+        const gi = UI.el('div');
+        gi.appendChild(UI.el('div', 'loot-name gold-name', rew.gold + ' gold'));
+        gi.appendChild(UI.el('div', 'loot-desc', 'Taken from what the jungle was carrying.'));
+        g.appendChild(gi);
+        land(g);
+      }
       for (const it of drops.items) {
         const btn = UI.el('button', 'btn small');
         btn.textContent = 'Equip';
@@ -211,14 +254,14 @@
           // Whether they equip it or keep it in the bag, it leaves the spoils list.
           UI.Panels.equipChooser(it, () => {
             row.remove();
-            if (!spoils.children.length) { head.remove(); }
+            if (!spoils.children.length) { head.remove(); chestWrap.remove(); }
           });
         });
-        spoils.appendChild(row);
+        land(row);
       }
       const counts = {};
       for (const p of drops.potions) counts[p] = (counts[p] || 0) + 1;
-      for (const p in counts) spoils.appendChild(UI.potionLine(p, counts[p]));
+      for (const p in counts) land(UI.potionLine(p, counts[p]));
       DJ.sfx('gold', 0.2);
     }
 

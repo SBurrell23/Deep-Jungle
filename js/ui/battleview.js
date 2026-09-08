@@ -315,7 +315,7 @@
       null, null, { max: u.maxHp });
     let barBottom = top + 9;
     if (u.maxMp > 0) {
-      DJ.bar(ctx, x, top + 10, bw, 6, u.mp / u.maxMp, '#4f9fe0', null, null, { max: u.maxMp });
+      DJ.bar(ctx, x, top + 10, bw, 6, u.mp / u.maxMp, '#4f9fe0', null, null, { max: u.maxMp, step: 10 });
       barBottom = top + 16;
     }
 

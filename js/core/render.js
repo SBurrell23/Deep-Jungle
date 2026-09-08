@@ -233,8 +233,13 @@
     }
     const max = opts && opts.max;
     if (max > 0 && w > 12) {
-      let step = 25;
-      for (const s of [25, 50, 100, 250, 500, 1000]) { step = s; if ((w / (max / s)) >= 6) break; }
+      // Mana pools are a fraction of a health pool, so they tick finer. The caller says
+      // what one segment is worth and the ladder climbs from there.
+      const base = (opts && opts.step) || 25;
+      let step = base;
+      for (const s of [base, base * 2, base * 4, base * 10, base * 20, base * 40]) {
+        step = s; if ((w / (max / s)) >= 6) break;
+      }
       ctx.fillStyle = 'rgba(0,0,0,0.75)';
       for (let v = step; v < max; v += step) {
         const tx = Math.round(x + w * (v / max));

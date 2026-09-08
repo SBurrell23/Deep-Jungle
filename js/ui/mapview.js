@@ -171,6 +171,10 @@
       const isCurrent = nd.id === run.currentId;
       const selectable = run.available.includes(nd.id);
       const known = visited || selectable || nd.prev.some((p) => run.visited[p]) || nd.type === 'heart' || nd.type === 'boss';
+      // Campfires and trading posts show from anywhere, greyed out until you arrive.
+      // Everything else stays a question mark: the point of the map is choosing a route
+      // toward the supplies you need, which you cannot do if you cannot see them.
+      const landmark = !known && (nd.type === 'rest' || nd.type === 'merchant');
       const isHover = hover === n && selectable;
       const r = nd.type === 'heart' ? NODE_R + 10 : nd.type === 'boss' ? NODE_R + 5 : NODE_R;
       const pulse = selectable ? 1 + Math.sin(t * 3.4) * 0.055 : 1;
@@ -197,11 +201,24 @@
       else { grd.addColorStop(0, '#20422a'); grd.addColorStop(1, '#15291b'); }
       ctx.fillStyle = grd; ctx.fill();
       ctx.lineWidth = isCurrent ? 3 : selectable ? 2.6 : 2;
-      ctx.strokeStyle = isCurrent ? '#8fe08a' : selectable ? '#e8c65a' : known ? (info ? info.color : '#4a7a52') : '#24402c';
+      ctx.strokeStyle = isCurrent ? '#8fe08a' : selectable ? '#e8c65a' : known ? (info ? info.color : '#4a7a52') : landmark ? '#3d6146' : '#24402c';
       ctx.stroke();
 
       // icon
-      if (known) {
+      if (landmark) {
+        // The real icon, dimmed, so it reads as somewhere you have not been yet.
+        const iconId = info ? info.icon : 'node_rest';
+        ctx.save();
+        ctx.globalAlpha = 0.38;
+        const s = 1.6;
+        const drew = DJ.drawSprite(ctx, iconId, 0, (DJ.SPRITES[iconId] ? DJ.SPRITES[iconId].h * s / 2 : 12), s, { center: true });
+        ctx.restore();
+        if (!drew) {
+          ctx.fillStyle = '#4a7a52';
+          ctx.font = 'bold 15px "Trebuchet MS", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText((info ? info.name : '?').slice(0, 2).toUpperCase(), 0, 0);
+        }
+      } else if (known) {
         const iconId = info ? info.icon : 'node_battle';
         const s = nd.type === 'heart' ? 2 : 1.6;
         const drew = DJ.drawSprite(ctx, iconId, 0, 0 + (DJ.SPRITES[iconId] ? DJ.SPRITES[iconId].h * s / 2 : 12), s, { center: true });
