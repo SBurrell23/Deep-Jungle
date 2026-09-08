@@ -509,6 +509,9 @@ button { font-family: inherit; }
 .loot-row {
   display: flex; align-items: center; gap: 10px; padding: 9px 11px; margin-bottom: 7px;
   background: #0f2115; border: 1px solid var(--line); border-radius: 9px;
+  /* The victory panel centres its text, which left every loot row's name floating in
+     the middle of its own column instead of sitting over its description. */
+  text-align: left;
 }
 .loot-row canvas { flex: 0 0 auto; }
 .loot-count {
@@ -706,10 +709,50 @@ button { font-family: inherit; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 .loot-name.gold-name { color: var(--gold-2); }
+.onward-btn .c-label { display: flex; align-items: center; justify-content: center; gap: 9px; }
+.onward-arrow { color: var(--green-2); font-size: 17px; line-height: 1; transform: translateY(-1px); }
+.onward-btn:hover .onward-arrow { transform: translate(3px, -1px); transition: transform .14s; }
 @media (prefers-reduced-motion: reduce) {
   .xp-burst b, .chest-wrap.open .chest-img, .spoils-list .spoil-row { animation: none; }
   .xp-spark { display: none; }
 }
+
+/* ---------- Equipment debug table ---------- */
+.idbg-summary { display: grid; gap: 3px; margin: 6px 0 10px; }
+.idbg-row { display: grid; grid-template-columns: 78px repeat(6, 1fr); gap: 6px; text-align: center; font-size: 12px; }
+.idbg-row.idbg-head { color: var(--ink-mute); font-weight: 800; letter-spacing: .6px; }
+.idbg-row span { background: #0f2115; border: 1px solid var(--line); border-radius: 6px; padding: 4px 0; }
+.idbg-row.idbg-head span { background: none; border: none; }
+.idbg-slot { text-align: left !important; padding-left: 8px !important; color: var(--ink-dim); text-transform: capitalize; }
+.idbg-total { color: var(--green-2); font-weight: 800; }
+.idbg-zero { color: #a04a4a; }
+.idbg-note { font-size: 11.5px; color: var(--ink-mute); line-height: 1.5; margin: 0 0 8px; }
+.idbg-h {
+  margin: 16px 0 6px; font-size: 11px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--green-2);
+}
+.idbg-tier { font-size: 11px; color: var(--ink-mute); margin: 9px 0 4px; letter-spacing: .4px; }
+.idbg-item {
+  display: flex; gap: 10px; align-items: flex-start; text-align: left;
+  background: #0f2115; border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 10px; margin-bottom: 5px;
+}
+.idbg-item canvas { flex: 0 0 auto; }
+.idbg-body { flex: 1; min-width: 0; }
+.idbg-name { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-size: 13px; font-weight: 700; }
+.idbg-price { font-size: 11px; color: var(--gold); font-weight: 700; }
+.idbg-score { font-size: 11px; color: var(--ink-mute); margin-left: auto; }
+.idbg-stats { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0 3px; }
+.idbg-chip {
+  display: inline-flex; align-items: baseline; gap: 4px; font-size: 11px;
+  background: #0b180f; border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 5px; padding: 2px 7px;
+}
+.idbg-chip b { font-weight: 900; color: var(--ink); }
+.idbg-chip span { font-size: 9.5px; font-weight: 800; letter-spacing: .5px; }
+.idbg-passive { border-left-color: var(--gold); }
+.idbg-passive b { color: var(--gold-2); font-weight: 700; font-size: 10.5px; }
+.idbg-desc { font-size: 11.5px; color: var(--ink-mute); line-height: 1.4; }
 
 /* ---------- Expedition history ---------- */
 .hist-body { flex: 1; display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); min-height: 0; }
@@ -1011,21 +1054,21 @@ body.targeting #battleCanvas.can-target { cursor: var(--cur-hand); }
 
 /* ---------- Victory screen ---------- */
 .lu-card {
-  display: flex; gap: 11px; align-items: flex-start; text-align: left;
+  display: flex; gap: 10px; align-items: flex-start; text-align: left;
   background: #1d3320; border: 1px solid var(--green); border-radius: 10px;
-  padding: 10px 12px; margin: 8px 0;
+  padding: 7px 10px; margin: 6px 0;
 }
 .lu-card canvas { flex: 0 0 auto; }
 .lu-body { flex: 1; min-width: 0; }
-.lu-head { font-weight: 800; color: var(--green-2); font-size: 14px; }
-.lu-grid { display: grid; gap: 4px; margin-top: 7px; }
-.lu-row { display: grid; grid-template-columns: 34px 1fr 62px; align-items: center; gap: 8px; font-size: 11px; }
+.lu-head { font-weight: 800; color: var(--green-2); font-size: 13.5px; line-height: 1.2; }
+.lu-grid { display: grid; gap: 1px; margin-top: 4px; }
+.lu-row { display: grid; grid-template-columns: 30px 1fr 54px; align-items: center; gap: 7px; font-size: 10.5px; line-height: 1.15; }
 .lu-row b { color: var(--ink-mute); font-weight: 800; }
-.lu-track { height: 7px; background: #0b180f; border: 1px solid #14281a; border-radius: 4px; overflow: hidden; position: relative; }
+.lu-track { height: 6px; background: #0b180f; border: 1px solid #14281a; border-radius: 4px; overflow: hidden; position: relative; }
 .lu-base { position: absolute; inset: 0; width: 0%; background: #3a6a3f; transition: width .5s ease-out; }
 .lu-gain { position: absolute; inset: 0; width: 0%; background: linear-gradient(90deg, #8fe08a, #d6ffa8); transition: width .9s cubic-bezier(.2,.9,.3,1); }
 .lu-val { font-size: 11px; color: var(--green-2); font-weight: 800; text-align: right; }
-.lu-skill { font-size: 12px; color: var(--gold); margin-top: 6px; font-weight: 700; }
+.lu-skill { font-size: 11.5px; color: var(--gold); margin-top: 4px; font-weight: 700; }
 .result-party { display: flex; gap: 14px; justify-content: center; margin: 4px 0 14px; flex-wrap: wrap; }
 .rp-hero { text-align: center; }
 .rp-hero .rp-name { font-size: 11.5px; font-weight: 700; margin-top: 3px; }

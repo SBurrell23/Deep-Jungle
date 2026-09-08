@@ -310,9 +310,9 @@
   R.battleDrops = function (node) {
     const rng = this.rng;
     const drops = { potions: [], items: [] };
-    // Nothing drops from the Heart. The run ends the moment it does, so a potion and a
-    // sword would go straight into the credits.
-    if (node.type === 'heart') return drops;
+    // The Heart drops like any other boss. It used to drop nothing, because the run
+    // ended the moment it died; now the player can carry straight on into The Beyond,
+    // where a fresh weapon is the difference between depth six and depth twelve.
     const boss = node.type === 'boss' || node.type === 'heart';
     const elite = node.type === 'elite';
     // The Undergrowth now hits hard enough to cost real sustain, so it hands a little

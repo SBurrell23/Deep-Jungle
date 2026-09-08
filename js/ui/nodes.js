@@ -185,10 +185,8 @@
       body.appendChild(p);
     }
 
-    body.appendChild(partyRow(run.party));
-
-    // Experience gets the loud treatment; gold has moved down into the spoils, where it
-    // sits beside the things it is actually competing with.
+    // Experience is one of the spoils, so it is built here and thrown out of the chest
+    // below with everything else rather than sitting on its own above the fight's take.
     const xp = UI.el('div', 'xp-burst');
     xp.appendChild(UI.el('b', null, '+' + rew.xp));
     xp.appendChild(UI.el('span', null, 'XP'));
@@ -197,18 +195,10 @@
       sp.style.cssText = 'left:' + (6 + i * 16) + '%;animation-delay:' + (i * 0.16).toFixed(2) + 's';
       xp.appendChild(sp);
     }
-    body.appendChild(xp);
-
-    const merged = mergeGains(gains);
-    for (const g of merged) body.appendChild(levelUpCard(g));
-    if (merged.length) DJ.sfx('levelup', 0.35);
 
     // Spoils come out of a chest: it sits shut for a beat, pops open, and the rows land
     // one after another rather than all appearing at once.
-    // The Heart drops nothing and shows no spoils. Its gold is still credited to the
-    // run, quietly, because it counts toward achievements and buys supplies for
-    // anyone who carries on into The Beyond.
-    if (!isFinal && drops && (drops.items.length || drops.potions.length || rew.gold)) {
+    if (drops && (drops.items.length || drops.potions.length || rew.gold)) {
       const head = UI.el('h4', null, 'Spoils');
       head.style.cssText = 'margin:14px 0 8px;font-size:14px';
       body.appendChild(head);
@@ -223,9 +213,14 @@
       body.appendChild(spoils);
 
       let landed = 0;
+      // Experience lands first, straight out of the chest, ahead of the gold.
+      spoils.appendChild(xp);
+      xp.classList.add('spoil-row');
+      xp.style.animationDelay = '0.34s';
+      landed = 1;
       const land = (row) => {
         row.classList.add('spoil-row');
-        row.style.animationDelay = (0.34 + landed * 0.13).toFixed(2) + 's';
+        row.style.animationDelay = (0.34 + landed * 0.13).toFixed(2) + 's';   // experience is index 0
         landed++;
         spoils.appendChild(row);
       };
@@ -268,6 +263,14 @@
       DJ.sfx('gold', 0.2);
     }
 
+    if (!xp.parentNode) body.appendChild(xp);
+
+    // Level ups come last, under the spoils, because they are the part you read rather
+    // than the part you act on.
+    const merged = mergeGains(gains);
+    for (const g of merged) body.appendChild(levelUpCard(g));
+    if (merged.length) DJ.sfx('levelup', 0.35);
+
     const acts = UI.$('#resultActions');
     acts.innerHTML = '';
     if (isFinal) {
@@ -290,8 +293,11 @@
       });
       acts.appendChild(d);
     } else {
-      const b = UI.el('button', 'choice-btn');
-      b.appendChild(UI.el('div', 'c-label', 'Onward'));
+      const b = UI.el('button', 'choice-btn onward-btn');
+      const lbl = UI.el('div', 'c-label');
+      lbl.appendChild(UI.el('span', 'onward-arrow', '\u279C'));
+      lbl.appendChild(UI.el('span', null, 'Onward'));
+      b.appendChild(lbl);
       b.addEventListener('click', () => { DJ.sfx('confirm'); N.finish(); });
       acts.appendChild(b);
     }

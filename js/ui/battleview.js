@@ -315,7 +315,7 @@
       null, null, { max: u.maxHp });
     let barBottom = top + 9;
     if (u.maxMp > 0) {
-      DJ.bar(ctx, x, top + 10, bw, 6, u.mp / u.maxMp, '#4f9fe0', null, null, { max: u.maxMp, step: 10 });
+      DJ.bar(ctx, x, top + 10, bw, 6, u.mp / u.maxMp, '#4f9fe0', null, null, { max: u.maxMp, step: 15 });
       barBottom = top + 16;
     }
 
@@ -716,12 +716,12 @@
     const rail = UI.el('div', 'act-primary');
     rail.appendChild(bindKey('q', attackBtn(u)));
     const potCount = Object.values(DJ.run.inventory).reduce((a, n) => a + (n > 0 ? 1 : 0), 0);
-    rail.appendChild(bindKey('w', utilBtn('act-item', 'potion_red', 'Items',
+    rail.appendChild(bindKey('w', utilBtn('act-defend', 'status_guard', 'Guard', 'Raise DEF', false,
+      () => submit({ type: 'defend' }),
+      'Guard: raises this hero\u2019s DEF by 50% for 2 turns.')));
+    rail.appendChild(bindKey('e', utilBtn('act-item', 'potion_red', 'Items',
       potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
       'Open your potions and use one on the party.')));
-    rail.appendChild(bindKey('e', utilBtn('act-defend', 'status_guard', 'Guard', 'Raise DEF', false,
-      () => submit({ type: 'defend' }),
-      'Guard: raises this hero\u2019s DEF by 50% for 2 turns and restores a little MP.')));
     menu.appendChild(rail);
 
     // Right: four fixed skill slots. Locked ones stay as empty placeholders so the

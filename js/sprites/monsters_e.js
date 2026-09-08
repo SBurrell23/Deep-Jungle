@@ -1,4 +1,4 @@
-// js/sprites/monsters_e.js — Tier 5 monsters + region bosses + Heart of the Jungle (face LEFT)
+// js/sprites/monsters_e.js â€” Tier 5 monsters + region bosses + Heart of the Jungle (face LEFT)
 (function () {
   const S = (window.DJ = window.DJ || {}).SPRITES || (DJ.SPRITES = {});
 
