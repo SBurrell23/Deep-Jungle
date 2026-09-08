@@ -949,6 +949,7 @@ input[type=range] { width: 100%; accent-color: var(--green); height: 22px; }
 :root {
   --cur-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M6 3 L6 25 L11.5 19.8 L15 27.5 L18.6 25.8 L15.1 18.4 L22.5 18.2 Z' fill='%235fbf5a' stroke='%230a1f0f' stroke-width='1.6' stroke-linejoin='round'/></svg>") 5 3, default;
   --cur-hand: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M12 3 a2 2 0 0 1 4 0 v9 h1 V9 a2 2 0 0 1 4 0 v4 h1 v-2 a2 2 0 0 1 4 0 v9 a8 8 0 0 1-8 8 h-3 a7 7 0 0 1-6-3.4 L5.5 19 a2.2 2.2 0 0 1 3.4-2.7 L12 19 Z' fill='%238fe08a' stroke='%230a1f0f' stroke-width='1.6' stroke-linejoin='round'/></svg>") 11 2, pointer;
+  --cur-help: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M6 3 L6 25 L11.5 19.8 L15 27.5 L18.6 25.8 L15.1 18.4 L22.5 18.2 Z' fill='%235fbf5a' stroke='%230a1f0f' stroke-width='1.6' stroke-linejoin='round'/><path d='M23.4 20.6 a2.5 2.5 0 1 1 2.5 2.5 v1.5' fill='none' stroke='%230a1f0f' stroke-width='4.2' stroke-linecap='round'/><circle cx='25.9' cy='28.4' r='2.3' fill='%230a1f0f'/><path d='M23.4 20.6 a2.5 2.5 0 1 1 2.5 2.5 v1.5' fill='none' stroke='%238fe08a' stroke-width='2' stroke-linecap='round'/><circle cx='25.9' cy='28.4' r='1.05' fill='%238fe08a'/></svg>") 5 3, help;
 }
 html, body { cursor: var(--cur-arrow); }
 button, .chip, .tab, .hero-card, .comp-card:not(.undiscovered), .choice-btn, .act-btn,
@@ -1169,7 +1170,7 @@ body.targeting #battleCanvas.can-target { cursor: var(--cur-hand); }
 .st-word {
   font-weight: 700;
   border-bottom: 1px dotted currentColor;
-  cursor: help;
+  cursor: var(--cur-help);
 }
 .a-desc .st-word { border-bottom: none; }
 

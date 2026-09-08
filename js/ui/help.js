@@ -52,11 +52,16 @@
   // ---- the exact numbers behind each status, straight from the engine ----
   function statusNumbers(id) {
     const T = DJ.STATUS_TUNE || {};
+    // Poison, Burn, Bleed and Stun last the same from every source; the number comes
+    // from the ability data rather than being written down again here.
+    const fixed = (DJ.FIXED_STATUS_TURNS || {})[id];
+    const forTurns = fixed ? '  ·  ' + fixed + ' turn' + (fixed === 1 ? '' : 's') : '';
     switch (id) {
       case 'poison': return Math.round(T.poisonPct * 1000) / 10 + '% of max HP per stack, each turn  ·  up to ' +
-        T.poisonMaxStacks + ' stacks  ·  ' + T.poisonTurns + ' turns';
-      case 'burn':   return Math.round(T.burnPct * 100) + '% of max HP each turn  ·  2 turns';
-      case 'bleed':  return Math.round(T.bleedPct * 1000) / 10 + '% of max HP each turn  ·  4 turns';
+        T.poisonMaxStacks + ' stacks' + forTurns;
+      case 'burn':   return Math.round(T.burnPct * 100) + '% of max HP each turn' + forTurns;
+      case 'bleed':  return Math.round(T.bleedPct * 1000) / 10 + '% of max HP each turn' + forTurns;
+      case 'stun':   return fixed ? fixed + ' turn' + (fixed === 1 ? '' : 's') : '';
       case 'regen':  return Math.round(T.regenPct * 100) + '% of max HP healed each turn';
       case 'thorns': return 'A thorns trinket reflects ' + pct(T.thornsPassive) + ' instead';
       case 'shield': return 'The pool is sized from the wearer’s max HP';

@@ -140,6 +140,24 @@ for (const [id, sk] of Object.entries(DJ.SKILLS)) {
       if (!named.has(a) && a !== 'charge') warn(`skill ${id} applies ${a} without naming it in its description`);
     }
   }
+  // Four statuses carry no inline duration on an ability card, on the grounds that they
+  // last the same everywhere. The tooltips and the field guide state that single number,
+  // so it has to stay true.
+  for (const id of ['poison', 'burn', 'bleed', 'stun']) {
+    const seen = new Set();
+    for (const sk of Object.values(DJ.SKILLS)) {
+      if (sk.status && sk.status.id === id) seen.add(sk.status.turns);
+      for (const st of (sk.self ? (Array.isArray(sk.self) ? sk.self : [sk.self]) : [])) {
+        if (st.id === id) seen.add(st.turns);
+      }
+    }
+    if (seen.size > 1) {
+      err(`${id} is meant to last the same from every source, but the data has ` +
+        `${Array.from(seen).sort().join(', ')} turns; even them up or give it an inline duration`);
+    }
+    if (!DJ.FIXED_STATUS_TURNS[id]) err(`${id} has no derived duration, so its tooltip cannot state one`);
+  }
+
   // The released half of a wind-up must never sit in a monster's own ability list, or it
   // could be cast directly with no warning at all.
   const held = new Set(Object.values(DJ.SKILLS).filter((s) => s.kind === 'charge').map((s) => s.charge));

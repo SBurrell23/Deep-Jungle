@@ -365,6 +365,25 @@
   def('b_toll_of_years', { name: 'Toll of Years', kind: 'debuff', target: 'enemies', mp: 0, status: { id: 'weak', turns: 3, chance: 0.8 }, fx: 'curse', sfx: 'debuff', desc: 'He counts the years aloud. Everyone who hears them ages a little, and is left Weak.' });
   def('b_grey_tithe', { name: 'The Grey Tithe', kind: 'drain', target: 'enemies', power: 1.2, mp: 0, drain: 0.24, fx: 'dark', sfx: 'drain', desc: 'Collects what he is owed from the whole party, and keeps it.' });
 
+  // Poison, Burn, Bleed and Stun last the same number of turns from every source in the
+  // game, which is what lets their ability cards leave the duration off. Read it back out
+  // of the data rather than writing it down twice: if one of them ever stops being
+  // uniform its entry drops out here and nothing claims a number that is not true.
+  DJ.FIXED_STATUS_TURNS = (function () {
+    const out = {};
+    for (const id of ['poison', 'burn', 'bleed', 'stun']) {
+      const seen = new Set();
+      for (const sk of Object.values(S)) {
+        if (sk.status && sk.status.id === id) seen.add(sk.status.turns);
+        for (const st of (sk.self ? (Array.isArray(sk.self) ? sk.self : [sk.self]) : [])) {
+          if (st.id === id) seen.add(st.turns);
+        }
+      }
+      if (seen.size === 1) out[id] = seen.values().next().value;
+    }
+    return out;
+  })();
+
   // ---- Status definitions ----
   DJ.STATUS = {
     poison: { name: 'Poison', icon: 'status_poison', color: '#7dd66a', bad: true, desc: 'Damage each turn. Every fresh dose adds a stack and resets the timer.' },

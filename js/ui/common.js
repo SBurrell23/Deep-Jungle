@@ -206,12 +206,23 @@
     return bits.length ? '<i>' + bits.join('  \u00b7  ') + '</i>' : '';
   };
   // `grants` is how long the ability being read hands this status out for, as opposed to
-  // `turns`, which is how long an effect already on a unit has left.
+  // `turns`, which is how long an effect already on a unit has left. With neither, fall
+  // back to the four that last the same from every source: those carry no inline marker,
+  // so the tooltip is the only place their length is written.
+  const lasts = (n) => `<i>Lasts ${n} turn${n === 1 ? '' : 's'}</i>`;
   UI.statusTip = function (el, id, turns, st, grants) {
     const d = DJ.STATUS[id];
     if (!d) return el;
-    return UI.tip(el, () => `<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span>` +
-      (grants ? `<i>Lasts ${grants} turn${grants === 1 ? '' : 's'}</i>` : UI.statusFoot(id, turns, st)));
+    return UI.tip(el, () => {
+      let foot = '';
+      if (grants) foot = lasts(grants);
+      else if (turns) foot = UI.statusFoot(id, turns, st);
+      else {
+        const fixed = (DJ.FIXED_STATUS_TURNS || {})[id];
+        if (fixed) foot = lasts(fixed);
+      }
+      return `<b style="color:${d.color}">${d.name}</b><span>${d.desc}</span>` + foot;
+    });
   };
 
   // ---- Status names inside ability text ----
