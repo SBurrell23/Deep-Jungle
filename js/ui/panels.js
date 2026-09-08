@@ -465,6 +465,27 @@
     });
   };
 
+  // Drinking a Heartbloom Nectar, wherever the player happens to be standing. Shared so
+  // the victory screen can offer one without duplicating the bookkeeping; the caller is
+  // handed the result and decides how to show it.
+  P.useNectar = function (after) {
+    const run = DJ.run;
+    const candidates = run.party.filter((h) => h.alive && h.level < DJ.MAX_LEVEL);
+    if (!(run.inventory.pink > 0) || !candidates.length) { DJ.sfx('error'); return; }
+    const drink = (h) => {
+      const res = run.usePotionOutOfBattle('pink', h);
+      if (!res) { DJ.sfx('error'); return; }
+      DJ.bump('potionsUsed');
+      DJ.bumpMap('potionsByType', 'pink');
+      DJ.saveRun(run);
+      DJ.checkAndAnnounce();
+      DJ.sfx('levelup');
+      if (after) after(res);
+    };
+    if (candidates.length === 1) { drink(candidates[0]); return; }
+    P.chooseHero('Use Heartbloom Nectar on whom?', drink, candidates);
+  };
+
   // Drinking a potion on the map: apply it, show what changed, then return to the bag.
   function applyFieldPotion(pid, target) {
     const run = DJ.run;
@@ -534,7 +555,9 @@
           if (e.party) { applyFieldPotion(pid, null); return; }
           const candidates = e.revive != null
             ? run.party.filter((h) => !h.alive)
-            : run.party.filter((h) => h.alive);
+            : e.levelUp
+              ? run.party.filter((h) => h.alive && h.level < DJ.MAX_LEVEL)
+              : run.party.filter((h) => h.alive);
           if (candidates.length === 1) { applyFieldPotion(pid, candidates[0]); return; }
           UI.closeOverlay(true);
           P.chooseHero(`Use ${DJ.POTIONS[pid].name} on whom?`, (h) => applyFieldPotion(pid, h), candidates);

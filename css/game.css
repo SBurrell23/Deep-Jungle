@@ -615,6 +615,13 @@ button { font-family: inherit; }
   grid-template-columns: repeat(auto-fill, minmax(161px, 1fr));
 }
 #roster .select-body { flex: 1; display: grid; grid-template-columns: 1fr 320px; min-height: 0; }
+/* The nectar offered at the end of a fight sits apart from the spoils above it: those
+   are things you were given, this is a thing you may choose to spend. */
+.nectar-offer:not(:empty) {
+  margin-top: 14px; padding-top: 13px; border-top: 1px dashed var(--line-2);
+}
+.nectar-offer .loot-row { background: #1a2f3a; border-color: #35566a; }
+
 @media (max-width: 780px) { #roster .select-body { grid-template-columns: 1fr; } }
 .roster-card {
   background: linear-gradient(#16301f, #102318); border: 1px solid var(--line);

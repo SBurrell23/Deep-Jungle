@@ -262,6 +262,12 @@
     for (const g of merged) body.appendChild(pop(levelUpCard(g)));
     if (merged.length) DJ.sfx('levelup', 0.35);
 
+    // Having just read who levelled, this is the moment somebody wants to spend a
+    // Heartbloom Nectar. It used to mean leaving for the map and opening the bag.
+    const nectar = UI.el('div', 'nectar-offer');
+    body.appendChild(nectar);
+    renderNectarOffer(nectar, body);
+
     const acts = UI.$('#resultActions');
     acts.innerHTML = '';
     if (isFinal) {
@@ -294,6 +300,34 @@
     }
     UI.show('result');
     DJ.checkAndAnnounce();
+  }
+
+  // The nectar on offer at the end of a fight. Redrawn after each use, so it disappears
+  // once the last one is gone or the whole party has reached the cap.
+  function renderNectarOffer(slot, body) {
+    const run = DJ.run;
+    slot.innerHTML = '';
+    const have = (run.inventory && run.inventory.pink) || 0;
+    if (!have || !run.party.some((h) => h.alive && h.level < DJ.MAX_LEVEL)) return;
+
+    const btn = UI.el('button', 'btn small');
+    btn.textContent = 'Use';
+    btn.addEventListener('click', () => {
+      DJ.sfx('click');
+      UI.Panels.useNectar((res) => {
+        for (const line of res.lines) {
+          if (!line.gains || !line.gains.length) continue;
+          for (const g of mergeGains(line.gains)) {
+            const card = levelUpCard(g);
+            card.classList.add('spoil-row');
+            body.insertBefore(card, slot);
+            card.scrollIntoView({ block: 'nearest' });
+          }
+        }
+        renderNectarOffer(slot, body);
+      });
+    });
+    slot.appendChild(UI.potionLine('pink', have, btn));
   }
 
   // ---------------- camp ----------------
