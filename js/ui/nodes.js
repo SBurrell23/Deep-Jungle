@@ -174,7 +174,7 @@
   function showVictory(node, rew, gains, drops) {
     const run = DJ.run;
     const isFinal = node.type === 'heart';
-    UI.$('#resultTitle').textContent = isFinal ? 'THE JUNGLE IS STILL' : 'Victory';
+    UI.$('#resultTitle').textContent = isFinal ? 'THE JUNGLE IS STILL' : 'Victory!';
     UI.$('#resultTitle').className = 'win';
     const body = UI.$('#resultBody');
     body.innerHTML = '';
@@ -185,8 +185,8 @@
       body.appendChild(p);
     }
 
-    // Experience is one of the spoils, so it is built here and thrown out of the chest
-    // below with everything else rather than sitting on its own above the fight's take.
+    // Experience is one of the spoils, so it is built here and lands with the rest of
+     // them below rather than sitting on its own above the fight's take.
     const xp = UI.el('div', 'xp-burst');
     xp.appendChild(UI.el('b', null, '+' + rew.xp));
     xp.appendChild(UI.el('span', null, 'XP'));
@@ -196,24 +196,15 @@
       xp.appendChild(sp);
     }
 
-    // Spoils come out of a chest: it sits shut for a beat, pops open, and the rows land
-    // one after another rather than all appearing at once.
+    // The rewards land one after another rather than all at once. They used to arrive
+    // out of a chest under a "Spoils" heading, but the whole screen is the spoils, so
+    // neither the label nor the container was earning its space.
     if (drops && (drops.items.length || drops.potions.length || rew.gold)) {
-      const head = UI.el('h4', null, 'Spoils');
-      head.style.cssText = 'margin:14px 0 8px;font-size:14px';
-      body.appendChild(head);
-
-      const chestWrap = UI.el('div', 'chest-wrap');
-      const chest = UI.spriteEl('chest_shut', 2.4, 'chest');
-      chest.className = 'chest-img';
-      chestWrap.appendChild(chest);
-      body.appendChild(chestWrap);
-
       const spoils = UI.el('div', 'spoils-list');
       body.appendChild(spoils);
 
       let landed = 0;
-      // Experience lands first, straight out of the chest, ahead of the gold.
+      // Experience lands first, ahead of the gold.
       spoils.appendChild(xp);
       xp.classList.add('spoil-row');
       xp.style.animationDelay = '0.34s';
@@ -224,15 +215,6 @@
         landed++;
         spoils.appendChild(row);
       };
-
-      // The chest opens once, shortly after the screen does.
-      setTimeout(() => {
-        chestWrap.classList.add('open');
-        const img = UI.spriteEl('chest_open', 2.4, 'chest');
-        img.className = 'chest-img';
-        chest.replaceWith(img);
-        DJ.sfx('open');
-      }, 280);
 
       if (rew.gold) {
         const g = UI.el('div', 'loot-row');
@@ -250,10 +232,7 @@
         btn.addEventListener('click', () => {
           DJ.sfx('click');
           // Whether they equip it or keep it in the bag, it leaves the spoils list.
-          UI.Panels.equipChooser(it, () => {
-            row.remove();
-            if (!spoils.children.length) { head.remove(); chestWrap.remove(); }
-          });
+          UI.Panels.equipChooser(it, () => { row.remove(); });
         });
         land(row);
       }
