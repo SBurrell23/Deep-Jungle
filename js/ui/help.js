@@ -172,7 +172,7 @@
     box.appendChild(defs([
       ['Attack', 'A basic strike at 100% power. Costs nothing.'],
       ['Ability', 'One of up to four abilities, each costing mana. The tag on the card says whether its numbers come from ATK or MAG.'],
-      ['Guard', 'Raises DEF by 50% for two turns. It restores no mana, and it is not a wasted turn as often as it looks.'],
+      ['Guard', 'Cuts everything landing on this hero by 45% for two turns. It restores no mana. Against a telegraphed attack it is usually the best turn available.'],
       ['Item', 'Drink a potion. Uses the whole turn, whoever it is aimed at.'],
     ]));
     box.appendChild(sub('Damage'));
@@ -184,6 +184,7 @@
       Math.round(DJ.AOE_FALLOFF.floor * 100) + '%. Against two it deals ' + Math.round(DJ.aoeShare(2) * 100) +
       '% to each, against three ' + Math.round(DJ.aoeShare(3) * 100) + '%, against four ' + Math.round(DJ.aoeShare(4) * 100) +
       '%. Sweeps are still the right answer to a crowd, but they are no longer the right answer to everything.'));
+    box.appendChild(note('A monster releasing a wind-up is the exception: it announced itself a full turn earlier, so it hits every hero for its full power and it never crits. What you do with that turn is the whole decision.'));
     box.appendChild(sub('Critical hits'));
     box.appendChild(p('Every attack starts at a 5% chance to crit and gains half a percent for each point of SPD it has over its target, up to a ceiling of 75%. Some abilities add their own chance on top. A crit deals 75% more damage.'));
     box.appendChild(sub('Resistance'));
@@ -270,6 +271,7 @@
     box.appendChild(bullets([
       'Every stat rises by that adventurer’s own per-level growth, shown on their card.',
       'A quarter of maximum health and just under a third of maximum mana are restored on the spot.',
+      'Mana pools grow slowly on purpose. An ability that cost half a bar at level 1 still costs a real share of one at level 20, so the expensive option stays a decision rather than becoming the default.',
       'Two abilities are known from the start. The third arrives at level ' +
         DJ.SKILL_UNLOCK_LEVELS[2] + ' and the fourth at level ' + DJ.SKILL_UNLOCK_LEVELS[3] + '.',
     ]));

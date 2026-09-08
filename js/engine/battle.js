@@ -10,9 +10,14 @@
   const DJ = (root.DJ = root.DJ || {});
 
   const STATUS_MULT = {
-    rage: { atk: 1.4 }, weak: { atk: 0.7, mag: 0.7 }, guard: { def: 1.5 }, haste: { spd: 1.5 }, slow: { spd: 0.65 },
+    rage: { atk: 1.4 }, weak: { atk: 0.7, mag: 0.7 }, haste: { spd: 1.5 }, slow: { spd: 0.65 },
     chill: { spd: 0.75 },
   };
+
+  // Guard is a flat reduction rather than a DEF multiplier. As a multiplier it was worth
+  // about 14% off a hit, because DEF is already divided into the damage and more of it
+  // buys less and less; a whole turn has to buy more than that or bracing is never right.
+  DJ.GUARD_CUT = 0.45;
 
   // How the effects that are not simple stat multipliers are sized. Kept in one place so
   // the Help page and the status tooltips quote the same numbers the engine uses.
@@ -57,7 +62,7 @@
     // and made the game about six points easier. A little more of both keeps fights the
     // same length rather than only making them longer.
     hpMult:  { normal: 1.90, elite: 1.75, boss: 1.19, final: 1.03 },
-    dmgMult: { normal: 0.93, elite: 0.94, boss: 0.82, final: 0.80 },
+    dmgMult: { normal: 0.905, elite: 0.915, boss: 0.80, final: 0.78 },
     levelScale: 0.10,   // stat growth per level above the monster's tier base
     // Damage from everything in a region, by region index. Hero HP climbs much faster
     // than a tier-1 monster's attack does, so the opening region needs a thumb on the
@@ -145,9 +150,10 @@
     const ev = [{ type: 'roundStart', round: this.round }];
     for (const u of this.alive('hero')) {
       if (DJ.hasPassive(u, 'regen') && u.hp < u.maxHp) { const h = Math.max(1, Math.round(u.maxHp * 0.05)); u.hp = Math.min(u.maxHp, u.hp + h); ev.push({ type: 'heal', target: u, amount: h, fx: null, quiet: true }); }
-      // 8% a round returned most of a mana bar over a long fight, on top of everything
-      // else. It is a trickle now, which is what a passive should be.
-      if (DJ.hasPassive(u, 'mpregen') && u.mp < u.maxMp) { const m = Math.max(1, Math.round(u.maxMp * 0.045)); u.mp = Math.min(u.maxMp, u.mp + m); ev.push({ type: 'mp', unit: u, amount: m, quiet: true }); }
+      // Measured over a run: at 4.5% a round this was still handing back 38% of a mana
+      // bar during an average fight, which is more than most casters spend in one. A
+      // trinket should shade a decision, not remove it.
+      if (DJ.hasPassive(u, 'mpregen') && u.mp < u.maxMp) { const m = Math.max(1, Math.round(u.maxMp * 0.032)); u.mp = Math.min(u.maxMp, u.mp + m); ev.push({ type: 'mp', unit: u, amount: m, quiet: true }); }
     }
     return ev;
   };
@@ -276,7 +282,7 @@
   P.critChance = function (src, tgt, skill) {
     // The payload of a wind-up never crits. The party spent a turn preparing for a known
     // quantity, and a coin flip on top of that would make the warning worthless.
-    if (skill && skill.noCrit) return 0;
+    if (skill && skill.telegraphed) return 0;
     let c = 0.05 + Math.max(0, DJ.effStat(src, 'spd') - DJ.effStat(tgt, 'spd')) * 0.005;
     if (skill && skill.crit) c += skill.crit;
     if (DJ.hasPassive(src, 'crit')) c += 0.10;
@@ -301,6 +307,8 @@
     // A shocked target is wide open. Everything lands harder while the charge holds,
     // which is what makes spending a turn shocking something worth doing.
     if (DJ.hasStatus(tgt, 'shock')) base *= DJ.STATUS_TUNE.shockAmp;
+    // And a braced one is behind its shield.
+    if (DJ.hasStatus(tgt, 'guard')) base *= 1 - DJ.GUARD_CUT;
     // The shield takes as much of the hit as it still can hold. A hit it swallows whole
     // deals nothing at all, which is the only way armour and wards can win a fight
     // untouched; a percentage reduction never could, however large.
@@ -457,8 +465,11 @@
   P.applySkill = function (u, sk, targets) {
     const ev = [];
     const hits = sk.hits || 1;
-    // A sweeping ability is worth less to each target the more of them there are.
-    const share = sk.target === 'enemies' ? DJ.aoeShare(targets.filter((t) => t.alive).length) : 1;
+    // A sweeping ability is worth less to each target the more of them there are - unless
+    // it was announced a turn in advance, in which case hitting the whole party for full
+    // is the entire point of having been warned.
+    const share = (sk.target === 'enemies' && !sk.telegraphed)
+      ? DJ.aoeShare(targets.filter((t) => t.alive).length) : 1;
     if (sk.kind === 'phys' || sk.kind === 'mag') {
       for (let h = 0; h < hits; h++) for (const t of targets) if (t.alive) this.dealDamage(u, t, sk, sk.kind, ev, share);
     } else if (sk.kind === 'drain') {
@@ -594,7 +605,9 @@
     const cutWindup = this.round <= 1 || u.hp / u.maxHp < 0.12;
     const pool = cutWindup ? usable.filter((s) => s.kind !== 'charge') : usable;
     if (!pool.length || rng.chance(attackW)) return { type: 'attack', target: pickTarget() };
-    const sk = rng.pick(pool);
+    // A wind-up is the most interesting thing a monster can do, so it is picked more
+    // often than the rest of the kit rather than taking an even share of it.
+    const sk = rng.weighted(pool.map((s) => ({ v: s, w: s.kind === 'charge' ? 1.3 : 1 })));
     let target = null;
     if (sk.target === 'enemy') {
       if (sk.kind === 'debuff') { const c = heroes.filter((h) => !DJ.hasStatus(h, sk.status.id)); target = c.length ? rng.pick(c) : pickTarget(); }
@@ -649,8 +662,15 @@
     // only thing in front of you returns half of every blow. Guarding answers both.
     const charging = foes.some((f) => DJ.hasStatus(f, 'charge'));
     const bristling = foes.length && foes.every((f) => DJ.hasStatus(f, 'thorns'));
-    if ((charging || bristling) && !DJ.hasStatus(u, 'guard') &&
-        u.hp / u.maxHp < (charging ? 0.8 : 0.55) && rng.chance(charging ? 0.55 : 0.45)) {
+    if (charging && !DJ.hasStatus(u, 'guard')) {
+      // Brace because of what is coming, not because of what has already landed. Whoever
+      // is taunting will be hit, and anyone who could not take it standing up should not
+      // try to. The rest hedge.
+      const drawing = DJ.hasStatus(u, 'taunt');
+      const fragile = u.hp / u.maxHp < 0.75;
+      if (drawing || fragile || rng.chance(0.3)) return { type: 'defend' };
+    }
+    if (bristling && !DJ.hasStatus(u, 'guard') && u.hp / u.maxHp < 0.55 && rng.chance(0.45)) {
       return { type: 'defend' };
     }
     // Mana abilities are worth a turn once the casters start running dry.

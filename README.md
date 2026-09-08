@@ -64,10 +64,24 @@ top. A hero who levels at low health comes out better off, but not full.
 
 **Attrition is the run.** A battle hands back only a small share of health and mana
 afterwards, so both drain across an expedition rather than resetting between fights. That
-makes campfires, potions and the merchant into real decisions, and it is what stops the
-most expensive ability in a kit being the correct answer to every encounter. An ability
-that sweeps the whole enemy line also loses power for each target beyond the first, so
-clearing a crowd is what sweeps are for rather than what they are always for.
+makes campfires, potions and the merchant into real decisions. An ability that sweeps the
+whole enemy line loses power for each target beyond the first, so clearing a crowd is what
+sweeps are for rather than what they are always for.
+
+**The expensive ability stays expensive.** Mana pools nearly triple across a run while
+ability costs are fixed, so a capstone that cost half a bar at level 1 was costing a fifth
+of one by the end and there was no longer any reason not to open every fight with it. The
+two abilities a hero starts with are cheap and stay cheap; the two that unlock at levels 5
+and 10 are priced against a full bar, so the big one is worth two or three casts a fight
+and the other turns have to be filled with something else.
+
+**Guard is a real stance.** It used to raise DEF by half, which — because DEF is already
+divided into the damage — took about 14% off a hit in exchange for a whole turn. Nobody
+ever guarded, and teaching the simulated player to brace against wind-ups made it lose
+*more* runs, which is the measurement saying the trade was bad rather than the players
+being wrong. Guard now cuts everything landing on that hero by 45%. A monster releasing a
+wind-up hits the whole party for full power and never crits, so bracing against one is
+usually the best turn on the board.
 
 A full run takes roughly an hour depending on your party. Progress saves to `localStorage`
 automatically, and you can leave and resume mid-expedition, including partway through a
@@ -160,17 +174,42 @@ Current tuning, measured over 400 simulated runs across 80 random party composit
 
 | Metric | Value |
 |---|---|
-| Win rate | 32.0% |
-| Average playtime | 51m51s |
-| Winning-run playtime | 64m20s |
-| Battles per run | 21.5 |
-| Nodes per run | 30.6 |
+| Win rate | 13.0% |
+| Average playtime | 49m33s |
+| Winning-run playtime | 74m40s |
+| Battles per run | 19.2 |
+| Nodes per run | 27.5 |
 
-Read that figure as a floor rather than a forecast. The simulated player fights competently
-but plans a route, shops and rests far worse than a person does, and since difficulty now
-comes mostly from attrition rather than from any single fight, that gap costs the simulator
-much more than it costs a player. Treat the number as a relative measure between two builds
-of the game, not as the odds a human faces.
+Read that figure as a floor rather than a forecast, and only as a relative measure between
+two builds. The gap between it and a person is large and has been measured directly: four
+separate attempts to make the simulated player behave more like one — drinking potions
+sooner, topping the party up between fights, spending its gold, reviving the fallen — each
+made its win rate *worse*, not better. Its losses are not caused by thrift. It loses
+because it reacts to the board it is looking at, and a person plays the board that is one
+turn away.
+
+```bash
+node tools/diag.js 40 4
+node tools/parties.js 20 5
+```
+
+`sweep.js` answers "did the run survive". `diag.js` answers "what was the party doing":
+what share of turns went on attacking rather than casting, how full the mana bars were
+when fights ended, how many potions were carried to the grave, how hard the incoming hits
+were as a share of the target's health, and what the party had left on the turn it lost.
+It drives `sim.js` unchanged and watches from outside by wrapping a few engine methods, so
+the player it describes is exactly the one `sweep.js` scores.
+
+That tool is how this pass was done. It found that the average ability cost 14.5% of the
+caster's bar, that the party ended fights on 85% health, that Guard was chosen on 1.4% of
+turns, and that losing runs finished with 866 gold and eleven potions unspent — which
+turned out to mean potions were not worth their turn rather than that the player was being
+timid.
+
+`parties.js` splits the same game by composition — balanced, sustain-heavy, random, and
+all-damage — because `sweep.js` averages over trios no player would ever pick. It exists
+to check how much the headline number understates a deliberate party. Currently: not much,
+which is itself worth knowing.
 
 ### Balance harnesses
 
