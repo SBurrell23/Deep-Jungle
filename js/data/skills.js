@@ -335,7 +335,7 @@
     guard:  { name: 'Guard',  icon: 'status_guard',  color: '#7fc8ff', bad: false, desc: 'DEF increased 50%.' },
     haste:  { name: 'Haste',  icon: 'status_haste',  color: '#ffd27f', bad: false, desc: 'SPD increased 50%.' },
     regen:  { name: 'Regen',  icon: 'status_regen',  color: '#8cff9c', bad: false, desc: 'Heals each turn.' },
-    shield: { name: 'Shield', icon: 'status_shield', color: '#7fe0ff', bad: false, desc: 'Absorbs a portion of damage.' },
+    shield: { name: 'Shield', icon: 'status_shield', color: '#7fe0ff', bad: false, desc: 'Soaks damage outright until it is used up. A hit it swallows whole does nothing.' },
     rage:   { name: 'Rage',   icon: 'status_rage',   color: '#ff6b6b', bad: false, desc: 'ATK increased 40%.' },
     taunt:  { name: 'Taunt',  icon: 'status_taunt',  color: '#ff8a5c', bad: false, desc: 'Enemies attack this hero.' },
   };

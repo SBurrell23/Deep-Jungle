@@ -471,10 +471,16 @@
         e.target.flashT = 1;
         e.target.flashColor = e.crit ? '#fff2a0' : '#ffffff';
         if (DJ.profile.settings.damageNumbers) {
-          fx.spawnText((e.crit ? 'CRIT ' : '') + e.dmg, c.x, c.y - 6, {
-            color: e.crit ? '#ffd75e' : (e.target.side === 'hero' ? '#ff8b8b' : '#ffffff'),
-            size: e.crit ? 24 : 18, shake: e.crit,
-          });
+          // A shield that swallowed the whole hit deals nothing at all. A red zero reads
+          // like a bug, so it is named for what happened.
+          if (!e.dmg && e.absorbed) {
+            fx.spawnText('ABSORBED', c.x, c.y - 6, { color: '#7fe0ff', size: 15 });
+          } else {
+            fx.spawnText((e.crit ? 'CRIT ' : '') + e.dmg, c.x, c.y - 6, {
+              color: e.crit ? '#ffd75e' : (e.target.side === 'hero' ? '#ff8b8b' : '#ffffff'),
+              size: e.crit ? 24 : 18, shake: e.crit,
+            });
+          }
         }
         fx.spawnParticles(c.x, c.y, { count: e.crit ? 14 : 8, color: e.target.side === 'hero' ? '#e05252' : '#ffd27f', speed: e.crit ? 130 : 90 });
         if (e.crit) { DJ.sfx('crit'); shake = 12; UI.flash(); }

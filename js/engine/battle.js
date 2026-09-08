@@ -261,10 +261,17 @@
     // level pressure: heroes vs. higher-level enemies take a bit more
     let crit = false;
     if (this.rng.chance(this.critChance(src, tgt, skill))) { crit = true; base *= 1.75; }
+    // The shield takes as much of the hit as it still can hold. A hit it swallows whole
+    // deals nothing at all, which is the only way armour and wards can win a fight
+    // untouched; a percentage reduction never could, however large.
     const sh = DJ.getStatus(tgt, 'shield');
     let absorbed = 0;
-    if (sh) { absorbed = Math.round(base * (sh.val || 0.3)); base -= absorbed; }
-    return { dmg: Math.max(1, Math.round(base)), crit, absorbed };
+    if (sh && (sh.pool || 0) > 0) {
+      absorbed = Math.min(sh.pool, base);
+      base -= absorbed;
+    }
+    const dmg = base <= 0.5 ? 0 : Math.max(1, Math.round(base));
+    return { dmg, crit, absorbed, shield: sh };
   };
 
   P.applyStatus = function (src, tgt, st, ev) {
@@ -280,8 +287,18 @@
     let turns = st.turns || 2;
     if (def && def.bad && (tgt.kind === 'boss' || tgt.kind === 'final') && st.id === 'stun') turns = 1;
     const ex = DJ.getStatus(tgt, st.id);
-    if (ex) { ex.turns = Math.max(ex.turns, turns); if (st.val) ex.val = Math.max(ex.val || 0, st.val); }
-    else tgt.statuses.push({ id: st.id, turns, val: st.val });
+    // A shield carries a pool of damage it can swallow, sized from the wearer's health
+    // and the strength of the effect. It ends when the pool runs dry or the turns do.
+    const pool = st.id === 'shield' ? Math.round(tgt.maxHp * (st.val || 0.3)) : 0;
+    if (ex) {
+      ex.turns = Math.max(ex.turns, turns);
+      if (st.val) ex.val = Math.max(ex.val || 0, st.val);
+      if (pool) ex.pool = Math.max(ex.pool || 0, pool);
+    } else {
+      const add = { id: st.id, turns, val: st.val };
+      if (pool) add.pool = pool;
+      tgt.statuses.push(add);
+    }
     if (def && def.bad && src.side === 'hero') this.stats.statuses++;
     ev.push({ type: 'status', target: tgt, status: st.id, applied: true, turns });
   };
@@ -290,9 +307,17 @@
     // miss check (blind)
     if (DJ.hasStatus(src, 'blind') && this.rng.chance(0.4)) { ev.push({ type: 'hit', source: src, target: tgt, miss: true, fx: skill ? skill.fx : 'hit' }); return 0; }
     const r = this.computeDamage(src, tgt, skill, kind);
+    if (r.absorbed > 0 && r.shield) {
+      r.shield.pool = Math.max(0, Math.round(r.shield.pool - r.absorbed));
+      if (r.shield.pool <= 0) {
+        const i = tgt.statuses.indexOf(r.shield);
+        if (i >= 0) tgt.statuses.splice(i, 1);
+        ev.push({ type: 'status', target: tgt, status: 'shield', applied: false, spent: true });
+      }
+    }
     tgt.hp = Math.max(0, tgt.hp - r.dmg);
     if (src.side === 'hero') { this.stats.damageDealt += r.dmg; if (r.crit) this.stats.crits++; if (r.dmg > this.stats.maxHit) this.stats.maxHit = r.dmg; }
-    else this.stats.damageTaken += r.dmg;
+    else this.stats.damageTaken += r.dmg;   // zero when the shield swallowed the hit whole
     ev.push({ type: 'hit', source: src, target: tgt, dmg: r.dmg, crit: r.crit, absorbed: r.absorbed, kind, fx: skill ? skill.fx : (kind === 'mag' ? 'arcane' : 'hit'), sfx: skill ? skill.sfx : 'hit' });
     // thorns reflect
     if (DJ.hasPassive(tgt, 'thorns') && tgt.alive && src.alive) {
