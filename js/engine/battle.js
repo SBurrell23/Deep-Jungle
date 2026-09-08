@@ -342,8 +342,9 @@
       if (tgt) this.dealDamage(u, tgt, null, 'phys', ev);
     } else if (action.type === 'defend') {
       ev.push({ type: 'action', unit: u, name: 'Defend', skill: null, targets: [u] });
+      // Guard is a defensive choice, nothing more. It used to hand back MP, which made
+      // spamming it at the end of a won fight the cheapest way to refill the party.
       this.applyStatus(u, u, { id: 'guard', turns: 2, chance: 1 }, ev);
-      const m = Math.max(2, Math.round(u.maxMp * 0.12)); if (u.maxMp) { u.mp = Math.min(u.maxMp, u.mp + m); ev.push({ type: 'mp', unit: u, amount: m }); }
       this.stats.defends++;
     } else if (action.type === 'skill') {
       const sk = DJ.SKILLS[action.skillId];

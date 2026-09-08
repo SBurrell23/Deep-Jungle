@@ -88,6 +88,14 @@
     UI.$('#compCount').textContent = `${Object.keys(comp).length} / ${DJ.MONSTERS.length}`;
   };
 
+  // Open one monster's entry from anywhere, so the battle screen can show it mid-fight.
+  C.inspect = function (monsterId) {
+    const m = DJ.MONSTER_BY_ID[monsterId];
+    if (!m) return false;
+    detail(m, DJ.profile.compendium[monsterId] || { seen: 0, killed: 0 });
+    return true;
+  };
+
   function detail(m, entry) {
     UI.openOverlay((panel, close) => {
       UI.overlayHeader(panel, m.name, close);

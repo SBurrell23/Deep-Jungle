@@ -216,7 +216,11 @@
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
   };
-  DJ.bar = function (ctx, x, y, w, h, pct, color, bg, border) {
+  // opts.max, when given, draws a dark tick every 25 points of that scale, so a bar can
+  // be read as a count of segments rather than a vague fraction. A 900-HP boss would put
+  // 36 ticks into 60 pixels, so the step doubles up through 50, 100, 250 and 500 until the
+  // gaps are at least four pixels wide: you still count segments, they are just worth more.
+  DJ.bar = function (ctx, x, y, w, h, pct, color, bg, border, opts) {
     ctx.save();
     ctx.fillStyle = bg || 'rgba(0,0,0,0.55)';
     ctx.fillRect(x, y, w, h);
@@ -226,6 +230,16 @@
       ctx.fillRect(x, y, fw, h);
       ctx.fillStyle = 'rgba(255,255,255,0.22)';
       ctx.fillRect(x, y, fw, Math.max(1, Math.floor(h / 3)));
+    }
+    const max = opts && opts.max;
+    if (max > 0 && w > 12) {
+      let step = 25;
+      for (const s of [25, 50, 100, 250, 500, 1000]) { step = s; if ((w / (max / s)) >= 6) break; }
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      for (let v = step; v < max; v += step) {
+        const tx = Math.round(x + w * (v / max));
+        ctx.fillRect(tx, y + 1, 1, h - 2);
+      }
     }
     ctx.strokeStyle = border || 'rgba(0,0,0,0.85)';
     ctx.lineWidth = 1;

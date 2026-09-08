@@ -85,7 +85,7 @@
   // -- Dryad Healer --
   def('mend',         { name: 'Mend', kind: 'heal', target: 'ally', power: 1.75, mp: 7, fx: 'heal', sfx: 'heal', desc: 'Heal one ally.' });
   def('thorn_bolt',   { name: 'Thorn Bolt', kind: 'mag', target: 'enemy', power: 1.4, mp: 4, fx: 'thorns', sfx: 'magic', desc: 'Launch a barbed thorn.' });
-  def('blooming',     { name: 'Blooming Grove', kind: 'heal', target: 'allies', power: 1.08, mp: 18, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
+  def('blooming',     { name: 'Blooming Grove', kind: 'heal', target: 'allies', power: 0.76, mp: 18, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
   def('rebirth',      { name: 'Rebirth', kind: 'revive', target: 'deadAlly', power: 0.5, mp: 18, fx: 'holy_heal', sfx: 'revive', desc: 'Revive a fallen ally at 50% HP.' });
   // -- Lizardfolk Berserker --
   def('rend',         { name: 'Rend', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, status: { id: 'bleed', turns: 3, chance: 0.7 }, fx: 'claw', sfx: 'slash', desc: 'Savage cut that bleeds.' });
@@ -124,7 +124,7 @@
   def('piercing_light', { name: 'Piercing Light', kind: 'phys', target: 'enemy', power: 3.0, mp: 16, fx: 'holy', sfx: 'arrow', desc: 'A radiant arrow of enormous power.' });
   // -- Sporeling Druid --
   def('spore_puff',   { name: 'Spore Puff', kind: 'mag', target: 'enemy', power: 1.18, mp: 5, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison', sfx: 'poison', desc: 'Poisonous spores.' });
-  def('mycelium',     { name: 'Mycelium Mend', kind: 'heal', target: 'allies', power: 0.85, mp: 17, fx: 'heal', sfx: 'heal', desc: 'Heal the whole party.' });
+  def('mycelium',     { name: 'Mycelium Mend', kind: 'heal', target: 'allies', power: 0.6, mp: 17, fx: 'heal', sfx: 'heal', desc: 'Heal the whole party.' });
   def('toxic_bloom',  { name: 'Toxic Bloom', kind: 'mag', target: 'enemies', power: 0.92, mp: 17, status: { id: 'poison', turns: 3, chance: 0.9 }, fx: 'poison_cloud', sfx: 'poison', desc: 'Poison cloud on all enemies.' });
   def('fungal_rebirth', { name: 'Fungal Rebirth', kind: 'revive', target: 'deadAlly', power: 0.35, mp: 19, self: { id: 'regen', turns: 2, chance: 1 }, fx: 'nature', sfx: 'revive', desc: 'Revive an ally at 40% HP.' });
   // -- Tiger Shaman --
@@ -156,7 +156,7 @@
   def('gourd_smash',  { name: 'Gourd Smash', kind: 'phys', target: 'enemy', power: 1.6, mp: 4, fx: 'hit_big', sfx: 'hit', desc: 'Bonk with the gourd.' });
   def('healing_brew', { name: 'Healing Brew', kind: 'heal', target: 'ally', power: 1.8, mp: 6, status: { id: 'regen', turns: 2, chance: 1 }, fx: 'heal', sfx: 'potion', desc: 'Heal an ally and grant Regen.' });
   def('fire_brew',    { name: 'Fire Brew', kind: 'mag', target: 'enemies', power: 1.4, mp: 10, status: { id: 'burn', turns: 2, chance: 0.6 }, fx: 'flame', sfx: 'fire', desc: 'Spit flaming brew at all foes.' });
-  def('master_brew',  { name: 'Master Brew', kind: 'heal', target: 'allies', power: 1.32, mp: 19, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'buff', sfx: 'potion', desc: 'Heal party and grant Rage.' });
+  def('master_brew',  { name: 'Master Brew', kind: 'heal', target: 'allies', power: 0.92, mp: 19, status: { id: 'rage', turns: 2, chance: 1 }, fx: 'buff', sfx: 'potion', desc: 'Heal party and grant Rage.' });
   // -- Gorilla Stormcaller --
   def('thunder_fist', { name: 'Thunder Fist', kind: 'phys', target: 'enemy', power: 1.88, mp: 5, status: { id: 'stun', turns: 1, chance: 0.4 }, fx: 'thunder', sfx: 'thunder', desc: 'Electrified punch.' });
   def('chain_lightning', { name: 'Chain Lightning', kind: 'mag', target: 'enemies', power: 1.5, mp: 10, fx: 'lightning', sfx: 'thunder', desc: 'Lightning arcs to all enemies.' });
@@ -169,7 +169,7 @@
   def('thousand_cuts', { name: 'Thousand Cuts', kind: 'phys', target: 'enemy', power: 0.8, hits: 6, mp: 16, crit: 0.15, fx: 'slash_big', sfx: 'slash', desc: 'Six slashes.' });
   // -- Treant Sage --
   def('root_grasp',   { name: 'Root Grasp', kind: 'mag', target: 'enemy', power: 1.4, mp: 4, status: { id: 'slow', turns: 2, chance: 0.7 }, fx: 'vine', sfx: 'magic', desc: 'Roots slow a target.' });
-  def('sap_surge',    { name: 'Sap Surge', kind: 'heal', target: 'allies', power: 0.98, mp: 15, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal + Regen for the party.' });
+  def('sap_surge',    { name: 'Sap Surge', kind: 'heal', target: 'allies', power: 0.69, mp: 15, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'nature', sfx: 'heal', desc: 'Heal + Regen for the party.' });
   def('ancient_word', { name: 'Ancient Word', kind: 'mag', target: 'enemies', power: 1.32, mp: 13, fx: 'holy', sfx: 'magic', desc: 'Words of power strike all enemies.' });
   def('worldroot',    { name: 'Worldroot', kind: 'mag', target: 'enemies', power: 1.8, mp: 22, status: { id: 'stun', turns: 1, chance: 0.4 }, fx: 'vine', sfx: 'explosion', desc: 'The roots of the world erupt.' });
   // -- Jaguar Paladin --
@@ -182,7 +182,7 @@
   def('beak_jab',     { name: 'Beak Jab', kind: 'phys', target: 'enemy', power: 1.55, mp: 4, fx: 'pierce', sfx: 'pierce', desc: 'A quick stab of that enormous beak.' });
   def('rally_song',   { name: 'Rally Song', kind: 'buff', target: 'allies', mp: 6, status: { id: 'haste', turns: 3, chance: 1 }, self: { id: 'rage', turns: 3, chance: 1 }, fx: 'song', sfx: 'buff', desc: 'The party gains Haste; you gain Rage.' });
   def('discord_cry',  { name: 'Discordant Cry', kind: 'debuff', target: 'enemies', mp: 10, status: { id: 'weak', turns: 3, chance: 0.8 }, fx: 'song', sfx: 'debuff', desc: 'An awful noise. All enemies are Weakened.' });
-  def('dawn_anthem',  { name: 'Anthem of Dawn', kind: 'heal', target: 'allies', power: 1.32, mp: 17, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
+  def('dawn_anthem',  { name: 'Anthem of Dawn', kind: 'heal', target: 'allies', power: 0.92, mp: 17, status: { id: 'regen', turns: 3, chance: 1 }, fx: 'holy_heal', sfx: 'heal', desc: 'Heal the party and grant Regen.' });
 
   // -- Scarab Alchemist --
   def('acid_flask',   { name: 'Acid Flask', kind: 'mag', target: 'enemy', power: 1.7, mp: 5, status: { id: 'weak', turns: 3, chance: 0.6 }, fx: 'poison', sfx: 'poison', desc: 'Corrosive glass. Eats armour as well as flesh.' });

@@ -273,9 +273,32 @@
     if (!dead) drawUnitBars(s, u, sw, sh, s.labelRow || 0);
   }
 
+  // Lowest y a health bar may occupy, just under the turn order strip. Measured once a
+  // frame, since the strip's height changes with the number of combatants.
+  let floorCache = { at: 0, v: 0 };
+  function barFloor() {
+    const now = performance.now();
+    if (now - floorCache.at < 100) return floorCache.v;
+    let v = 0;
+    const el = document.querySelector('.turn-order');
+    if (el && canvas) {
+      const c = canvas.getBoundingClientRect(), r = el.getBoundingClientRect();
+      if (r.height) v = Math.max(0, r.bottom - c.top + 5);
+    }
+    floorCache = { at: now, v };
+    return v;
+  }
+
   function drawUnitBars(s, u, sw, sh, idx) {
-    const top = s.y - sh - 20 - (idx % 3) * 15;
-    const bw = u.side === 'hero' ? Math.min(Math.max(40, sw * 0.8), 54) : Math.max(46, sw * 0.9);
+    // There is room above the battlefield, so the bars take it: wide enough that the
+    // segment ticks are countable and tall enough to read at a glance.
+    // The turn order strip sits over the top of the canvas. On a short window a tall
+    // sprite's bars would slide underneath it, so they are pushed back down below it
+    // instead, keeping the row stagger so neighbouring bars still read apart.
+    const floor = barFloor();
+    let top = s.y - sh - 21 - (idx % 3) * 18;
+    if (top < floor) top = floor + (idx % 3) * 18;
+    const bw = u.side === 'hero' ? Math.min(Math.max(56, sw * 1.05), 84) : Math.max(66, sw * 1.15);
     const x = s.x - bw / 2;
     if (u.side === 'enemy') {
       ctx.save();
@@ -288,11 +311,12 @@
       ctx.restore();
     }
 
-    DJ.bar(ctx, x, top, bw, 5, u.hp / u.maxHp, u.side === 'hero' ? '#4fbf5a' : '#c9483f');
-    let barBottom = top + 5;
-    if (u.side === 'hero' && u.maxMp > 0) {
-      DJ.bar(ctx, x, top + 6, bw, 4, u.mp / u.maxMp, '#4f9fe0');
-      barBottom = top + 10;
+    DJ.bar(ctx, x, top, bw, 9, u.hp / u.maxHp, u.side === 'hero' ? '#4fbf5a' : '#c9483f',
+      null, null, { max: u.maxHp });
+    let barBottom = top + 9;
+    if (u.maxMp > 0) {
+      DJ.bar(ctx, x, top + 10, bw, 6, u.mp / u.maxMp, '#4f9fe0', null, null, { max: u.maxMp });
+      barBottom = top + 16;
     }
 
     // statuses
@@ -541,7 +565,13 @@
 
       if (!pendingAction || !pendingAction.targets) {
         if (hoverTarget) hoverTarget = null;
-        canvas.classList.remove('can-target');
+        // Not choosing a target, so an enemy under the cursor is something to read about
+        // rather than something to hit.
+        const insp = !hit && hitTestAny(e);
+        canvas.classList.toggle('can-target', !!(insp && insp.side === 'enemy'));
+        if (insp && insp.side === 'enemy' && !hit) {
+          UI.showTip('<b>' + insp.name + '</b><span>Click to read its compendium entry.</span>', e.clientX, e.clientY);
+        }
         return;
       }
       hoverTarget = hitTest(e);
@@ -549,7 +579,15 @@
     });
     canvas.addEventListener('mouseleave', () => UI.hideTip());
     canvas.addEventListener('click', (e) => {
-      if (!pendingAction || !pendingAction.targets) return;
+      if (!pendingAction || !pendingAction.targets) {
+        const u = hitTestAny(e);
+        if (u && u.side === 'enemy' && UI.Compendium && UI.Compendium.inspect) {
+          UI.hideTip();
+          DJ.sfx('page');
+          UI.Compendium.inspect(u.id);
+        }
+        return;
+      }
       const u = hitTest(e);
       if (u) chooseTarget(u);
       else DJ.sfx('error');
@@ -580,6 +618,24 @@
       if (u) chooseTarget(u);
     });
   };
+
+  // Any living unit under the cursor, ignoring whether it is a legal target. Used for
+  // inspection, which is available whenever you are not in the middle of choosing one.
+  function hitTestAny(e) {
+    const r = canvas.getBoundingClientRect();
+    const px = e.clientX - r.left, py = e.clientY - r.top;
+    let best = null, bestD = 1e9;
+    for (const s of slots.heroes.concat(slots.enemies)) {
+      if (!s.u.alive) continue;
+      const spr = DJ.SPRITES[s.u.sprite];
+      const sw = (spr ? spr.w : 32) * s.scale, sh = (spr ? spr.h : 32) * s.scale;
+      if (px >= s.x - sw / 2 - 6 && px <= s.x + sw / 2 + 6 && py >= s.y - sh - 10 && py <= s.y + 10) {
+        const d = Math.abs(px - s.x);
+        if (d < bestD) { bestD = d; best = s.u; }
+      }
+    }
+    return best;
+  }
 
   function hitTest(e) {
     const r = canvas.getBoundingClientRect();
@@ -663,7 +719,7 @@
     rail.appendChild(bindKey('w', utilBtn('act-item', 'potion_red', 'Items',
       potCount ? potCount + (potCount > 1 ? ' kinds' : ' kind') : 'empty', !potCount, openItemMenu,
       'Open your potions and use one on the party.')));
-    rail.appendChild(bindKey('e', utilBtn('act-defend', 'status_guard', 'Guard', 'Raise DEF, Regain MP', false,
+    rail.appendChild(bindKey('e', utilBtn('act-defend', 'status_guard', 'Guard', 'Raise DEF', false,
       () => submit({ type: 'defend' }),
       'Guard: raises this hero\u2019s DEF by 50% for 2 turns and restores a little MP.')));
     menu.appendChild(rail);

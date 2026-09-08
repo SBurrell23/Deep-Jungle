@@ -276,14 +276,21 @@
             for (const h of run.party) gains.push(...DJ.grantXp(h, Math.round(24 + node.level * 11)));
             showTrainResult(gains);
           } },
-        { label: 'Forage', desc: 'Search the clearing for potions and a little gold.', sfx: 'open',
+        // Foraging used to offer another potion, which nobody wants by the time they
+        // reach a campfire. A guaranteed piece of gear makes it a real alternative to
+        // resting, and the gold keeps pace with what the shelf now costs.
+        { label: 'Forage', desc: 'Search the clearing. A potion, a piece of gear, and gold.', sfx: 'open',
           fn: () => {
-            const loot = { gold: 12 + node.level * 4, potions: [DJ.rollPotion(run.rng, run)] };
-            if (run.rng.chance(0.4)) loot.potions.push(DJ.rollPotion(run.rng, run));
+            const loot = {
+              gold: 20 + node.level * 8,
+              potions: [DJ.rollPotion(run.rng, run)],
+              items: [DJ.rollItem(run.rng, node.level, 1)],
+            };
             run.applyLoot(loot);
             DJ.bump('goldEarned', loot.gold);
+            for (const it of loot.items) { DJ.bump('itemsFound'); if (it.rarity === 'epic') DJ.bump('epicsFound'); }
             run.restHeal(0.25);
-            showLoot('Foraged', loot);
+            showLoot('Foraged', loot, true);
           } },
       ]);
   }
