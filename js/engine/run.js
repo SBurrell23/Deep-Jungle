@@ -163,11 +163,12 @@
   };
 
   // The guaranteed camp before the Heart hands out emergency supplies, so a party with
-  // no healer or revive skill can still contest the finale.
+  // no healer or revive skill can still contest the finale. An Elixir every time: strong,
+  // but it only undoes damage. A free Phoenix Down used to undo the whole fight, which
+  // took most of the tension out of the finale.
   R.finalCampSupplies = function () {
     const given = [];
-    if ((this.inventory.phoenix || 0) < 1) { this.addPotion('phoenix', 1); given.push('phoenix'); }
-    if ((this.inventory.elixir || 0) < 1) { this.addPotion('elixir', 1); given.push('elixir'); }
+    this.addPotion('elixir', 1); given.push('elixir');
     for (let i = (this.inventory.red || 0); i < 3; i++) { this.addPotion('red', 1); given.push('red'); }
     for (let i = (this.inventory.yellow || 0); i < 2; i++) { this.addPotion('yellow', 1); given.push('yellow'); }
     return given;
@@ -283,6 +284,9 @@
   R.battleDrops = function (node) {
     const rng = this.rng;
     const drops = { potions: [], items: [] };
+    // Nothing drops from the Heart. The run ends the moment it does, so a potion and a
+    // sword would go straight into the credits.
+    if (node.type === 'heart') return drops;
     const boss = node.type === 'boss' || node.type === 'heart';
     const elite = node.type === 'elite';
     // The Undergrowth now hits hard enough to cost real sustain, so it hands a little
