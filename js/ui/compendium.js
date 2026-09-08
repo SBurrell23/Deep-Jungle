@@ -286,6 +286,10 @@
         const a = DJ.unlockRequirement(h.id);
         card.appendChild(UI.el('div', 'rc-tag locked', a ? a.name : 'Locked'));
       }
+      if (unlocked) {
+        const badge = UI.heartWinBadge(h.id);
+        if (badge) card.appendChild(badge);
+      }
       const show = () => { rosterHover = h.id; renderPanel(); };
       card.addEventListener('mouseenter', show);
       card.addEventListener('focus', show);

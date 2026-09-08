@@ -292,6 +292,23 @@
     return wrap;
   };
 
+  // How many expeditions this adventurer has carried to the Heart. Counted when the
+  // Heart dies rather than when the run ends, so a party that went on into The Beyond
+  // and fell there still gets the credit.
+  DJ.heartWinsWith = (heroId) => ((DJ.profile.stats || {}).wonWith || {})[heroId] || 0;
+
+  // The gold tick that marks one. Returns null for an adventurer who has not done it,
+  // so callers can append the result without checking first.
+  UI.heartWinBadge = function (heroId) {
+    const n = DJ.heartWinsWith(heroId);
+    if (!n) return null;
+    const b = UI.el('div', 'won-badge', '\u2713');
+    UI.tip(b, '<b>Beat the Heart of the Jungle</b><span>' + (n === 1
+      ? 'You have finished an expedition with this adventurer.'
+      : 'You have finished ' + n + ' expeditions with this adventurer.') + '</span>');
+    return b;
+  };
+
   UI.goldTag = function (amount) {
     const w = UI.el('span', 'gold-tag');
     if (DJ.SPRITES.icon_gold) w.appendChild(UI.spriteEl('icon_gold', 1.1, 'gold'));

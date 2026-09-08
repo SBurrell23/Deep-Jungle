@@ -32,6 +32,8 @@
       card.appendChild(UI.spriteEl(h.id, 2.75, h.name));
       card.appendChild(UI.el('div', 'hero-name', h.name));
       card.appendChild(UI.el('div', 'hero-role', h.role));
+      const badge = UI.heartWinBadge(h.id);
+      if (badge) card.appendChild(badge);
       const idx = picked.indexOf(h.id);
       if (idx >= 0) card.appendChild(UI.el('div', 'pick-num', String(idx + 1)));
       const act = () => selectCard(h, true);
