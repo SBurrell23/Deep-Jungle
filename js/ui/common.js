@@ -32,10 +32,13 @@
     const sp = DJ.SPRITES[id];
     scale = scale || 2;
     if (sp) {
-      c.width = sp.w * scale; c.height = sp.h * scale;
+      // Take the rasterized size rather than recomputing it: sp.w * scale truncates on a
+      // fractional scale and can clip the last column off.
+      const src = DJ.spriteCanvas(id, scale);
+      c.width = src ? src.width : Math.round(sp.w * scale);
+      c.height = src ? src.height : Math.round(sp.h * scale);
       const x = c.getContext('2d');
       x.imageSmoothingEnabled = false;
-      const src = DJ.spriteCanvas(id, scale);
       if (src) x.drawImage(src, 0, 0);
     } else {
       c.width = 32 * scale; c.height = 32 * scale;
@@ -60,13 +63,13 @@
     const sp = DJ.SPRITES[id];
     const c = document.createElement('canvas');
     scale = scale || 2;
-    c.width = (sp ? sp.w : 32) * scale; c.height = (sp ? sp.h : 32) * scale;
+    const t = sp ? DJ.spriteTinted(id, scale, '#24402c', 1) : null;
+    c.width = t ? t.width : Math.round((sp ? sp.w : 32) * scale);
+    c.height = t ? t.height : Math.round((sp ? sp.h : 32) * scale);
     const x = c.getContext('2d');
     x.imageSmoothingEnabled = false;
-    if (sp) {
-      const t = DJ.spriteTinted(id, scale, '#24402c', 1);
-      if (t) x.drawImage(t, 0, 0);
-    } else { x.fillStyle = '#24402c'; x.fillRect(0, 0, c.width, c.height); }
+    if (t) x.drawImage(t, 0, 0);
+    else { x.fillStyle = '#24402c'; x.fillRect(0, 0, c.width, c.height); }
     c.style.width = c.width + 'px'; c.style.height = c.height + 'px';
     return c;
   };

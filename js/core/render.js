@@ -13,18 +13,28 @@
     const sp = DJ.SPRITES[id];
     if (!sp) return null;
     const c = document.createElement('canvas');
-    c.width = sp.w * scale; c.height = sp.h * scale;
+    // Every edge is snapped to a whole pixel, and each rect is measured from one snapped
+    // edge to the next rather than from a snapped origin plus a fractional size. That way
+    // row N's bottom and row N+1's top are the same integer and the two meet exactly.
+    // Filling at fractional coordinates instead leaves the canvas antialiasing the join,
+    // and a half-transparent row over a dark background reads as a black line through the
+    // sprite. Whole-number scales never showed it; the battle screen, which scales every
+    // unit slightly for depth, showed it on almost every row.
+    const at = (n) => Math.round(n * scale);
+    c.width = at(sp.w); c.height = at(sp.h);
     const x = c.getContext('2d');
     x.imageSmoothingEnabled = false;
     for (let y = 0; y < sp.h; y++) {
       const row = sp.px[y] || '';
+      const top = at(y), bottom = at(y + 1);
       let run = 0, runChar = null, runStart = 0;
       for (let px = 0; px <= sp.w; px++) {
         const ch = px < sp.w ? row[px] : null;
         if (ch === runChar) { run++; continue; }
         if (runChar && runChar !== '.' && sp.pal[runChar]) {
+          const left = at(runStart), right = at(runStart + run);
           x.fillStyle = sp.pal[runChar];
-          x.fillRect(runStart * scale, y * scale, run * scale, scale);
+          x.fillRect(left, top, right - left, bottom - top);
         }
         runChar = ch; run = 1; runStart = px;
       }
@@ -57,6 +67,10 @@
     const c = DJ.spriteCanvas(id, scale || 1);
     if (!c) return false;
     ctx.save();
+    // The battle and map canvases are scaled by the device pixel ratio, so on a 125% or
+    // 150% display every sprite would otherwise be resampled with bilinear smoothing and
+    // come out soft. Pixel art wants nearest-neighbour whatever the screen is doing.
+    ctx.imageSmoothingEnabled = false;
     if (opts.alpha != null) ctx.globalAlpha = opts.alpha;
     let dx = x, dy = y;
     if (opts.center) { dx = x - c.width / 2; dy = y - c.height; }  // anchored at feet
