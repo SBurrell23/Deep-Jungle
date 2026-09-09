@@ -275,7 +275,8 @@
     box.appendChild(sub('What a level gives'));
     box.appendChild(bullets([
       'Every stat rises by that adventurer’s own per-level growth, shown on their card.',
-      'A little over a tenth of maximum health and mana are restored on the spot. Levelling is relief, not a refill.',
+      Math.round((DJ.LEVEL_RESTORE || {}).hp * 100) + '% of maximum health and ' +
+        Math.round((DJ.LEVEL_RESTORE || {}).mp * 100) + '% of maximum mana are restored on the spot. Levelling is relief, not a refill.',
       'Mana pools grow slowly on purpose. An ability that cost half a bar at level 1 still costs a real share of one at level 20, so the expensive option stays a decision rather than becoming the default.',
       'Two abilities are known from the start. The third arrives at level ' +
         DJ.SKILL_UNLOCK_LEVELS[2] + ' and the fourth at level ' + DJ.SKILL_UNLOCK_LEVELS[3] + '.',

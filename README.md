@@ -59,8 +59,9 @@ numbers the engine uses, the XP curve, gear, potions, and a section on when atta
 wrong move. Everything it quotes is read from live data, so it cannot drift.
 
 Levelling restores rather than fully heals: the increase to max HP and MP is added straight
-to the current values, and then a further 12% of each is topped up on top. A hero who levels
-at low health comes out better off, but nowhere near full.
+to the current values, and then a further 12% of max HP and 23% of max MP is topped up on
+top. A hero who levels at low health comes out better off, but nowhere near full; a caster
+who levels while dry gets enough to cast again.
 
 **Attrition is the run.** A battle hands back only a small share of health and mana
 afterwards, so both drain across an expedition rather than resetting between fights. That

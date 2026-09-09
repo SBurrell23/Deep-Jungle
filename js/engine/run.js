@@ -3,6 +3,11 @@
   const DJ = (root.DJ = root.DJ || {});
 
   DJ.xpForLevel = (lvl) => Math.round(26 * Math.pow(lvl, 1.32));
+
+  // What a level hands back on the spot, over and above the rise in the maximums. Health
+  // stays mean because health attrition is the spine of a run; mana is looser, so a level
+  // is enough to get a caster back into the fight without refilling them.
+  DJ.LEVEL_RESTORE = { hp: 0.12, mp: 0.23 };
   DJ.MAX_LEVEL = 20;
 
   DJ.makeHeroUnit = function (heroId, level) {
@@ -57,8 +62,8 @@
       // A level-up is a moment of relief, not a refill. At a quarter of health and near a
       // third of mana it was undoing most of a hard fight on its own, which is a strange
       // thing for the reward of winning that fight to do.
-      u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.12));
-      u.mp = Math.min(u.maxMp, u.mp + Math.round(u.maxMp * 0.2));
+      u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * DJ.LEVEL_RESTORE.hp));
+      u.mp = Math.min(u.maxMp, u.mp + Math.round(u.maxMp * DJ.LEVEL_RESTORE.mp));
       u.xpNext = DJ.xpForLevel(u.level);
       const newSkill = DJ.SKILL_UNLOCK_LEVELS.map((l, i) => (l === u.level ? DJ.HERO_BY_ID[u.id].skills[i] : null)).filter(Boolean);
       gains.push({ unit: u, level: u.level, delta: { hp: u.maxHp - before.hp, mp: u.maxMp - before.mp, atk: u.base.atk - before.atk, mag: u.base.mag - before.mag, def: u.base.def - before.def, spd: u.base.spd - before.spd }, newSkills: newSkill });
